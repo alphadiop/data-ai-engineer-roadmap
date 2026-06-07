@@ -14,17 +14,22 @@
 - [ ] Streaming
 - [ ] Auto Loader
 - [ ] Jobs
+- [ ] orchestration Jobs
 
 ### Machine Learning
 - [ ] Classification
 - [ ] Régression
 - [ ] Clustering
+- [ ] Evaluation modèles
+- [ ] Scikit-learn
 - [ ] MLflow
 
 ### GenAI
 - [ ] Embeddings
 - [ ] Vector Search
+- [ ] Vector database
 - [ ] RAG
+- [ ] Prompt engineering
 - [ ] Fine-tuning
 - [ ] Agents
 
