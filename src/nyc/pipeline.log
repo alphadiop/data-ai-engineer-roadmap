@@ -1,0 +1,568 @@
+2026-06-09 00:05:17,721 | INFO | OrdersBronze START
+2026-06-09 00:05:22,752 | INFO | Bronze loaded : 7 rows
+2026-06-09 00:05:22,753 | INFO | OrdersBronze SUCCESS
+2026-06-09 00:05:22,754 | INFO | OrdersSilver START
+2026-06-09 00:05:26,157 | INFO | Silver rows : 4
+2026-06-09 00:05:26,157 | INFO | OrdersSilver SUCCESS
+2026-06-09 00:05:26,158 | INFO | RevenueGold START
+2026-06-09 00:05:29,221 | INFO | Gold rows : 3
+2026-06-09 00:05:29,222 | INFO | RevenueGold SUCCESS
+2026-06-09 00:05:29,223 | INFO | ========================================================================================================================
+2026-06-09 00:05:29,223 | INFO | PIPELINE SUCCESS
+2026-06-09 00:05:29,224 | INFO | ========================================================================================================================
+2026-06-09 00:12:49,461 | INFO | OrdersBronze START
+2026-06-09 00:12:53,765 | INFO | Bronze loaded : 7 rows
+2026-06-09 00:12:53,766 | INFO | OrdersBronze SUCCESS
+2026-06-09 00:13:13,426 | INFO | OrdersBronze START
+2026-06-09 00:13:17,353 | INFO | Bronze loaded : 7 rows
+2026-06-09 00:13:17,354 | INFO | OrdersBronze SUCCESS
+2026-06-09 00:13:17,356 | INFO | OrdersSilver START
+2026-06-09 00:13:20,199 | INFO | Silver rows : 4
+2026-06-09 00:13:20,202 | INFO | OrdersSilver SUCCESS
+2026-06-09 00:13:20,204 | INFO | RevenueGold START
+2026-06-09 00:13:23,061 | INFO | Gold rows : 3
+2026-06-09 00:13:23,062 | INFO | RevenueGold SUCCESS
+2026-06-09 10:01:24,422 | INFO | OrdersBronze START
+2026-06-09 10:01:50,484 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:01:50,491 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:01:50,494 | INFO | OrdersBronze FINISHED in 26.07 seconds
+2026-06-09 10:02:17,448 | INFO | OrdersBronze START
+2026-06-09 10:02:22,162 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:02:22,163 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:02:22,163 | INFO | OrdersBronze FINISHED in 4.71 seconds
+2026-06-09 10:03:38,117 | INFO | OrdersBronze START
+2026-06-09 10:03:42,261 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:03:42,262 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:03:42,263 | INFO | OrdersBronze FINISHED in 4.15 seconds
+2026-06-09 10:05:07,761 | INFO | OrdersBronze START
+2026-06-09 10:05:11,807 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:05:11,808 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:05:11,809 | INFO | OrdersBronze FINISHED in 4.05 seconds
+2026-06-09 10:06:48,459 | INFO | OrdersBronze START
+2026-06-09 10:06:52,272 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:06:52,273 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:06:52,273 | INFO | OrdersBronze FINISHED in 3.81 seconds
+2026-06-09 10:08:54,621 | INFO | OrdersBronze START
+2026-06-09 10:08:58,327 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:08:58,328 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:08:58,328 | INFO | OrdersBronze FINISHED in 3.71 seconds
+2026-06-09 10:09:29,301 | INFO | OrdersBronze START
+2026-06-09 10:09:33,189 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:09:33,189 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:09:33,190 | INFO | OrdersBronze FINISHED in 3.89 seconds
+2026-06-09 10:10:48,308 | INFO | OrdersBronze START
+2026-06-09 10:10:52,133 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:10:52,134 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:10:52,135 | INFO | OrdersBronze FINISHED in 3.83 seconds
+2026-06-09 10:11:53,678 | INFO | OrdersBronze START
+2026-06-09 10:11:57,268 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:11:57,269 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:11:57,270 | INFO | OrdersBronze FINISHED in 3.59 seconds
+2026-06-09 10:13:00,428 | INFO | OrdersBronze START
+2026-06-09 10:13:04,163 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:13:04,164 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:13:04,164 | INFO | OrdersBronze FINISHED in 3.74 seconds
+2026-06-09 10:17:10,661 | INFO | OrdersBronze START
+2026-06-09 10:17:14,792 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:17:14,793 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:17:14,793 | INFO | OrdersBronze FINISHED in 4.13 seconds
+2026-06-09 10:18:17,260 | INFO | OrdersBronze START
+2026-06-09 10:18:20,939 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:18:20,940 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:18:20,941 | INFO | OrdersBronze FINISHED in 3.68 seconds
+2026-06-09 10:18:37,828 | INFO | OrdersBronze START
+2026-06-09 10:18:41,834 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:18:41,835 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:18:41,836 | INFO | OrdersBronze FINISHED in 4.01 seconds
+2026-06-09 10:20:24,147 | INFO | OrdersBronze START
+2026-06-09 10:20:28,414 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:20:28,415 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:20:28,416 | INFO | OrdersBronze FINISHED in 4.27 seconds
+2026-06-09 10:52:58,385 | INFO | OrdersBronze START
+2026-06-09 10:53:02,963 | INFO | Bronze loaded : 7 rows
+2026-06-09 10:53:02,966 | INFO | OrdersBronze SUCCESS
+2026-06-09 10:53:02,967 | INFO | OrdersBronze FINISHED in 4.58 seconds
+2026-06-09 11:23:01,190 | INFO | OrdersBronze START
+2026-06-09 11:23:54,557 | INFO | Bronze loaded : 7 rows
+2026-06-09 11:23:54,560 | INFO | OrdersBronze SUCCESS
+2026-06-09 11:23:54,562 | INFO | OrdersBronze FINISHED in 53.37 seconds
+2026-06-09 11:23:54,564 | INFO | OrdersSilver START
+2026-06-09 11:23:56,494 | INFO | Bronze rows : 7
+2026-06-09 11:23:56,495 | INFO | Bronze sample:
+2026-06-09 11:23:56,496 | ERROR | OrdersSilver FAILED : [JVM_ATTRIBUTE_NOT_SUPPORTED] Attribute `_jdf` is not supported in Spark Connect as it depends on the JVM. If you need to use this attribute, do not use Spark Connect when creating your session. Visit https://spark.apache.org/docs/latest/sql-getting-started.html#starting-point-sparksession for creating regular Spark Session in detail.
+2026-06-09 11:23:56,496 | INFO | OrdersSilver FINISHED in 1.93 seconds
+2026-06-09 11:28:48,174 | INFO | OrdersBronze START
+2026-06-09 11:28:53,817 | INFO | Bronze loaded : 7 rows
+2026-06-09 11:28:53,819 | INFO | OrdersBronze SUCCESS
+2026-06-09 11:28:53,820 | INFO | OrdersBronze FINISHED in 5.65 seconds
+2026-06-09 11:28:53,821 | INFO | OrdersSilver START
+2026-06-09 11:28:54,453 | INFO | Bronze rows : 7
+2026-06-09 11:28:54,454 | INFO | Bronze sample:
+2026-06-09 11:28:54,455 | ERROR | OrdersSilver FAILED : [JVM_ATTRIBUTE_NOT_SUPPORTED] Attribute `_jdf` is not supported in Spark Connect as it depends on the JVM. If you need to use this attribute, do not use Spark Connect when creating your session. Visit https://spark.apache.org/docs/latest/sql-getting-started.html#starting-point-sparksession for creating regular Spark Session in detail.
+2026-06-09 11:28:54,455 | INFO | OrdersSilver FINISHED in 0.63 seconds
+2026-06-09 11:36:29,126 | INFO | OrdersBronze START
+2026-06-09 11:36:33,355 | INFO | Bronze loaded : 7 rows
+2026-06-09 11:36:33,358 | INFO | OrdersBronze SUCCESS
+2026-06-09 11:36:33,358 | INFO | OrdersBronze FINISHED in 4.23 seconds
+2026-06-09 11:36:33,359 | INFO | OrdersSilver START
+2026-06-09 11:36:33,916 | INFO | Bronze rows : 7
+2026-06-09 11:36:33,917 | INFO | Bronze sample:
+2026-06-09 11:36:33,918 | ERROR | OrdersSilver FAILED : [JVM_ATTRIBUTE_NOT_SUPPORTED] Attribute `_jdf` is not supported in Spark Connect as it depends on the JVM. If you need to use this attribute, do not use Spark Connect when creating your session. Visit https://spark.apache.org/docs/latest/sql-getting-started.html#starting-point-sparksession for creating regular Spark Session in detail.
+2026-06-09 11:36:33,918 | INFO | OrdersSilver FINISHED in 0.56 seconds
+2026-06-09 11:37:18,929 | INFO | OrdersBronze START
+2026-06-09 11:37:23,955 | INFO | Bronze loaded : 7 rows
+2026-06-09 11:37:23,980 | INFO | OrdersBronze SUCCESS
+2026-06-09 11:37:23,981 | INFO | OrdersBronze FINISHED in 5.05 seconds
+2026-06-09 11:37:23,982 | INFO | OrdersSilver START
+2026-06-09 11:37:24,447 | INFO | Bronze rows : 7
+2026-06-09 11:37:24,448 | INFO | Bronze sample:
+2026-06-09 11:37:25,530 | INFO | 
+   order_id  customer_id country  amount  order_date
+0       1.0          101      FR   100.0  2025-01-01
+1       2.0          102      FR     NaN  2025-01-01
+2       3.0          101      FR   100.0  2025-01-01
+3       3.0          101      FR   100.0  2025-01-01
+4       4.0          103      DE   -50.0  2025-01-02
+2026-06-09 11:37:25,532 | INFO | delta : training.silver.orders_clean
+2026-06-09 11:37:26,144 | INFO | Silver rows : 4
+2026-06-09 11:37:26,154 | INFO | Silver sample:
+2026-06-09 11:37:27,868 | INFO | 
+   order_id  customer_id country  amount  order_date
+0       1.0        101.0      FR     100  2025-01-01
+1       3.0        101.0      FR     100  2025-01-01
+2       5.0          NaN      US     200  2025-01-02
+3       6.0        104.0      ES     300  2025-01-03
+2026-06-09 11:37:30,928 | INFO | Silver rows : 4
+2026-06-09 11:37:30,930 | INFO | OrdersSilver SUCCESS
+2026-06-09 11:37:30,942 | INFO | OrdersSilver FINISHED in 6.96 seconds
+2026-06-09 11:37:30,943 | INFO | RevenueGold START
+2026-06-09 11:37:34,651 | INFO | Gold rows : 3
+2026-06-09 11:37:34,688 | INFO | RevenueGold SUCCESS
+2026-06-09 11:37:34,693 | INFO | RevenueGold FINISHED in 3.75 seconds
+2026-06-09 11:45:06,802 | INFO | OrdersBronze START
+2026-06-09 11:45:10,560 | INFO | Bronze loaded : 7 rows
+2026-06-09 11:45:10,564 | INFO | OrdersBronze SUCCESS
+2026-06-09 11:45:10,565 | INFO | OrdersBronze FINISHED in 3.76 seconds
+2026-06-09 11:45:10,566 | INFO | OrdersSilver START
+2026-06-09 11:45:11,135 | INFO | Bronze rows : 7
+2026-06-09 11:45:11,137 | INFO | Bronze sample:
+2026-06-09 11:45:12,502 | INFO | 
+   order_id  customer_id country  amount  order_date
+0       1.0          101      FR   100.0  2025-01-01
+1       2.0          102      FR     NaN  2025-01-01
+2       3.0          101      FR   100.0  2025-01-01
+3       3.0          101      FR   100.0  2025-01-01
+4       4.0          103      DE   -50.0  2025-01-02
+2026-06-09 11:45:12,503 | INFO | delta : training.silver.orders_clean
+2026-06-09 11:45:13,080 | INFO | Silver rows : 4
+2026-06-09 11:45:13,081 | INFO | Silver sample:
+2026-06-09 11:45:13,880 | INFO | Row(value='{"order_id":1.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 11:45:13,881 | INFO | Row(value='{"order_id":3.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 11:45:13,882 | INFO | Row(value='{"order_id":5.0,"country":"US","amount":200,"order_date":"2025-01-02"}')
+2026-06-09 11:45:13,882 | INFO | Row(value='{"order_id":6.0,"customer_id":104,"country":"ES","amount":300,"order_date":"2025-01-03"}')
+2026-06-09 11:45:16,934 | INFO | Silver rows : 4
+2026-06-09 11:45:16,935 | INFO | OrdersSilver SUCCESS
+2026-06-09 11:45:16,936 | INFO | OrdersSilver FINISHED in 6.37 seconds
+2026-06-09 11:45:16,936 | INFO | RevenueGold START
+2026-06-09 11:45:21,046 | INFO | Gold rows : 3
+2026-06-09 11:45:21,047 | INFO | RevenueGold SUCCESS
+2026-06-09 11:45:21,048 | INFO | RevenueGold FINISHED in 4.11 seconds
+2026-06-09 12:02:24,489 | INFO | OrdersBronze START
+2026-06-09 12:02:28,860 | INFO | Bronze loaded : 7 rows
+2026-06-09 12:02:28,860 | INFO | OrdersBronze SUCCESS
+2026-06-09 12:02:28,861 | INFO | OrdersBronze FINISHED in 4.37 seconds
+2026-06-09 12:02:28,862 | INFO | OrdersSilver START
+2026-06-09 12:02:29,381 | INFO | Bronze rows : 7
+2026-06-09 12:02:29,382 | INFO | Bronze sample:
+2026-06-09 12:02:30,120 | INFO | delta : training.silver.orders_clean
+2026-06-09 12:02:30,620 | INFO | Silver rows : 4
+2026-06-09 12:02:30,621 | INFO | Silver sample:
+2026-06-09 12:02:31,247 | INFO | Row(value='{"order_id":1.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 12:02:31,248 | INFO | Row(value='{"order_id":3.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 12:02:31,250 | INFO | Row(value='{"order_id":5.0,"country":"US","amount":200,"order_date":"2025-01-02"}')
+2026-06-09 12:02:31,251 | INFO | Row(value='{"order_id":6.0,"customer_id":104,"country":"ES","amount":300,"order_date":"2025-01-03"}')
+2026-06-09 12:02:33,974 | INFO | Silver rows : 4
+2026-06-09 12:02:33,975 | INFO | OrdersSilver SUCCESS
+2026-06-09 12:02:33,976 | INFO | OrdersSilver FINISHED in 5.11 seconds
+2026-06-09 12:02:33,977 | INFO | RevenueGold START
+2026-06-09 12:02:36,765 | INFO | Gold rows : 3
+2026-06-09 12:02:36,766 | INFO | RevenueGold SUCCESS
+2026-06-09 12:02:36,767 | INFO | RevenueGold FINISHED in 2.79 seconds
+2026-06-09 13:07:07,743 | INFO | OrdersBronze START
+2026-06-09 13:07:29,267 | INFO | Bronze loaded : 7 rows
+2026-06-09 13:07:29,268 | INFO | OrdersBronze SUCCESS
+2026-06-09 13:07:29,269 | INFO | OrdersBronze FINISHED in 21.53 seconds
+2026-06-09 13:07:29,283 | INFO | OrdersSilver START
+2026-06-09 13:07:30,129 | INFO | Bronze rows : 7
+2026-06-09 13:07:30,130 | INFO | Bronze sample:
+2026-06-09 13:07:31,702 | INFO | delta : training.silver.orders_clean
+2026-06-09 13:07:32,689 | INFO | Silver rows : 4
+2026-06-09 13:07:32,691 | INFO | Silver sample:
+2026-06-09 13:07:34,236 | INFO | Row(value='{"order_id":1.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 13:07:34,256 | INFO | Row(value='{"order_id":3.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 13:07:34,260 | INFO | Row(value='{"order_id":5.0,"country":"US","amount":200,"order_date":"2025-01-02"}')
+2026-06-09 13:07:34,261 | INFO | Row(value='{"order_id":6.0,"customer_id":104,"country":"ES","amount":300,"order_date":"2025-01-03"}')
+2026-06-09 13:07:38,663 | INFO | Silver rows : 4
+2026-06-09 13:07:38,665 | INFO | OrdersSilver SUCCESS
+2026-06-09 13:07:38,666 | INFO | OrdersSilver FINISHED in 9.38 seconds
+2026-06-09 13:07:38,666 | INFO | RevenueGold START
+2026-06-09 13:07:42,913 | INFO | Gold rows : 3
+2026-06-09 13:07:42,914 | INFO | RevenueGold SUCCESS
+2026-06-09 13:07:42,915 | INFO | RevenueGold FINISHED in 4.25 seconds
+2026-06-09 13:17:18,198 | INFO | OrdersBronze START
+2026-06-09 13:17:18,281 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:17:18,282 | INFO | OrdersBronze FINISHED in 0.08 seconds
+2026-06-09 13:17:45,519 | INFO | OrdersBronze START
+2026-06-09 13:17:45,579 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:17:45,580 | INFO | OrdersBronze FINISHED in 0.06 seconds
+2026-06-09 13:19:08,196 | INFO | OrdersBronze START
+2026-06-09 13:19:08,257 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:19:08,259 | INFO | OrdersBronze FINISHED in 0.06 seconds
+2026-06-09 13:19:33,626 | INFO | OrdersBronze START
+2026-06-09 13:19:33,697 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:19:33,698 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:20:49,398 | INFO | OrdersBronze START
+2026-06-09 13:20:49,452 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:20:49,453 | INFO | OrdersBronze FINISHED in 0.06 seconds
+2026-06-09 13:24:20,551 | INFO | OrdersBronze START
+2026-06-09 13:24:20,623 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:24:20,624 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:24:42,307 | INFO | OrdersBronze START
+2026-06-09 13:24:42,379 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:24:42,381 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:26:13,604 | INFO | OrdersBronze START
+2026-06-09 13:26:13,672 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:26:13,673 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:39:00,120 | INFO | OrdersBronze START
+2026-06-09 13:39:00,267 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:39:00,268 | INFO | OrdersBronze FINISHED in 0.15 seconds
+2026-06-09 13:39:07,396 | INFO | OrdersBronze START
+2026-06-09 13:39:07,462 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:39:07,463 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:40:56,808 | INFO | OrdersBronze START
+2026-06-09 13:40:56,875 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:40:56,876 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:41:39,501 | INFO | OrdersBronze START
+2026-06-09 13:41:39,573 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:41:39,575 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:56:33,505 | INFO | OrdersBronze START
+2026-06-09 13:56:33,572 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:56:33,573 | INFO | OrdersBronze FINISHED in 0.07 seconds
+2026-06-09 13:57:14,121 | INFO | OrdersBronze START
+2026-06-09 13:57:14,182 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:57:14,183 | INFO | OrdersBronze FINISHED in 0.06 seconds
+2026-06-09 13:59:42,631 | INFO | OrdersBronze START
+2026-06-09 13:59:42,689 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 13:59:42,691 | INFO | OrdersBronze FINISHED in 0.06 seconds
+2026-06-09 14:00:27,855 | INFO | OrdersBronze START
+2026-06-09 14:00:27,956 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 14:00:27,957 | INFO | OrdersBronze FINISHED in 0.10 seconds
+2026-06-09 14:00:55,720 | INFO | OrdersBronze START
+2026-06-09 14:00:55,798 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 14:00:55,799 | INFO | OrdersBronze FINISHED in 0.08 seconds
+2026-06-09 14:01:13,875 | INFO | OrdersBronze START
+2026-06-09 14:01:13,970 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 14:01:13,972 | INFO | OrdersBronze FINISHED in 0.10 seconds
+2026-06-09 14:01:31,532 | INFO | OrdersBronze START
+2026-06-09 14:01:37,106 | INFO | Bronze loaded : 7 rows
+2026-06-09 14:01:37,107 | INFO | OrdersBronze SUCCESS
+2026-06-09 14:01:37,117 | INFO | OrdersBronze FINISHED in 5.59 seconds
+2026-06-09 14:01:37,120 | INFO | OrdersSilver START
+2026-06-09 14:01:37,804 | INFO | Bronze rows : 7
+2026-06-09 14:01:37,805 | INFO | Bronze sample:
+2026-06-09 14:01:38,777 | INFO | delta : training.silver.orders_clean
+2026-06-09 14:01:39,374 | INFO | Silver rows : 4
+2026-06-09 14:01:39,377 | INFO | Silver sample:
+2026-06-09 14:01:40,004 | INFO | Row(value='{"order_id":1.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 14:01:40,006 | INFO | Row(value='{"order_id":3.0,"customer_id":101,"country":"FR","amount":100,"order_date":"2025-01-01"}')
+2026-06-09 14:01:40,007 | INFO | Row(value='{"order_id":5.0,"country":"US","amount":200,"order_date":"2025-01-02"}')
+2026-06-09 14:01:40,008 | INFO | Row(value='{"order_id":6.0,"customer_id":104,"country":"ES","amount":300,"order_date":"2025-01-03"}')
+2026-06-09 14:01:43,700 | INFO | Silver rows : 4
+2026-06-09 14:01:43,714 | INFO | OrdersSilver SUCCESS
+2026-06-09 14:01:43,727 | INFO | OrdersSilver FINISHED in 6.61 seconds
+2026-06-09 14:01:43,732 | INFO | RevenueGold START
+2026-06-09 14:01:48,332 | INFO | Gold rows : 3
+2026-06-09 14:01:48,340 | INFO | RevenueGold SUCCESS
+2026-06-09 14:01:48,363 | INFO | RevenueGold FINISHED in 4.63 seconds
+2026-06-09 14:01:48,366 | INFO | ========================================================================================================================
+2026-06-09 14:01:48,368 | INFO | PIPELINE SUCCESS
+2026-06-09 14:01:48,371 | INFO | ========================================================================================================================
+2026-06-09 14:06:32,394 | INFO | OrdersBronze START
+2026-06-09 14:06:32,456 | ERROR | OrdersBronze FAILED : [NO_ACTIVE_SESSION] No active Spark session found. Please create a new Spark session before running the code.
+2026-06-09 14:06:32,457 | INFO | OrdersBronze FINISHED in 0.06 seconds
+2026-07-14 08:02:03,450 | INFO | Extract START
+2026-07-14 08:02:03,451 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-14 08:02:03,452 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-14 08:02:05,433 | INFO | Extracted green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-14 08:02:22,655 | INFO | Count_of_records uber 202411 : 52222
+2026-07-14 08:02:22,656 | INFO | Extract SUCCESS
+2026-07-14 08:02:22,657 | INFO | Extract FINISHED in 19.21 seconds
+2026-07-14 08:02:22,658 | INFO | Transformation START
+2026-07-14 08:02:22,659 | ERROR | Transformation FAILED : Transformation.run() missing 1 required positional argument: 'df_bronze'
+2026-07-14 08:02:22,660 | INFO | Transformation FINISHED in 0.00 seconds
+2026-07-14 08:10:00,094 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 08:10:00,098 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 08:10:01,753 | INFO | Extracted yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 08:10:03,384 | INFO | Count_of_records uber 202411 : 3646369
+2026-07-14 09:47:42,842 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:47:42,855 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:47:46,352 | INFO | Extracted yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:47:50,081 | INFO | Count_of_records uber 202411 : 3646369
+2026-07-14 09:56:03,044 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:56:03,045 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:56:03,396 | INFO | Extracted yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:56:04,179 | INFO | Count_of_records uber 202411 : 3646369
+2026-07-14 09:56:14,296 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:56:14,298 | INFO | Extracting yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:56:14,560 | INFO | Extracted yellow_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2024/yellow_tripdata_2024-11.parquet
+2026-07-14 09:56:15,078 | INFO | Count_of_records uber 202411 : 3646369
+2026-07-14 12:17:36,635 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-14 12:17:36,637 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-14 12:17:38,414 | INFO | Downloading yellow_tripdata_2025-07.parquet
+2026-07-14 12:17:59,364 | INFO | Bronze rows : 3898963
+2026-07-14 12:18:02,655 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 09:03:45,902 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:03:45,912 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:03:56,988 | INFO | Bronze rows : 3898963
+2026-07-15 09:10:14,780 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:10:14,781 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:10:16,128 | INFO | Bronze rows : 3898963
+2026-07-15 09:16:50,218 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:16:50,219 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:16:51,484 | INFO | Bronze rows : 3898963
+2026-07-15 09:25:50,568 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:25:50,569 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:25:51,885 | INFO | Bronze rows : 3898963
+2026-07-15 09:28:03,523 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:28:03,524 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:28:04,842 | INFO | Bronze rows : 3898963
+2026-07-15 09:38:24,018 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:38:24,019 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:38:25,772 | INFO | Bronze rows : 3898963
+2026-07-15 09:38:28,163 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 09:38:50,634 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 09:38:57,145 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 09:46:46,627 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:46:46,628 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:46:47,790 | INFO | Bronze rows : 3898963
+2026-07-15 09:46:49,479 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 09:47:08,070 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 09:47:14,435 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 09:47:18,752 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 09:47:23,511 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 09:52:53,684 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:52:53,686 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 09:52:54,854 | INFO | Bronze rows : 3898963
+2026-07-15 09:52:56,577 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 09:53:11,041 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 09:53:16,958 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 09:53:20,274 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 09:53:24,501 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 10:00:15,524 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 10:00:15,526 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 10:00:17,037 | INFO | Bronze rows : 3898963
+2026-07-15 10:00:18,842 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 10:00:33,533 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 10:00:38,984 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 10:00:42,325 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 10:00:46,295 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 10:00:47,734 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 10:00:47,735 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 10:00:49,604 | INFO | Bronze rows : 3898963
+2026-07-15 10:00:51,265 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 10:01:06,960 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 10:01:12,441 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 10:01:15,416 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 10:01:19,654 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 11:34:07,686 | INFO | ************************************************** Starting UberBronze **************************************************
+2026-07-15 11:34:07,689 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 11:34:07,690 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 11:34:16,802 | INFO | Bronze rows : 3898963
+2026-07-15 11:34:16,803 | INFO | ************************************************** Finished UberBronze **************************************************
+2026-07-15 11:34:16,805 | INFO | ************************************************** Starting UberSilver **************************************************
+2026-07-15 11:34:19,265 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 11:34:20,687 | INFO | ************************************************** Finished UberSilver **************************************************
+2026-07-15 11:34:20,688 | INFO | ************************************************** Starting UberGold **************************************************
+2026-07-15 11:34:40,991 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 11:34:47,435 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 11:34:51,218 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 11:34:56,695 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 11:34:56,699 | INFO | ************************************************** Finished UberGold **************************************************
+2026-07-15 11:44:42,951 | INFO | Period 202507 already loaded
+2026-07-15 11:44:44,295 | INFO | Period 202507 already loaded
+2026-07-15 11:45:41,857 | INFO | Period 202507 already loaded
+2026-07-15 11:46:56,507 | INFO | Period 202507 already loaded =======================================================
+2026-07-15 11:47:14,304 | INFO | Period 202507 already loaded =====================================================================================
+2026-07-15 12:26:27,686 | INFO | periode = 202507
+2026-07-15 12:26:27,687 | INFO | table_name = silver_nyc_taxi
+2026-07-15 12:26:27,688 | INFO | taxi_type = yellow
+2026-07-15 12:26:27,689 | INFO | row_count = {}
+2026-07-15 12:26:29,663 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-15 12:26:29,664 | INFO | Extracting yellow_tripdata_2025-07.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-07-15 12:26:38,160 | INFO | ======================================================= Bronze rows : 3898963 ======================================================= 
+2026-07-15 12:26:38,161 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-15 12:26:38,162 | INFO | 
+ ========================================================================================================================
+2026-07-15 12:26:38,163 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-15 12:26:40,699 | INFO | Silver rows : 3898963 -> 3648251
+2026-07-15 12:26:42,206 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-15 12:26:42,207 | INFO | 
+ ========================================================================================================================
+2026-07-15 12:26:42,207 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-15 12:27:00,842 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 12:27:06,762 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 12:27:10,934 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 12:27:16,448 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 12:27:16,450 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-15 12:27:16,451 | INFO | 
+ ========================================================================================================================
+2026-07-15 12:27:19,151 | INFO | periode = 202507
+2026-07-15 12:27:19,152 | INFO | table_name = silver_nyc_taxi
+2026-07-15 12:27:19,153 | INFO | taxi_type = yellow
+2026-07-15 12:27:19,153 | INFO | row_count = {'bronze': 3898963, 'silver': 3648251, 'fact_trips': 3648251, 'dim_date': 33, 'kpi_daily': 33, 'dim_location': 265}
+2026-07-15 14:00:52,061 | INFO | periode = 202507
+2026-07-15 14:00:52,063 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:00:52,064 | INFO | taxi_type = yellow
+2026-07-15 14:00:55,999 | INFO | Period 202507 already loaded =====================================================================================
+2026-07-15 14:14:47,451 | INFO | periode = 202501
+2026-07-15 14:14:47,452 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:14:47,452 | INFO | taxi_type = yellow
+2026-07-15 14:14:49,503 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-15 14:14:49,504 | INFO | Extracting yellow_tripdata_2025-01.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-01.parquet
+2026-07-15 14:14:51,256 | INFO | ======================================================= Downloading yellow_tripdata_2025-01.parquet ======================================================= 
+2026-07-15 14:14:56,993 | INFO | ======================================================= Bronze rows : 3475226 ======================================================= 
+2026-07-15 14:14:56,995 | INFO | run completed in 7.49s
+2026-07-15 14:14:56,995 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-15 14:14:56,996 | INFO | 
+ ========================================================================================================================
+2026-07-15 14:14:56,997 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-15 14:14:59,395 | INFO | Silver rows : 3475226 -> 3323486
+2026-07-15 14:15:01,004 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-15 14:15:01,005 | INFO | 
+ ========================================================================================================================
+2026-07-15 14:15:01,005 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-15 14:15:21,454 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 14:15:27,883 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 14:15:32,147 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 14:15:36,985 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 14:15:36,986 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-15 14:15:36,986 | INFO | 
+ ========================================================================================================================
+2026-07-15 14:15:40,058 | INFO | periode = 202501
+2026-07-15 14:15:40,059 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:15:40,059 | INFO | taxi_type = yellow
+2026-07-15 14:15:40,060 | INFO | row_count = {'bronze': 3475226, 'silver': 3323486, 'fact_trips': 3323486, 'dim_date': 33, 'kpi_daily': 33, 'dim_location': 265}
+2026-07-15 14:36:30,382 | INFO | periode = 202502
+2026-07-15 14:36:30,384 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:36:30,386 | INFO | taxi_type = yellow
+2026-07-15 14:36:32,590 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-15 14:36:32,592 | INFO | Extracting yellow_tripdata_2025-02.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-02.parquet
+2026-07-15 14:36:33,091 | INFO | ======================================================= Downloading yellow_tripdata_2025-02.parquet ======================================================= 
+2026-07-15 14:36:36,202 | INFO | ======================================================= Bronze rows : 3577543 ======================================================= 
+2026-07-15 14:36:36,202 | INFO | run completed in 3.61s
+2026-07-15 14:36:36,203 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-15 14:36:36,204 | INFO | ========================================================================================================================
+2026-07-15 14:36:36,204 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-15 14:36:36,625 | INFO | add_trip_duration completed in 0.04s
+2026-07-15 14:36:36,627 | INFO | add_date_key completed in 0.0s
+2026-07-15 14:36:36,631 | INFO | add_tip_percent completed in 0.0s
+2026-07-15 14:36:36,640 | INFO | add_average_speed completed in 0.0s
+2026-07-15 14:36:36,641 | INFO | add_date_features completed in 0.0s
+2026-07-15 14:36:36,643 | INFO | apply_quality_rules completed in 0.0s
+2026-07-15 14:36:37,947 | INFO | Silver rows : 3577543 -> 3421081
+2026-07-15 14:36:39,077 | INFO | run completed in 2.87s
+2026-07-15 14:36:39,077 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-15 14:36:39,078 | INFO | ========================================================================================================================
+2026-07-15 14:36:39,079 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-15 14:36:39,080 | INFO | get_fact_trips completed in 0.0s
+2026-07-15 14:36:39,082 | INFO | get_dim_date completed in 0.0s
+2026-07-15 14:36:39,083 | INFO | get_kpi_daily completed in 0.0s
+2026-07-15 14:36:39,086 | ERROR | UberGold.get_dim_location() missing 1 required positional argument: 'context'
+2026-07-15 14:36:39,088 | ERROR | ************ Error in pipeline : UberGold.get_dim_location() missing 1 required positional argument: 'context' ************
+2026-07-15 14:36:41,580 | INFO | insert_audit completed in 2.49s
+2026-07-15 14:36:41,582 | INFO | periode = 202502
+2026-07-15 14:36:41,583 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:36:41,584 | INFO | taxi_type = yellow
+2026-07-15 14:36:41,585 | INFO | row_count = {'bronze': 3577543, 'silver': 3421081}
+2026-07-15 14:38:57,950 | INFO | periode = 202502
+2026-07-15 14:38:57,951 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:38:57,952 | INFO | taxi_type = yellow
+2026-07-15 14:38:58,998 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-15 14:38:58,999 | INFO | Extracting yellow_tripdata_2025-02.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-02.parquet
+2026-07-15 14:39:00,119 | INFO | ======================================================= Bronze rows : 3577543 ======================================================= 
+2026-07-15 14:39:00,120 | INFO | run completed in 1.12s
+2026-07-15 14:39:00,121 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-15 14:39:00,122 | INFO | ========================================================================================================================
+2026-07-15 14:39:00,123 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-15 14:39:00,619 | INFO | add_trip_duration completed in 0.04s
+2026-07-15 14:39:00,630 | INFO | add_date_key completed in 0.0s
+2026-07-15 14:39:00,634 | INFO | add_tip_percent completed in 0.0s
+2026-07-15 14:39:00,635 | INFO | add_average_speed completed in 0.0s
+2026-07-15 14:39:00,635 | INFO | add_date_features completed in 0.0s
+2026-07-15 14:39:00,636 | INFO | apply_quality_rules completed in 0.0s
+2026-07-15 14:39:01,809 | INFO | Silver rows : 3577543 -> 3421081
+2026-07-15 14:39:02,935 | INFO | run completed in 2.81s
+2026-07-15 14:39:02,936 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-15 14:39:02,937 | INFO | ========================================================================================================================
+2026-07-15 14:39:02,937 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-15 14:39:16,780 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 14:39:16,781 | INFO | sauvegarde_tables_df completed in 8.47s
+2026-07-15 14:39:22,273 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 14:39:22,273 | INFO | sauvegarde_tables_df completed in 5.49s
+2026-07-15 14:39:25,557 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 14:39:25,558 | INFO | sauvegarde_tables_df completed in 3.28s
+2026-07-15 14:39:29,735 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 14:39:29,736 | INFO | sauvegarde_tables_df completed in 4.17s
+2026-07-15 14:39:29,737 | INFO | run completed in 26.8s
+2026-07-15 14:39:29,737 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-15 14:39:29,738 | INFO | ========================================================================================================================
+2026-07-15 14:39:31,919 | INFO | insert_audit completed in 2.18s
+2026-07-15 14:39:31,920 | INFO | periode = 202502
+2026-07-15 14:39:31,920 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:39:31,922 | INFO | taxi_type = yellow
+2026-07-15 14:39:31,923 | INFO | row_count = {'bronze': 3577543, 'silver': 3421081, 'fact_trips': 3421081, 'dim_date': 30, 'kpi_daily': 30, 'dim_location': 265}
+2026-07-15 14:41:29,003 | INFO | periode = 202502
+2026-07-15 14:41:29,004 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:41:29,005 | INFO | taxi_type = yellow
+2026-07-15 14:41:30,068 | INFO | Period 202502 already loaded =====================================================================================
+2026-07-15 14:42:00,802 | INFO | periode = 202503
+2026-07-15 14:42:00,803 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:42:00,804 | INFO | taxi_type = yellow
+2026-07-15 14:42:01,976 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-15 14:42:01,980 | INFO | Extracting yellow_tripdata_2025-03.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-03.parquet
+2026-07-15 14:42:02,281 | INFO | ======================================================= Downloading yellow_tripdata_2025-03.parquet ======================================================= 
+2026-07-15 14:42:05,626 | INFO | ======================================================= Bronze rows : 4145257 ======================================================= 
+2026-07-15 14:42:05,627 | INFO | run completed in 3.65s
+2026-07-15 14:42:05,628 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-15 14:42:05,629 | INFO | ========================================================================================================================
+2026-07-15 14:42:05,629 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-15 14:42:06,126 | INFO | add_trip_duration completed in 0.05s
+2026-07-15 14:42:06,127 | INFO | add_date_key completed in 0.0s
+2026-07-15 14:42:06,128 | INFO | add_tip_percent completed in 0.0s
+2026-07-15 14:42:06,129 | INFO | add_average_speed completed in 0.0s
+2026-07-15 14:42:06,130 | INFO | add_date_features completed in 0.0s
+2026-07-15 14:42:06,131 | INFO | apply_quality_rules completed in 0.0s
+2026-07-15 14:42:07,534 | INFO | Silver rows : 4145257 -> 3955117
+2026-07-15 14:42:08,946 | INFO | run completed in 3.32s
+2026-07-15 14:42:08,947 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-15 14:42:08,948 | INFO | ========================================================================================================================
+2026-07-15 14:42:08,948 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-15 14:42:08,949 | INFO | get_fact_trips completed in 0.0s
+2026-07-15 14:42:08,950 | INFO | get_dim_date completed in 0.0s
+2026-07-15 14:42:08,952 | INFO | get_kpi_daily completed in 0.0s
+2026-07-15 14:42:22,851 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 14:42:22,853 | INFO | sauvegarde_tables_df completed in 9.01s
+2026-07-15 14:42:28,398 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 14:42:28,398 | INFO | sauvegarde_tables_df completed in 5.55s
+2026-07-15 14:42:31,779 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 14:42:31,781 | INFO | sauvegarde_tables_df completed in 3.38s
+2026-07-15 14:42:35,963 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 14:42:35,964 | INFO | sauvegarde_tables_df completed in 4.18s
+2026-07-15 14:42:35,965 | INFO | run completed in 27.02s
+2026-07-15 14:42:35,966 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-15 14:42:35,967 | INFO | ========================================================================================================================
+2026-07-15 14:42:38,551 | INFO | insert_audit completed in 2.58s
+2026-07-15 14:42:38,551 | INFO | periode = 202503
+2026-07-15 14:42:38,552 | INFO | table_name = silver_nyc_taxi
+2026-07-15 14:42:38,553 | INFO | taxi_type = yellow
+2026-07-15 14:42:38,554 | INFO | row_count = {'bronze': 4145257, 'silver': 3955117, 'fact_trips': 3955117, 'dim_date': 35, 'kpi_daily': 35, 'dim_location': 265}

@@ -1,0 +1,18 @@
+2026-07-12 21:21:24,692 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:21:24,698 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:37:49,483 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:37:49,484 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:37:50,434 | INFO | Extracted green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:38:16,306 | INFO | Count: 52222
+2026-07-12 21:41:14,567 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:41:14,568 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:41:14,904 | INFO | Extracted green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:41:15,480 | INFO | Count_of_records uber 202411 : 52222
+2026-07-12 21:44:35,807 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:44:35,808 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:44:36,239 | INFO | Extracted green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:44:36,797 | INFO | Count_of_records uber 202411 : 52222
+2026-07-12 21:53:11,431 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:53:11,435 | INFO | Extracting green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:53:12,324 | INFO | Extracted green_tripdata_2024-11.parquet from /Volumes/nyc_taxi/bronze/raw_files/green/2024/green_tripdata_2024-11.parquet
+2026-07-12 21:53:12,750 | INFO | Count_of_records uber 202411 : 52222
