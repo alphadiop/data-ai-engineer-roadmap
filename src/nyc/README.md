@@ -19,9 +19,15 @@
 - [ ] Time Travel
 - [ ] OPTIMIZE
 - [ ] VACUUM
+- [ ] Auto Loader
+- [ ] Structured Streaming
+- [ ] Unity Catalog (permissions)
+- [ ] Delta Live Tables (ou Lakeflow)
+- [ ] CI/CD Databricks avec Git et Asset Bundles
+
 
 #### Semaine 4
-- [ ] Jobs
+- [ ] Databricks Workflows (Jobs)
 - [ ] Workflows
 - [ ] Paramètres
 - [ ] Monitoring
@@ -31,7 +37,6 @@
 - [ ] Kafka
 - [ ] ML
 - [ ] Agents AI
-
 
 
 

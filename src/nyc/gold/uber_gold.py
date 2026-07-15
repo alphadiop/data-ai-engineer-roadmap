@@ -7,8 +7,10 @@ if PROJECT_ROOT not in sys.path:
 
 from common.pipeline_step import PipelineStep
 from common.logger import PipelineLogger
-from silver.uber_silver import UberSilver
 from common.decorators import log_execution
+from common.delta_manager import DeltaManager
+
+from silver.uber_silver import UberSilver
 
 
 from pyspark.sql import SparkSession
@@ -32,15 +34,15 @@ from pyspark.sql.functions import (
 
 
 class UberGold(PipelineStep):
+    """
+    Après chaque chargement reussi, faire optimize_period
+    Puis chaque semaine ou mois faire vacuum
+    """
     def __init__(self, spark: SparkSession, logger: PipelineLogger):
         super().__init__(spark, self.__class__.__name__)
         self.spark = spark
         self.logger = logger
-        ##self.spark = SparkSession.getActiveSession()
-        #self.df_silver = (
-            #spark.table("nyc_taxi.silver.silver_nyc_taxi")
-            #.where("Periode = 202411")
-        #)
+
 
     @log_execution
     def run(self, context):
@@ -61,6 +63,15 @@ class UberGold(PipelineStep):
             context.df_silver,
             "silver",
             "silver_nyc_taxi"
+        )
+
+        delta_manager = DeltaManager(
+            spark=spark,
+            logger=self.logger
+        )
+        delta_manager.optimize_period(
+            "nyc_taxi.silver.silver_nyc_taxi",
+            context.periode
         )
                 
         self.sauvegarde_tables_df(

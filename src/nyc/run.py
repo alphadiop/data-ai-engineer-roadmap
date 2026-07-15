@@ -13,7 +13,7 @@ from gold.uber_gold import UberGold
 from common.logger import PipelineLogger
 from common.pipeline_context import PipelineContext
 from common.decorators import log_execution
-
+from common.delta_manager import DeltaManager
 
 from audit.audit_manager import AuditManager
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 spark=spark, 
                 path_volume=path_volume, 
                 taxi_type=taxi_type, 
-                periode=202503, 
+                periode=202504, 
                 logger=logger
             ),
             UberSilver(

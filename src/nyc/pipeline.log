@@ -566,3 +566,44 @@
 2026-07-15 14:42:38,552 | INFO | table_name = silver_nyc_taxi
 2026-07-15 14:42:38,553 | INFO | taxi_type = yellow
 2026-07-15 14:42:38,554 | INFO | row_count = {'bronze': 4145257, 'silver': 3955117, 'fact_trips': 3955117, 'dim_date': 35, 'kpi_daily': 35, 'dim_location': 265}
+2026-07-15 20:34:23,361 | INFO | periode = 202504
+2026-07-15 20:34:23,396 | INFO | table_name = silver_nyc_taxi
+2026-07-15 20:34:23,416 | INFO | taxi_type = yellow
+2026-07-15 20:34:26,189 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-15 20:34:26,192 | INFO | Extracting yellow_tripdata_2025-04.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2025/yellow_tripdata_2025-04.parquet
+2026-07-15 20:34:28,401 | INFO | ======================================================= Downloading yellow_tripdata_2025-04.parquet ======================================================= 
+2026-07-15 20:34:38,245 | INFO | ======================================================= Bronze rows : 3970553 ======================================================= 
+2026-07-15 20:34:38,246 | INFO | run completed in 12.05s
+2026-07-15 20:34:38,247 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-15 20:34:38,249 | INFO | ========================================================================================================================
+2026-07-15 20:34:38,251 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-15 20:34:38,824 | INFO | add_trip_duration completed in 0.07s
+2026-07-15 20:34:38,826 | INFO | add_date_key completed in 0.0s
+2026-07-15 20:34:38,827 | INFO | add_tip_percent completed in 0.0s
+2026-07-15 20:34:38,830 | INFO | add_average_speed completed in 0.0s
+2026-07-15 20:34:38,831 | INFO | add_date_features completed in 0.0s
+2026-07-15 20:34:38,835 | INFO | apply_quality_rules completed in 0.0s
+2026-07-15 20:34:40,522 | INFO | Silver rows : 3970553 -> 3776318
+2026-07-15 20:34:41,775 | INFO | run completed in 3.52s
+2026-07-15 20:34:41,778 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-15 20:34:41,780 | INFO | ========================================================================================================================
+2026-07-15 20:34:41,780 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-15 20:34:41,782 | INFO | get_fact_trips completed in 0.0s
+2026-07-15 20:34:41,783 | INFO | get_dim_date completed in 0.0s
+2026-07-15 20:34:41,784 | INFO | get_kpi_daily completed in 0.0s
+2026-07-15 20:35:01,761 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-15 20:35:01,761 | INFO | sauvegarde_tables_df completed in 13.38s
+2026-07-15 20:35:07,925 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-15 20:35:07,926 | INFO | sauvegarde_tables_df completed in 6.16s
+2026-07-15 20:35:11,344 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-15 20:35:11,345 | INFO | sauvegarde_tables_df completed in 3.42s
+2026-07-15 20:35:16,058 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-15 20:35:16,059 | INFO | sauvegarde_tables_df completed in 4.71s
+2026-07-15 20:35:16,060 | INFO | run completed in 34.28s
+2026-07-15 20:35:16,061 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-15 20:35:16,061 | INFO | ========================================================================================================================
+2026-07-15 20:35:18,157 | INFO | insert_audit completed in 2.09s
+2026-07-15 20:35:18,158 | INFO | periode = 202504
+2026-07-15 20:35:18,158 | INFO | table_name = silver_nyc_taxi
+2026-07-15 20:35:18,159 | INFO | taxi_type = yellow
+2026-07-15 20:35:18,160 | INFO | row_count = {'bronze': 3970553, 'silver': 3776318, 'fact_trips': 3776318, 'dim_date': 32, 'kpi_daily': 32, 'dim_location': 265}
