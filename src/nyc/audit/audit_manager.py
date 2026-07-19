@@ -5,6 +5,9 @@ PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+import uuid
+
+
 from common.pipeline_step import PipelineStep
 from common.logger import PipelineLogger
 from common.decorators import log_execution
@@ -34,46 +37,43 @@ class AuditManager:
         result = self.spark.sql(query).collect()[0]["cnt"]
         return result > 0
     
+        ## context.run_id = str(uuid.uuid4())
 
-    @log_execution
     def insert_audit(self, context):
-
-        data = [
-            (
-                context.periode,
-                context.table_name,
-                context.taxi_type,
-                context.row_count.get("silver", 0),
-                context.status,
-                context.start_time,
-                context.end_time,
-                context.duration_seconds,
-                context.message
-            )
-        ]
+        data = [(
+            context.run_id,
+            int(context.periode),
+            context.table_name,
+            context.taxi_type,
+            context.status,
+            context.start_time,
+            context.end_time,
+            context.duration_seconds,
+            context.error_step,
+            context.message
+        )]
 
         df = self.spark.createDataFrame(
             data,
-            [
+            schema=[
+                "run_id",
                 "periode",
                 "table_name",
                 "taxi_type",
-                "nb_rows",
                 "status",
                 "start_time",
                 "end_time",
                 "duration_seconds",
+                "error_step",
                 "message"
             ]
         )
 
         (
-            df.write
+        df.write
             .format("delta")
             .mode("append")
-            .saveAsTable(
-                "nyc_taxi.audit.audit_load"
-            )
+            .saveAsTable("nyc_taxi.audit.audit_load")
         )
 
     ## table audit : nyc_taxi.audit.audit_load
@@ -95,5 +95,71 @@ class AuditManager:
             f"Deleting period {periode} "
             f"from {catalog_name}.{schema_name}.{table_name}"
         )
-                                                 
+        
+
+    def insert_row_counts(self, context):
+        data = []
+        for table_name, row_count in context.row_count.items():
+
+            data.append(
+                (
+                    context.run_id,
+                    int(context.periode),
+                    table_name,
+                    int(row_count),
+                    datetime.now()
+                )
+            )
+
+        df = self.spark.createDataFrame(
+            data,
+            schema=[
+                "run_id",
+                "periode",
+                "table_name",
+                "row_count",
+                "created_at"
+            ]
+        )
+
+        (
+            df.write
+            .format("delta")
+            .mode("append")
+            .saveAsTable("nyc_taxi.audit.audit_row_count")
+        )
+
+    
+
+    @log_execution
+    def insert_audit_bis(self, context):
+        data = [
+            (
+                int(context.periode),
+                context.table_name,
+                context.taxi_type,
+                context.row_count.get("silver", 0),
+                context.status,
+                context.start_time,
+                context.end_time,
+                context.duration_seconds,
+                context.message,
+                context.error_step
+            )
+        ]
+
+        df = self.spark.createDataFrame(
+            data=data,
+            schema=schema
+        )
+
+        (
+            df.write
+                .format("delta")
+                .mode("append")
+                .option("mergeSchema", "true")
+                .saveAsTable("nyc_taxi.audit.audit_load")
+        )
+
+                                  
                                             

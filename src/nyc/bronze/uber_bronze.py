@@ -74,7 +74,7 @@ class UberBronze(PipelineStep):
         if not path_file.exists():
             url = (f"https://d37ci6vzurychx.cloudfront.net/trip-data/{file_name}")
             
-            self.logger.info(f"{'=' * 55} Downloading {file_name} {'=' * 55} ")
+            self.logger.info(f"{'=' * 25} Downloading {file_name} {'=' * 25} ")
             urllib.request.urlretrieve(url, str(path_file))
 
         archived = self.path_volume / self.taxi_type / str(self.year) / file_name

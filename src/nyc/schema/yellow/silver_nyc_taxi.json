@@ -1,0 +1,118 @@
+{
+"VendorID": {
+  "sql_type": "INT",
+  "nullable": ""
+},
+"tpep_pickup_datetime": {
+  "sql_type": "TIMESTAMP",
+  "nullable": ""
+},
+"tpep_dropoff_datetime": {
+  "sql_type": "TIMESTAMP",
+  "nullable": ""
+  },
+"passenger_count": {
+  "sql_type": "BIGINT",
+  "nullable": ""
+  },
+"trip_distance": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"RatecodeID": {
+  "sql_type": "BIGINT",
+  "nullable": ""
+  },
+"store_and_fwd_flag": {
+  "sql_type": "STRING",
+  "nullable": ""
+  },
+"PULocationID": {
+  "sql_type": "INT",
+  "nullable": ""
+  },
+"DOLocationID": {
+  "sql_type": "INT",
+  "nullable": ""
+  },
+"payment_type": {
+  "sql_type": "BIGINT",
+  "nullable": ""
+  },
+"fare_amount": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"extra": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"mta_tax": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"tip_amount": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"tolls_amount": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"improvement_surcharge": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"total_amount": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"congestion_surcharge": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"Airport_fee": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"cbd_congestion_fee": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+  },
+"periode": {
+  "sql_type": "INT",
+  "nullable": "NOT NULL"
+  },
+"trip_duration_minute": {
+  "sql_type": "DECIMAL(19,5)",
+  "nullable": ""
+} ,
+"trip_date": {
+  "sql_type": "INT",
+  "nullable": ""
+  } ,
+"tip_percent": {
+  "sql_type": "DECIMAL(10,2)",
+  "nullable": ""
+  },
+"average_speed": {
+  "sql_type": "DECIMAL(10,2)",
+  "nullable": ""
+  },
+"pickup_hour": {
+  "sql_type": "INT",
+  "nullable": ""
+  },
+"pickup_day_of_week": {
+  "sql_type": "INT",
+  "nullable": ""
+  },
+"pickup_month": {
+  "sql_type": "INT",
+  "nullable": ""
+},
+"pickup_year": {
+  "sql_type": "INT",
+  "nullable": ""
+  }
+}

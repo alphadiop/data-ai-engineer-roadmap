@@ -15,7 +15,7 @@ class PipelineContext:
         self.df_dim_date = None
         self.df_kpi_daily = None
         self.dim_location = None
-
+      
         self.nb_rows = 0
         self.status = None
 
@@ -25,5 +25,6 @@ class PipelineContext:
         self.end_time=None
 
         self.message = ""
+        self.current_step = ""
 
         self.row_count = {}

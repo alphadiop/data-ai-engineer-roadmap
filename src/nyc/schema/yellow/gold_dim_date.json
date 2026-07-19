@@ -1,0 +1,42 @@
+{
+  "periode": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "date": {
+    "sql_type": "DATE",
+    "nullable": "NOT NULL"
+  },
+  "year": {
+    "sql_type": "SMALLINT",
+    "nullable": "NOT NULL"
+  },
+  "quarter": {
+    "sql_type": "TINYINT",
+    "nullable": "NOT NULL"
+  },
+  "month": {
+    "sql_type": "TINYINT",
+    "nullable": "NOT NULL"
+  },
+  "day": {
+    "sql_type": "TINYINT",
+    "nullable": "NOT NULL"
+  },
+  "day_of_week": {
+    "sql_type": "TINYINT",
+    "nullable": "NOT NULL"
+  },
+  "day_name": {
+    "sql_type": "STRING",
+    "nullable": "NOT NULL"
+  },
+  "month_name": {
+    "sql_type": "STRING",
+    "nullable": "NOT NULL"
+  },
+  "trip_date": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  }
+}

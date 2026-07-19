@@ -25,16 +25,19 @@ from pyspark.sql.functions import (
     when
 )
 
-
 #from tabulate import tabulate
 from common.pipeline_step import PipelineStep
 from common.logger import PipelineLogger
 from common.decorators import log_execution 
-
+from common.schema_manager import SchemaManager
+from utils.load_json import load_json
 
 #self.logger.info(f"Gold rows : {gold_df.count()}")
        
 class UberSilver(PipelineStep):
+
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/"
+
     def __init__(self, spark: SparkSession, logger: PipelineLogger):
         super().__init__(spark,self.__class__.__name__)
         self.spark = spark
@@ -143,6 +146,37 @@ class UberSilver(PipelineStep):
         )
 
     @log_execution
+    def cast_columns(self, df: DataFrame) -> DataFrame:
+        return (
+            df
+            .withColumn(
+                "tpep_pickup_datetime",
+                col("tpep_pickup_datetime").cast("timestamp")
+            )
+            .withColumn(
+                "tpep_dropoff_datetime",
+                col("tpep_dropoff_datetime").cast("timestamp")
+            )
+            .withColumn(
+                "trip_distance",
+                 col("trip_distance").cast("decimal(19,5)")
+            )
+            .withColumn(
+                "fare_amount",
+                col("fare_amount").cast("decimal(19,5)")
+            )
+            .withColumn(
+                "tip_amount",
+                col("tip_amount").cast("decimal(19,5)")
+            )
+            .withColumn(
+                "total_amount",
+                col("total_amount").cast("decimal(19,5)")
+            )
+        )
+
+
+    @log_execution
     def run(self, context):
 
         df_bronze = context.df_bronze
@@ -156,6 +190,7 @@ class UberSilver(PipelineStep):
             .transform(self.add_tip_percent)
             .transform(self.add_average_speed)
             .transform(self.add_date_features)
+            .transform(self.cast_columns)
             .transform(self.apply_quality_rules)
         )
 
@@ -164,9 +199,18 @@ class UberSilver(PipelineStep):
             f"{rows_count_bronze} -> {df_silver.count()}"
         )
 
+        schema_json = load_json(
+            path = os.path.join(self.path_sql_schema,"yellow" ,"silver_nyc_taxi.json")
+        )
+
+        df_silver = SchemaManager.apply_schema(
+                df = df_silver,
+                schema_json = schema_json
+        )
+
         context.df_silver = df_silver
         context.row_count["silver"] = df_silver.count()
-        
+
         return df_silver
 
     
@@ -178,36 +222,7 @@ class UberSilver(PipelineStep):
             F.col("amount") > 0
         )
 
-    @log_execution
-    def sauvegarde_tables_df(
-        self,
-        df: DataFrame,
-        schema_name: str,
-        table_name: str
-    ):
-        ### self.spark.sql("DROP TABLE IF EXISTS {0}".format(table_name))
-        (
-            df.write
-            .format("delta")
-            .mode("append")
-            .option("mergeSchema", "true")
-            .partitionBy("periode")
-            .saveAsTable(
-                f"nyc_taxi.{schema_name}.{table_name}"
-            )
-        )
-
-    def sauvegarde(self, df):
-        (
-            df.write
-        .format("delta")
-        #.mode("append")
-        .mode("overwrite")
-        .option("mergeSchema", "true")
-        .partitionBy("period")
-        .saveAsTable("bronze_nyc_taxi")
-        )
-
+   
 ## silver.silver_nyc_taxi
 
 if __name__ == "__main__":

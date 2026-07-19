@@ -4,3 +4,4 @@ from .logger import PipelineLogger
 from .pipeline_context import PipelineContext
 from .decorators import log_execution
 from .delta_manager import DeltaManager
+from .schema_manager import SchemaManager

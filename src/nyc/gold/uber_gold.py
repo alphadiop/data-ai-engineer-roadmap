@@ -9,6 +9,8 @@ from common.pipeline_step import PipelineStep
 from common.logger import PipelineLogger
 from common.decorators import log_execution
 from common.delta_manager import DeltaManager
+from common.schema_manager import SchemaManager
+from utils.load_json import load_json
 
 from silver.uber_silver import UberSilver
 
@@ -37,7 +39,11 @@ class UberGold(PipelineStep):
     """
     Après chaque chargement reussi, faire optimize_period
     Puis chaque semaine ou mois faire vacuum
+    Attention : vacuum est dans le module maintenace_job dans jobs
     """
+
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/"
+
     def __init__(self, spark: SparkSession, logger: PipelineLogger):
         super().__init__(spark, self.__class__.__name__)
         self.spark = spark
@@ -47,50 +53,87 @@ class UberGold(PipelineStep):
     @log_execution
     def run(self, context):
 
+        """ 
+            attention : ["nyc_taxi.gold.gold_dim_date", "nyc_taxi.ref.gold_dim_location"]
+            ne sont pas des tables optimisable par période
+        """
         df_silver = context.df_silver
 
         context.df_fact_trips = self.get_fact_trips(df_silver)
         context.df_dim_date = self.get_dim_date(df_silver)
         context.df_kpi_daily = self.get_kpi_daily(df_silver)
-        context.dim_location = self.get_dim_location()
-
-        context.row_count["fact_trips"] = context.df_fact_trips.count()
-        context.row_count["dim_date"] = context.df_dim_date.count()
-        context.row_count["kpi_daily"] = context.df_kpi_daily.count()
-        context.row_count["dim_location"] = context.dim_location.count()
-
-        self.sauvegarde_tables_df(
-            context.df_silver,
-            "silver",
-            "silver_nyc_taxi"
-        )
-
+        
         delta_manager = DeltaManager(
-            spark=spark,
+            spark=self.spark,
             logger=self.logger
         )
-        delta_manager.optimize_period(
+       
+        schema_manager = SchemaManager(
+            spark=self.spark,
+            logger=self.logger
+        )
+         
+        if self.logger:
+            self.logger.info(f"{'=' * 12} Début Validation des schemas {'=' * 12} ")
+
+        schema_json = self.get_schema_json(
+                type_taxi=context.type_taxi, 
+                table_name="silver_nyc_taxi"
+        )
+        
+        schema_manager.validate_columns(
+            df=context.df_silver, 
+            schema_json=schema_json
+        )
+
+        if self.logger:
+            self.logger.info(f"{'=' * 12} Fin Validation des schemas {'=' * 12} ")
+
+
+        if self.logger:
+            self.logger.info(f"{'=' * 12} Chargement des données dans Delta {'=' * 12} ")
+
+        tables = [
+            ("silver", "silver_nyc_taxi", context.df_silver),
+            ("gold", "gold_fact_trips", context.df_fact_trips),
+            ("gold", "gold_dim_date", context.df_dim_date),
+            ("gold", "gold_kpi_daily", context.df_kpi_daily),
+        ]
+
+        for schema_name, table_name, df in tables:
+
+            delta_manager.sauvegarde_tables_delta(
+                df=df,
+                schema_name=schema_name,
+                table_name=table_name,
+                periode=context.periode
+            )
+
+        if self.logger:
+            self.logger.info(f"{'=' * 12} Optimisation des tables Delta {'=' * 12} ")
+
+        tables_to_optimize = [
             "nyc_taxi.silver.silver_nyc_taxi",
-            context.periode
-        )
-                
-        self.sauvegarde_tables_df(
-            context.df_fact_trips,
-            "gold",
-            "gold_fact_trips"
-        )
+            "nyc_taxi.gold.gold_fact_trips",
+            "nyc_taxi.gold.gold_kpi_daily"
+        ]
+        
+        for table in tables_to_optimize:
 
-        self.sauvegarde_tables_df(
-            context.df_dim_date,
-            "gold",
-            "gold_dim_date"
-        )
+            delta_manager.optimize_period(
+                table_name=table,
+                periode=context.periode
+            )
 
-        self.sauvegarde_tables_df(
-            context.df_kpi_daily,
-            "gold",
-            "gold_kpi_daily"
+
+    def get_schema_json(self, type_taxi, table_name: str) -> dict:
+        path = os.path.join(
+            self.path_sql_schema,
+            type_taxi,
+            f"{table_name}.json"
         )
+        return load_json(path)
+    
 
 
     @log_execution   
@@ -127,7 +170,7 @@ class UberGold(PipelineStep):
             )
         )
 
-    # "gold_dimdate", "gold_kpi_daily", "gold_fact_trips", "gold_dim_location"
+    # "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "gold_dim_location"
 
     @log_execution
     def get_fact_trips(self, df_silver: DataFrame) -> DataFrame:
@@ -185,8 +228,7 @@ class UberGold(PipelineStep):
         return (
             self.spark.read.csv("/Volumes/nyc_taxi/ref/ref_files/taxi_zone_lookup.csv", header=True)
             .withColumn(
-                "location_id",
-                col("LocationID").cast("int")
+                "location_id", col("LocationID").cast("int")
             )
             .select(
                 "location_id",
@@ -196,27 +238,6 @@ class UberGold(PipelineStep):
             )
         )
 
-    @log_execution
-    def sauvegarde_tables_df(
-        self,
-        df: DataFrame,
-        schema_name: str,
-        table_name: str
-    ):
-        ### self.spark.sql("DROP TABLE IF EXISTS {0}".format(table_name))
-        (
-            df.write
-            .format("delta")
-            .mode("append")
-            .option("mergeSchema", "true")
-            .partitionBy("periode")
-            .saveAsTable(
-                f"nyc_taxi.{schema_name}.{table_name}"
-            )
-        )
-        self.logger.info(
-            f"Table nyc_taxi.{schema_name}.{table_name} saved"
-        )
 
 
     @log_execution
@@ -224,16 +245,16 @@ class UberGold(PipelineStep):
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.silver.silver_nyc_taxi")
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_fact_trips")
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_kpi_daily")
-        self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_dimdate")
+        self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_dim_date")
 
     @log_execution
     def purges_tables(self):
         spark.sql("TRUNCATE TABLE nyc_taxi.silver.silver_nyc_taxi").show(truncate=False)
-        spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_dimdate").show(truncate=False)
+        spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_dim_date").show(truncate=False)
         spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_kpi_daily").show(truncate=False)
         spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_fact_trips").show(truncate=False)
 
-        ### "gold_dimdate", "gold_kpi_daily", "gold_fact_trips", "gold_dim_location"
+        ### "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "gold_dim_location"
 
 
 

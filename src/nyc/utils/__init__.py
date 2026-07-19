@@ -1,1 +1,1 @@
-from .tabulate_dataframe import tabulate_dataframe
+from .load_json import load_json

@@ -1,0 +1,50 @@
+{
+  "periode": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "trip_date": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "date": {
+    "sql_type": "DATE",
+    "nullable": "NOT NULL"
+  },
+  "PULocationID": {
+    "sql_type": "INT",
+    "nullable": ""
+  },
+  "DOLocationID": {
+    "sql_type": "INT",
+    "nullable": ""
+  },
+  "trip_duration_minute": {
+    "sql_type": "INT",
+    "nullable": ""
+  },
+  "trip_distance": {
+    "sql_type": "DECIMAL(19,5)",
+    "nullable": ""
+  },
+  "passenger_count": {
+    "sql_type": "INT",
+    "nullable": ""
+  },
+  "fare_amount": {
+    "sql_type": "DECIMAL(19,5)",
+    "nullable": ""
+  },
+  "tip_amount": {
+    "sql_type": "DECIMAL(19,5)",
+    "nullable": ""
+  },
+  "total_amount": {
+    "sql_type": "DECIMAL(19,5)",
+    "nullable": ""
+  },
+  "payment_type": {
+    "sql_type": "TINYINT",
+    "nullable": ""
+  }
+}

@@ -5,6 +5,11 @@ PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+import uuid
+from datetime import datetime
+
+from setup.create_tables import CreateTables
+from setup.create_catalog import CreateCatalog
 
 from bronze.uber_bronze import UberBronze
 from silver.uber_silver import UberSilver
@@ -15,12 +20,16 @@ from common.pipeline_context import PipelineContext
 from common.decorators import log_execution
 from common.delta_manager import DeltaManager
 
+from jobs.maintenance_job import MaintenanceJob
+
 from audit.audit_manager import AuditManager
 
 from pyspark.sql import SparkSession
 from datetime import datetime
 
 class PipelineRunner:
+
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/"
 
     def __init__(self, spark,logger,steps):
         self.spark = spark
@@ -30,19 +39,30 @@ class PipelineRunner:
 
     def run(self):
 
+        #### CreateTables(spark=self.spark, logger=self.logger).run() ## A faire une fois
+
         context = PipelineContext()
 
+        ### context.run_id = str(uuid.uuid4())
+        context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()
+        context.type_taxi = "yellow"
 
         bronze_step = self.steps[0]
+
         context.periode = bronze_step.periode
+
+        self.logger.info(
+            f"periode = {context.periode}, type = {type(context.periode)}"
+        )
+        
         context.taxi_type = bronze_step.taxi_type
         context.table_name = "silver_nyc_taxi"
 
-        self.logger.info(f"periode = {context.periode}")
-        self.logger.info(f"table_name = {context.table_name}")
-        self.logger.info(f"taxi_type = {context.taxi_type}")
-    
+        self.logger.info(f"{'*' * 25} periode = {context.periode} {'*' * 25} ")
+        self.logger.info(f"{'*' * 25} table_name = {context.table_name} {'*' * 25} ")
+        self.logger.info(f"{'*' * 25} taxi_type = {context.taxi_type} {'*' * 25} ")
+
         audit_manager = AuditManager(
             spark=self.spark, 
             logger=self.logger
@@ -57,36 +77,42 @@ class PipelineRunner:
         try:
 
             for step in self.steps:
-                self.logger.info(f"{'*' * 55} Starting {step.__class__.__name__} {'*' * 55}")
+                context.current_step = step.__class__.__name__
+                self.logger.info(f"{'*' * 55} Starting {context.current_step} {'*' * 55}")
 
                 step.run(context)
                 
-                self.logger.info(f"{'*' * 55} Finished {step.__class__.__name__} {'*' * 55}")
+                self.logger.info(f"{'*' * 55} Finished {context.current_step} {'*' * 55}")
                 self.logger.info(f"{'='*120}")
 
             context.status = "SUCCESS"
             context.message = "OK"
+            context.error_step = ""
+
+            MaintenanceJob(
+                spark=self.spark,
+                logger=self.logger
+            ).run()
             
         except Exception as e:
             context.status = "ERROR"
+            context.error_step = context.current_step
             context.message = str(e)
-            context.row_count["silver"] = 0
-            self.logger.error(f"{'*' * 12} Error in pipeline : {e} {'*'*12}")
+
+            self.logger.error(
+                f"Error in pipeline : {e}"
+            )
 
             raise
 
         finally:
-
             context.end_time = datetime.now()
             context.duration_seconds = (context.end_time - context.start_time).total_seconds()
-            audit_manager.insert_audit(context)
-            
-            self.logger.info(f"periode = {context.periode}")
-            self.logger.info(f"table_name = {context.table_name}")
-            self.logger.info(f"taxi_type = {context.taxi_type}")
-            self.logger.info(f"row_count = {context.row_count}")
-        return context
 
+            audit_manager.insert_audit(context)
+            audit_manager.insert_row_counts(context)
+            
+        return context
 
 
 if __name__ == "__main__":
@@ -94,7 +120,8 @@ if __name__ == "__main__":
     taxi_type = "yellow"
     #taxi_type = "green"
     #taxi_type = "fhv"
-    ## spark = SparkSession.builder.appName("MyDatabricksApp").getOrCreate()
+    ### spark = SparkSession.builder.appName("MyDatabricksApp").getOrCreate()
+
     logger = PipelineLogger("uber_pipeline")
     
     runner = PipelineRunner(
@@ -105,7 +132,7 @@ if __name__ == "__main__":
                 spark=spark, 
                 path_volume=path_volume, 
                 taxi_type=taxi_type, 
-                periode=202508, 
+                periode=202505, 
                 logger=logger
             ),
             UberSilver(

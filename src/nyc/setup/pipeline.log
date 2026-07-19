@@ -1,0 +1,8 @@
+2026-07-18 11:14:57,158 | INFO | nyc_taxi.silver.silver_nyc_taxi
+2026-07-18 11:14:57,921 | INFO | nyc_taxi.gold.gold_fact_trips
+2026-07-18 11:14:58,663 | INFO | nyc_taxi.gold.gold_dim_date
+2026-07-18 11:14:59,499 | INFO | nyc_taxi.gold.gold_kpi_daily
+2026-07-18 11:40:03,669 | INFO | nyc_taxi.silver.silver_nyc_taxi has ['periode']
+2026-07-18 11:40:04,288 | INFO | nyc_taxi.gold.gold_fact_trips has ['periode']
+2026-07-18 11:40:05,069 | INFO | nyc_taxi.gold.gold_dim_date has []
+2026-07-18 11:40:05,560 | INFO | nyc_taxi.gold.gold_kpi_daily has []
