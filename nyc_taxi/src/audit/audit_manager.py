@@ -1,7 +1,7 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -128,38 +128,3 @@ class AuditManager:
             .mode("append")
             .saveAsTable("nyc_taxi.audit.audit_row_count")
         )
-
-    
-
-    @log_execution
-    def insert_audit_bis(self, context):
-        data = [
-            (
-                int(context.periode),
-                context.table_name,
-                context.taxi_type,
-                context.row_count.get("silver", 0),
-                context.status,
-                context.start_time,
-                context.end_time,
-                context.duration_seconds,
-                context.message,
-                context.error_step
-            )
-        ]
-
-        df = self.spark.createDataFrame(
-            data=data,
-            schema=schema
-        )
-
-        (
-            df.write
-                .format("delta")
-                .mode("append")
-                .option("mergeSchema", "true")
-                .saveAsTable("nyc_taxi.audit.audit_load")
-        )
-
-                                  
-                                            

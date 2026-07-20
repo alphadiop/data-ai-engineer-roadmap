@@ -4,7 +4,7 @@ from pathlib import Path
 
 class PipelineLogger:
 
-    PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+    PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/"
 
     def __init__(self, name, level:int=logging.INFO):
         self.logger = logging.getLogger(name)

@@ -1,7 +1,7 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -18,6 +18,7 @@ class Cheick:
 
 
     def get_partition_columns(self):
+        
         """Return the list of columns to partition the data."""
         for table in [
             "nyc_taxi.silver.silver_nyc_taxi",

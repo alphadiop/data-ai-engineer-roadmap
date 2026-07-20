@@ -2,7 +2,7 @@ import os
 import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union,Tuple
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -41,10 +41,11 @@ class DeltaManager:
             self.logger.info(
                 f"Dropping table nyc_taxi.{schema_name}.{table_name}"
             )
-            self.spark.sql(
-                f"DROP TABLE IF EXISTS nyc_taxi.{schema_name}.{table_name}"
+            self.drop_table(
+                schema_name=schema_name, 
+                table_name=table_name
             )
-
+            
         str_schema = ", ".join(list(map(lambda tp:" ".join(tp), schema)))
 
         self.spark.sql(f"""
@@ -56,11 +57,93 @@ class DeltaManager:
          )
 
 
+    def drop_table(
+        self,
+        schema_name: str,
+        table_name: str
+    ):
+
+        self.spark.sql(
+            f"""
+            DROP TABLE IF EXISTS
+            nyc_taxi.{schema_name}.{table_name}
+            """
+        )
+    
+    def rename_table(
+        self,
+        schema_name: str,
+        old_name: str,
+        new_name: str
+    ):
+
+        self.spark.sql(
+            f"""
+            ALTER TABLE
+            nyc_taxi.{schema_name}.{old_name}
+            RENAME TO
+            nyc_taxi.{schema_name}.{new_name}
+            """
+        )
+
+    def table_exists(
+        self,
+        schema_name: str,
+        table_name: str
+    ):
+        return self.spark.catalog.tableExists(
+            f"nyc_taxi.{schema_name}.{table_name}"
+        )
+    
+
+    def show_tables(
+        self,
+        schema_name: str
+    ):
+        return self.spark.sql(
+            f"""
+            SHOW TABLES IN
+            nyc_taxi.{schema_name}
+            """
+        )
+
+
+    def truncate_table(
+        self,
+        schema_name: str,
+        table_name: str
+    ):
+
+        self.spark.sql(
+            f"""
+            TRUNCATE TABLE
+            nyc_taxi.{schema_name}.{table_name}
+            """
+        )
+
+
+
+    def restore_version(
+        self,
+        table_name: str,
+        version: int
+    ):
+
+        self.spark.sql(
+            f"""
+            RESTORE TABLE {table_name}
+            TO VERSION AS OF {version}
+            """
+        )
+
+
+
     def optimize_table(self, table_name:str):
         self.spark.sql(f"OPTIMIZE {table_name}")
         if self.logger:
             self.logger.info(f"{'=' * 12} OPTIMIZE completed {'=' * 12} ")
             self.logger.info(f"OPTIMIZE completed {table_name}")
+
 
 
     def optimize_period(self, table_name: str, periode: int):

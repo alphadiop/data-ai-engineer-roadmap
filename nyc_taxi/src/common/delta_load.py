@@ -1,7 +1,7 @@
 from pyspark.sql import Row
 from datetime import datetime
 
-class DeltaLogger:
+class DeltaLoad:
 
     def __init__(self, spark):
         self.spark = spark

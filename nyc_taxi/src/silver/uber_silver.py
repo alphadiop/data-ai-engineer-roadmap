@@ -2,7 +2,7 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -36,7 +36,7 @@ from utils.load_json import load_json
        
 class UberSilver(PipelineStep):
 
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/"
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src/schema/"
 
     def __init__(self, spark: SparkSession, logger: PipelineLogger):
         super().__init__(spark,self.__class__.__name__)

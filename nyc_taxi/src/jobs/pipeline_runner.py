@@ -1,7 +1,7 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -9,7 +9,7 @@ import uuid
 from datetime import datetime
 
 from setup.create_tables import CreateTables
-from setup.create_catalog import CreateCatalog
+from common.catalog_manager import CatalogManager
 
 from bronze.uber_bronze import UberBronze
 from silver.uber_silver import UberSilver
@@ -29,7 +29,7 @@ from datetime import datetime
 
 class PipelineRunner:
 
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/"
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src/schema/"
 
     def __init__(self, spark,logger,steps):
         self.spark = spark
@@ -45,6 +45,7 @@ class PipelineRunner:
 
         ### context.run_id = str(uuid.uuid4())
         context.run_id = int(datetime.now().timestamp())
+        
         context.start_time = datetime.now()
         context.type_taxi = "yellow"
 
@@ -91,8 +92,7 @@ class PipelineRunner:
 
             MaintenanceJob(
                 spark=self.spark,
-                logger=self.logger
-            ).run()
+                logger=self.logger).run()
             
         except Exception as e:
             context.status = "ERROR"
@@ -132,7 +132,7 @@ if __name__ == "__main__":
                 spark=spark, 
                 path_volume=path_volume, 
                 taxi_type=taxi_type, 
-                periode=202509, 
+                periode=202511, 
                 logger=logger
             ),
             UberSilver(

@@ -1,7 +1,7 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc"
+PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     from sql_schema.get_columns_from_schema import get_columns_from_schema
 
     logger = PipelineLogger("build_schema")
-    path = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/yellow/audit_load.json"
+    path = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src/schema/yellow/audit_load.json"
     load_json = load_json(path)
     schema = build_schema(load_json)
     print(schema)
