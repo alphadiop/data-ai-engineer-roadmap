@@ -367,7 +367,7 @@ if __name__ == "__main__":
         spark=spark,
         logger=logger
     )
-    path = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/src/nyc/schema/yellow/audit_load.json"
+    path = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc/schema/yellow/audit_load.json"
     load_json = load_json(path)
     schema = build_schema(load_json)
     colums = get_columns_from_schema(schema)

@@ -9,7 +9,8 @@ import uuid
 from datetime import datetime
 
 from setup.create_tables import CreateTables
-from common.catalog_manager import CatalogManager
+from setup.create_catalog import CreateCatalog
+
 
 from bronze.uber_bronze import UberBronze
 from silver.uber_silver import UberSilver
@@ -19,6 +20,7 @@ from common.logger import PipelineLogger
 from common.pipeline_context import PipelineContext
 from common.decorators import log_execution
 from common.delta_manager import DeltaManager
+from common.catalog_manager import CatalogManager
 
 from jobs.maintenance_job import MaintenanceJob
 
@@ -29,7 +31,7 @@ from datetime import datetime
 
 class PipelineRunner:
 
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src/schema/"
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
     def __init__(self, spark,logger,steps):
         self.spark = spark
@@ -39,13 +41,13 @@ class PipelineRunner:
 
     def run(self):
 
+        ### CreateCatalog(spark=self.spark, logger=self.logger).run()
         #### CreateTables(spark=self.spark, logger=self.logger).run() ## A faire une fois
 
         context = PipelineContext()
 
-        ### context.run_id = str(uuid.uuid4())
         context.run_id = int(datetime.now().timestamp())
-        
+
         context.start_time = datetime.now()
         context.type_taxi = "yellow"
 
@@ -53,16 +55,16 @@ class PipelineRunner:
 
         context.periode = bronze_step.periode
 
-        self.logger.info(
-            f"periode = {context.periode}, type = {type(context.periode)}"
-        )
-        
         context.taxi_type = bronze_step.taxi_type
         context.table_name = "silver_nyc_taxi"
 
-        self.logger.info(f"{'*' * 25} periode = {context.periode} {'*' * 25} ")
-        self.logger.info(f"{'*' * 25} table_name = {context.table_name} {'*' * 25} ")
-        self.logger.info(f"{'*' * 25} taxi_type = {context.taxi_type} {'*' * 25} ")
+        self.logger.info(
+            f"{'*' * 25} periode : {context.periode}, type = {type(context.periode)}"
+        )
+        self.logger.info(f"{'*' * 25} taxi_type : {context.taxi_type} {'*' * 25} ")
+        self.logger.info(f"{'*' * 25} periode : {context.periode} {'*' * 25} ")
+        self.logger.info(f"{'*' * 25} table_name : {context.table_name} {'*' * 25} ")
+        self.logger.info(f"{'*' * 2} path_schema : {self.path_sql_schema} {'*' * 5} ")
 
         audit_manager = AuditManager(
             spark=self.spark, 
@@ -132,7 +134,7 @@ if __name__ == "__main__":
                 spark=spark, 
                 path_volume=path_volume, 
                 taxi_type=taxi_type, 
-                periode=202511, 
+                periode=202601, 
                 logger=logger
             ),
             UberSilver(

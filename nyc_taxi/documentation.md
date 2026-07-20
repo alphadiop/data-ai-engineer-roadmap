@@ -521,3 +521,59 @@ Gold
 ## Priorité 4
 
 * [ ] Lakeflow / Delta Live Tables
+
+
+---
+
+### Création / structure
+* [ ] Création / structure
+
+### Lecture / écriture
+* [ ] read_delta()
+* [ ] write_delta()
+* [ ] sauvegarde_tables_delta()
+
+### Maintenance
+* [ ] optimize_table()
+* [ ] optimize_period()
+* [ ] vacuum()
+* [ ] vacuum_dry_run()
+
+### Administration
+* [ ] history()
+* [ ] describe_detail()
+* [ ] count_period()
+* [ ] delete_period()
+* [ ] time_travel()
+
+### Streaming
+* [ ] read_stream()
+* [ ] write_stream()
+
+---
+
+### CatalogManager : Responsable du metastore
+* [ ] create_catalog()
+* [ ] drop_catalog()
+* [ ] create_schema()
+* [ ] drop_schema()
+* [ ] show_catalogs()
+* [ ] show_schemas()
+* [ ] show_tables()
+
+### DeltaManager: Il manipule les tables.
+* [ ] create_table()
+* [ ] drop_table()
+* [ ] read_delta()
+* [ ] write_delta()
+* [ ] optimize()
+* [ ] vacuum()
+* [ ] history()
+* [ ] describe_detail()
+* [ ] time_travel()
+
+### AuditManager : Responsable du suiv
+* [ ] insert_audit()
+* [ ] insert_row_count()
+* [ ] is_period_loaded()
+
