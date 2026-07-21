@@ -4,12 +4,22 @@
 ##### Objectif principal de Bundles : intégrer Databricks dans un processus CI/CD
 ---
 
+### Etapes principales
+- [ ] Installer la CLI Databricks
+- [ ] Structure du projet
+- [ ] Créer le bundle
+- [ ] Déclarer le job NYC Taxi
+- [ ] Définir les environnements 
+- [ ] Validation
+- [ ] Déploiement
+
 
 #### Commandes importantes
 - [ ] databricks bundle validate
 - [ ] databricks bundle deploy
 - [ ] databricks bundle run nyc_taxi_pipeline
 * Ces commandes permettent de valider, déployer et exécuter le projet directement depuis la CLI.
+
 
 ### architecture conseillée
 ```text
