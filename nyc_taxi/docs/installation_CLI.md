@@ -1,4 +1,18 @@
 
+✓ GitHub  
+✓ Databricks CLI  
+
+→ Créer un premier Job Databricks  
+→ Paramétrer la période  
+→ Exécuter le pipeline via le Job  
+→ Découvrir les Workflows  
+
+Puis :  
+→ Databricks Asset Bundles  
+→ GitHub Actions (plus tard)  
+→ CI/CD  
+
+
 
 ### Installation CLI
 - [ ] ouvrir PowerShell en mode admin

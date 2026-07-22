@@ -1,16 +1,6 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-
-from common.pipeline_step import PipelineStep
-from common.logger import PipelineLogger
-from common.decorators import log_execution 
-
-
 import urllib
 import re
 import sys
@@ -18,17 +8,27 @@ from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (col, lit)
+from urllib.error import HTTPError, URLError
 
-
-
+from nyc_taxi.src.common.pipeline_step import PipelineStep
+from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.common.decorators import log_execution 
+from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
 
 ### Path(self.path_volume) / file_name
 class UberBronze(PipelineStep):
+    """ 
+     Télécharger les données Uber et les stocker dans le répertoire Bronze
+     Mais avant de le télécharger, nous allons vérifier si le fichier existe dans le répertoire Bronze.
+     Si le fichier existe, nous allons le télécharger à partir du répertoire Bronze.
+     Sinon, nous allons le télécharger à partir du répertoire Bronze.
+    """
 
-    def __init__(self, spark, path_volume:Path | str,  taxi_type: str, periode:int, logger:PipelineLogger):
-        super().__init__(spark, __file__)
+    path_volume = Path("/Volumes/nyc_taxi/bronze/raw_files")
+
+    def __init__(self, spark,  taxi_type: str, periode:int, logger:PipelineLogger):
+        super().__init__(spark,self.__class__.__name__)
         self.spark = spark
-        self.path_volume = Path(path_volume)
         self.taxi_type = taxi_type
         self.periode = periode
         self.logger = logger
@@ -48,7 +48,7 @@ class UberBronze(PipelineStep):
     @log_execution
     def get_path_file(self) -> Path:
         return (
-            self.path_volume 
+            self.path_volume
             / self.taxi_type 
             / str(self.year) 
             / self.get_file_name(self.taxi_type)
@@ -66,24 +66,44 @@ class UberBronze(PipelineStep):
         path_file = self.path_volume / self.taxi_type / str(self.year) / file_name
         archive_dir = self.path_volume / self.taxi_type / str(self.year) / file_name
 
-
         self.logger.info(f"Extracting {file_name} from {path_file}")
 
-        path_file.parent.mkdir(parents=True, exist_ok=True)
+        path_file.parent.mkdir(
+            parents=True, exist_ok=True
+        )
 
         if not path_file.exists():
             url = (f"https://d37ci6vzurychx.cloudfront.net/trip-data/{file_name}")
             
-            self.logger.info(f"{'=' * 25} Downloading {file_name} {'=' * 25} ")
-            urllib.request.urlretrieve(url, str(path_file))
+            self.logger.info(
+                f"{'=' * 25} Downloading {file_name} {'=' * 25} "
+            )
+
+            try:
+                urllib.request.urlretrieve(url, str(path_file))
+
+            except HTTPError as e:
+
+                if e.code in (403, 404):
+                    raise DataNotAvailableError(
+                            f"Dataset indisponible pour "
+                            f"{self.taxi_type} {self.periode}"
+                        )
+                raise
+
+            except URLError as e:
+                self.logger.error(
+                    f"Error downloading {file_name} : {e}"
+                )
+                raise
 
         archived = self.path_volume / self.taxi_type / str(self.year) / file_name
 
         if not archived.exists():
             path_file.replace(archived)
             path_file = archived
-        df = self.spark.read.parquet(str(path_file))
 
+        df = self.spark.read.parquet(str(path_file))
 
         df_bronze = df.withColumn("periode", lit(self.periode))
 
@@ -99,7 +119,6 @@ class UberBronze(PipelineStep):
         )
         return df_bronze
             
-    
 
     def get_period(self, file_name: str) -> str:
         match = re.search(r"(\d{4})-(\d{2})", file_name)
@@ -122,14 +141,13 @@ class UberBronze(PipelineStep):
 if __name__ == "__main__":
     path_volume = "/Volumes/nyc_taxi/bronze/raw_files"
     taxi_type = "yellow"
-    taxi_type = "green"
+    #taxi_type = "green"
     #taxi_type = "fhv"
     logger = PipelineLogger('Bronze')
     extractor = UberBronze(
         spark, 
-        path_volume, 
         taxi_type, 
-        periode=202411,
+        periode=202607,
         logger=logger
     )
     #print(extractor.get_file_name(taxi_type))

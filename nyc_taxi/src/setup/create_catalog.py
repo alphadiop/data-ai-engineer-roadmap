@@ -2,12 +2,9 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
 
-from common.catalog_manager import CatalogManager
-from common.logger import PipelineLogger 
+from nyc_taxi.src.common.catalog_manager import CatalogManager
+from nyc_taxi.src.common.logger import PipelineLogger 
 
 
 class CreateCatalog:

@@ -2,12 +2,9 @@ import os
 import sys
 from pyspark.sql import SparkSession
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/srcc"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
     
-from common.delta_manager import DeltaManager
-from common.logger import PipelineLogger
+from nyc_taxi.src.common.delta_manager import DeltaManager
+from nyc_taxi.src.common.logger import PipelineLogger
 
 class MaintenanceJob:
     """ attention :

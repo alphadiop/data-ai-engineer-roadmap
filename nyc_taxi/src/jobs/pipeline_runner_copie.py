@@ -4,7 +4,6 @@ import sys
 
 import uuid
 from datetime import datetime
-import argparse
 
 from nyc_taxi.src.setup.create_tables import CreateTables
 from nyc_taxi.src.setup.create_catalog import CreateCatalog
@@ -129,43 +128,15 @@ class PipelineRunner:
 
 
 if __name__ == "__main__":
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--taxi_type",
-        type=str,
-        required=True,
-        help="yellow, green ou fhv"
-    )
-    parser.add_argument(
-        "--periode",
-        type=int,
-        required=False,
-        help="Format YYYYMM"
-    )
-    
-    logger = PipelineLogger("uber_pipeline")
-
-    audit_manager = AuditManager(
-        spark=spark,
-        logger=logger
-    )
-    args = parser.parse_args()
-
-    #taxi_type = "yellow"
+  
+    taxi_type = "yellow"
     #taxi_type = "green"
     #taxi_type = "fhv"
-    #periode=202603
+    ### spark = SparkSession.builder.appName("MyDatabricksApp").getOrCreate()
+    periode=202606
 
-    taxi_type = args.taxi_type
-
-    if args.periode:
-        periode = args.periode
-    else:
-        periode = audit_manager.get_next_period()
-
-    logger.info(f"Job parameters : taxi_type={taxi_type}, periode={periode}")
-
+    logger = PipelineLogger("uber_pipeline")
+    
     runner = PipelineRunner(
         spark=spark,
         logger=logger,

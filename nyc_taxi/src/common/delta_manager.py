@@ -2,11 +2,9 @@ import os
 import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union,Tuple
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
 
-from common.logger import PipelineLogger
+
+from nyc_taxi.src.common.logger import PipelineLogger
 from pyspark.sql import DataFrame
 
 from utils.sql_schema.build_schema import build_schema

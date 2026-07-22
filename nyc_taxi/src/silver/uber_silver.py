@@ -2,9 +2,6 @@
 import os
 import sys
 
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
 
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
@@ -26,11 +23,11 @@ from pyspark.sql.functions import (
 )
 
 #from tabulate import tabulate
-from common.pipeline_step import PipelineStep
-from common.logger import PipelineLogger
-from common.decorators import log_execution 
-from common.schema_manager import SchemaManager
-from utils.load_json import load_json
+from nyc_taxi.src.common.pipeline_step import PipelineStep
+from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.common.decorators import log_execution 
+from nyc_taxi.src.common.schema_manager import SchemaManager
+from nyc_taxi.src.utils.load_json import load_json
 
 #self.logger.info(f"Gold rows : {gold_df.count()}")
        

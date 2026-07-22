@@ -1,17 +1,11 @@
 import os
 import sys
-
-PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
 import uuid
 
-
-from common.pipeline_step import PipelineStep
-from common.logger import PipelineLogger
-from common.decorators import log_execution
-
+from nyc_taxi.src.common.pipeline_step import PipelineStep
+from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.common.decorators import log_execution
+from pyspark.sql.functions import max as spark_max
 
 from pyspark.sql.functions import col
 from datetime import datetime
@@ -128,3 +122,37 @@ class AuditManager:
             .mode("append")
             .saveAsTable("nyc_taxi.audit.audit_row_count")
         )
+
+    def get_next_period(self) -> int:
+        try:
+            max_period = (
+                self.spark.table("nyc_taxi.audit.audit_load")
+                    .select(spark_max("periode").alias("periode"))
+                    .collect()[0]["periode"]
+            )
+
+            if max_period is None:
+                return 202401
+
+            year = max_period // 100
+            month = max_period % 100
+
+            if month == 12:
+                return (year + 1) * 100 + 1
+
+            return year * 100 + (month + 1)
+
+        except Exception:
+            # Première exécution du projet
+            return 202401
+
+if __name__ == "__main__":
+    logger = PipelineLogger("uber_pipeline")
+    audit_manager = AuditManager(
+        spark=spark,
+        logger=logger
+    )
+    logger.info(f"Periode choisie : {audit_manager.get_next_period()}")
+
+
+    
