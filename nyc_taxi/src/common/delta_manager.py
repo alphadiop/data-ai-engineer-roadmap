@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union,Tuple
 from nyc_taxi.src.common.logger import PipelineLogger
 from pyspark.sql import DataFrame
 
-from utils.sql_schema.build_schema import build_schema
-from utils.sql_schema.get_columns_from_schema import get_columns_from_schema
-from utils.load_json import load_json
+from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
+from nyc_taxi.src.utils.sql_schema.get_columns_from_schema import get_columns_from_schema
+from nyc_taxi.src.utils.load_json import load_json
 
 
 class DeltaManager:
@@ -60,7 +60,6 @@ class DeltaManager:
         schema_name: str,
         table_name: str
     ):
-
         self.spark.sql(
             f"""
             DROP TABLE IF EXISTS
@@ -120,13 +119,11 @@ class DeltaManager:
         )
 
 
-
     def restore_version(
         self,
         table_name: str,
         version: int
     ):
-
         self.spark.sql(
             f"""
             RESTORE TABLE {table_name}
@@ -183,14 +180,19 @@ class DeltaManager:
 
     def vacuum(self,table_name: str,retain_hours: int = 168):
         """ Conserver les versions des 7 derniers jours -> retention 168h """
-        self.spark.sql(
+        try:
+            self.spark.sql(
             f"""
             VACUUM {table_name}
             RETAIN {retain_hours} HOURS
             """
-        )
-        if self.logger:
-            self.logger.info(f"VACUUM completed on {table_name}")
+            )
+            if self.logger:
+                self.logger.info(f"VACUUM completed on {table_name}")
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"Vacuum failed on {table_name} : {e}")
+            raise
 
 
     def vacuum_dry_run(self, table_name: str) -> DataFrame:
@@ -256,25 +258,31 @@ class DeltaManager:
         df: DataFrame,
         schema_name: str,
         table_name: str,
-        periode:int
+        periode:int,
+        replace:bool=False
     ):
-        self.delete_period(
-            schema_name = schema_name,
-            table_name=table_name,
-            periode=periode
-        )
-
-        (
-            df.write
-            .format("delta")
-            .mode("append")
-            .saveAsTable(
-                f"nyc_taxi.{schema_name}.{table_name}"
+        if replace:
+            (
+                df.write
+                .format("delta")
+                .mode("overwrite")
+                .option("replaceWhere", f"periode = {periode}")
+                .saveAsTable(f"nyc_taxi.{schema_name}.{table_name}")
             )
-        )
-        self.logger.info(
-            f"Table nyc_taxi.{schema_name}.{table_name} saved"
-        )
+            self.logger.info(
+                f"Table nyc_taxi.{schema_name}.{table_name} replaced"
+            )
+
+        else:
+            (
+                df.write
+                .format("delta")
+                .mode("append")
+                .saveAsTable(f"nyc_taxi.{schema_name}.{table_name}")
+            )
+            self.logger.info(
+                f"Table nyc_taxi.{schema_name}.{table_name} saved"
+            )
 
 
 
