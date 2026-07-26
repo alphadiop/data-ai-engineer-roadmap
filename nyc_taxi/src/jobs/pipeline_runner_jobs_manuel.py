@@ -55,7 +55,7 @@ class PipelineRunner:
         context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()
         bronze_step = self.steps[0]
-        context.taxi_type = "yellow"
+        context.taxi_type = bronze_step.taxi_type
         context.table_name = "silver_nyc_taxi"
         context.periode = bronze_step.periode
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     # Je rend le parametre periode optionnel car il est renseigné automatiquement à partir de la table audit
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--periode", type=int, required=False)
+    parser.add_argument("--periode", type=int, required=True)
     parser.add_argument("--taxi_type", type=str, default="yellow")
 
     args = parser.parse_args()

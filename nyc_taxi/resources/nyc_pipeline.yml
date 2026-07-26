@@ -1,50 +1,30 @@
 resources:
   jobs:
+
     nyc_taxi_job:
       name: nyc_taxi_pipeline
 
-      # Paramètres globaux du Job
       parameters:
         - name: periode
           default: "202601"
-
         - name: taxi_type
           default: "yellow"
 
+
       tasks:
-        - task_key: bronze
+        - task_key: pipeline
           job_cluster_key: nyc_cluster
-          notebook_task:
-            notebook_path: ../src/bronze/uber_bronze.py
-            base_parameters:
-              periode: "{{job.parameters.periode}}"
-              taxi_type: "{{job.parameters.taxi_type}}"
+          python_wheel_task:
+            package_name: nyc_taxi
+            entry_point: pipeline
+            parameters:
 
-        - task_key: silver
-          depends_on:
-            - task_key: bronze
+              - "--periode"
+              - "{{job.parameters.periode}}"
 
-          job_cluster_key: nyc_cluster
-          notebook_task:
-            notebook_path: ../src/silver/uber_silver.py
+              - "--taxi_type"
+              - "{{job.parameters.taxi_type}}"
 
-            base_parameters:
-              periode: "{{job.parameters.periode}}"
-              taxi_type: "{{job.parameters.taxi_type}}"
-
-
-        - task_key: gold
-          depends_on:
-            - task_key: silver
-
-          job_cluster_key: nyc_cluster
-
-          notebook_task:
-            notebook_path: ../src/gold/uber_gold.py
-
-            base_parameters:
-              periode: "{{job.parameters.periode}}"
-              taxi_type: "{{job.parameters.taxi_type}}"
 
       job_clusters:
         - job_cluster_key: nyc_cluster
