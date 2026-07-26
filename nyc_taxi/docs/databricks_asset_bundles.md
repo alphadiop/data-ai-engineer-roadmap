@@ -71,6 +71,18 @@
 
 
 
+### Créer le Job
+- [ ] parameters:
+  - periode
+  - taxi_type
+
+### Déployer
+- [ ] databricks bundle deploy
+
+### Lancer
+- [ ] databricks bundle run nyc_taxi_job
+- [ ] databricks bundle run nyc_taxi_job --params periode=202603,taxi_type=yellow
+- [ ] nyc_taxi_job = clé YAML du Job dans le bundle
 
 
 ---
@@ -208,34 +220,6 @@ nyc_taxi/
 #### Étape 7 : Déploiement
 - [ ] databricks bundle deploy
 - [ ] databricks bundle run nyc_taxi_pipeline
-
-```text
- Bronze
-   ↓
- Silver
-   ↓
- Gold
-   ↓
- Audit
-```
-
-
-pourra devenir un Job Databricks : 
-
-```text
-CreateCatalog
-      ↓
-CreateTables
-      ↓
-UberBronze
-      ↓
-UberSilver
-      ↓
-UberGold
-      ↓
-MaintenanceJob
-```
-* avec exécution planifiée tous les jours.
 
 
 
