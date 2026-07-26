@@ -9,7 +9,7 @@
 - [ ] puis de la déployer automatiquement.
 
 
-### Tu exécutes manuellement :
+### Tu exécutes manuellement (Sans Asset Bundles):
 - [ ] ouvrir Databricks
 - [ ] attacher un cluster
 - [ ] lancer notebook
@@ -21,8 +21,59 @@
 - [ ] On ajoute une couche de déploiement
 
 
+### Fichiers YAML
+- [ ] databricks.yml : C'est la carte d'identité du projet
+- [ ] resources/nyc_pipeline.yml : Définir le Job
 
 
+### Validation
+- [ ] Avant de déployer : databricks bundle validate
+- [ ] La CLI vérifie :
+  - [ ] YAML correct
+  - [ ] chemins corrects
+  - [ ] ressources valides
+
+
+### Déploiement
+- [ ] Commande : databricks bundle deploy
+
+### Résultat :
+- [ ] Uploading files...
+- [ ] Creating job nyc_taxi_pipeline...
+- [ ] Creating job cluster...
+- [ ] Deployment successful
+
+### Dans Databricks :
+- [ ] Workflows
+- [ ] nyc_taxi_pipeline
+- [ ] apparaît automatiquement
+
+
+### Exécuter le pipeline : 
+- [ ] Au lieu de cliquer : databricks bundle run nyc_taxi_job
+- [ ] La CLI lance : Bronze -> Silver -> Gold
+
+
+### Avec Bundle :
+- [ ] Git
+- [ ] databricks bundle deploy
+- [ ] Job Databricks
+- [ ] Pipeline reproductible
+---
+
+| Avant                  | Avec Bundle           |
+| ---------------------- | --------------------- |
+| configuration manuelle | configuration en YAML |
+| difficile à reproduire | reproductible         |
+| risque d'erreur        | contrôlé par Git      |
+| déploiement manuel     | automatisé            |
+| difficile en équipe    | collaboratif          |
+
+
+
+
+
+---
 ### Etapes principales
 - [ ] Installer la CLI Databricks
 - [ ] Structure du projet
@@ -36,47 +87,20 @@
 #### Commandes importantes
 - [ ] databricks bundle validate
 - [ ] databricks bundle deploy
-- [ ] databricks bundle run nyc_taxi_pipeline
-* Ces commandes permettent de valider, déployer et exécuter le projet directement depuis la CLI.
+- [ ] databricks bundle run nyc_taxi_pipeline 
+- [ ] Ces commandes permettent de valider, déployer et exécuter le projet directement depuis la CLI.
 
 
-### architecture conseillée
-```text
-nyc_taxi
-│
-├── src
-│   ├── bronze
-│   ├── silver
-│   ├── gold
-│   ├── audit
-│   ├── common
-│   └── jobs
-│
-├── schema
-│
-├── tests
-│
-├── resources
-│   └── jobs.yml
-│
-└── databricks.yml
-```
 
 ---
 ### Puis créer un Job Databricks :
-```text
-CreateCatalog
-      ↓
-CreateTables
-      ↓
-UberBronze
-      ↓
-UberSilver
-      ↓
-UberGold
-      ↓
-MaintenanceJob
-```
+- [ ] CreateCatalog
+- [ ] CreateTables
+- [ ] UberBronze
+- [ ] UberSilver
+- [ ] UberGold
+- [ ] MaintenanceJob
+
 
 ---
 ### Les tables
