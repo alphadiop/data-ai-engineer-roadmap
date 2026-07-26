@@ -127,15 +127,6 @@ class UberBronze(PipelineStep):
         return f"{match.group(1)}{match.group(2)}"
     
 
-    def sauvegarde(self, df):
-        (
-            df.write
-           .format("delta")
-           .mode("append")
-           .option("mergeSchema", "true")
-           .partitionBy("periode")
-           .saveAsTable("bronze_nyc_taxi")
-        )
 
 
 if __name__ == "__main__":
@@ -150,11 +141,3 @@ if __name__ == "__main__":
         periode=202607,
         logger=logger
     )
-    #print(extractor.get_file_name(taxi_type))
-    #print(extractor.get_path_file())
-    #df = extractor.run()
-    
-    #extractor.sauvegarde(df, file_name)
-    #transformer = Transformation()
-    #df_silver = transformer(df)
-    ##display(df.limit(10))

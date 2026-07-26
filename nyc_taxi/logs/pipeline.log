@@ -535,3 +535,167 @@
 2026-07-22 21:48:35 | INFO | ============ Historique ============ 
 2026-07-22 22:20:16 | INFO | ============ Historique ============ 
 2026-07-22 22:20:24 | INFO | ============ Historique ============ 
+2026-07-24 08:24:02 | INFO | ************************* periode : 202601, type = <class 'int'>
+2026-07-24 08:24:02 | INFO | ************************* taxi_type : yellow ************************* 
+2026-07-24 08:24:02 | INFO | ************************* periode : 202601 ************************* 
+2026-07-24 08:24:02 | INFO | ************************* table_name : silver_nyc_taxi ************************* 
+2026-07-24 08:24:02 | INFO | ** path_schema : /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/ ***** 
+2026-07-24 08:24:03 | INFO | Period 202601 already loaded =====================================================================================
+2026-07-24 08:24:26 | INFO | ************************* periode : 202601, type = <class 'int'>
+2026-07-24 08:24:26 | INFO | ************************* taxi_type : yellow ************************* 
+2026-07-24 08:24:26 | INFO | ************************* periode : 202601 ************************* 
+2026-07-24 08:24:26 | INFO | ************************* table_name : silver_nyc_taxi ************************* 
+2026-07-24 08:24:26 | INFO | ** path_schema : /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/ ***** 
+2026-07-24 08:24:27 | INFO | Period 202601 already loaded =====================================================================================
+2026-07-24 08:24:49 | INFO | ************************* periode : 202601, type = <class 'int'>
+2026-07-24 08:24:49 | INFO | ************************* taxi_type : yellow ************************* 
+2026-07-24 08:24:49 | INFO | ************************* periode : 202601 ************************* 
+2026-07-24 08:24:49 | INFO | ************************* table_name : silver_nyc_taxi ************************* 
+2026-07-24 08:24:49 | INFO | ** path_schema : /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/ ***** 
+2026-07-24 08:24:50 | INFO | Period 202601 already loaded =====================================================================================
+2026-07-24 08:25:14 | INFO | ************************* periode : 202601, type = <class 'int'>
+2026-07-24 08:25:14 | INFO | ************************* taxi_type : yellow ************************* 
+2026-07-24 08:25:14 | INFO | ************************* periode : 202601 ************************* 
+2026-07-24 08:25:14 | INFO | ************************* table_name : silver_nyc_taxi ************************* 
+2026-07-24 08:25:14 | INFO | ** path_schema : /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/ ***** 
+2026-07-24 08:25:15 | INFO | Period 202601 already loaded =====================================================================================
+2026-07-24 08:29:15 | INFO | ************************* periode : 202602, type = <class 'int'>
+2026-07-24 08:29:15 | INFO | ************************* taxi_type : yellow ************************* 
+2026-07-24 08:29:15 | INFO | ************************* periode : 202602 ************************* 
+2026-07-24 08:29:15 | INFO | ************************* table_name : silver_nyc_taxi ************************* 
+2026-07-24 08:29:15 | INFO | ** path_schema : /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/ ***** 
+2026-07-24 08:29:16 | INFO | Period 202602 already loaded =====================================================================================
+****************
+2026-07-24 08:25:42 | INFO | Extracting yellow_tripdata_2026-02.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2026/yellow_tripdata_2026-02.parquet
+2026-07-24 08:25:48 | INFO | ======================================================= Bronze rows : 3399866 ======================================================= 
+2026-07-24 08:25:48 | INFO | run completed in 5.96s
+2026-07-24 08:25:48 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-24 08:25:48 | INFO | ========================================================================================================================
+2026-07-24 08:25:48 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-24 08:25:48 | INFO | add_trip_duration completed in 0.04s
+2026-07-24 08:25:48 | INFO | add_date_key completed in 0.0s
+2026-07-24 08:25:48 | INFO | add_tip_percent completed in 0.0s
+2026-07-24 08:25:48 | INFO | add_average_speed completed in 0.0s
+2026-07-24 08:25:48 | INFO | add_date_features completed in 0.0s
+2026-07-24 08:25:48 | INFO | cast_columns completed in 0.0s
+2026-07-24 08:25:48 | INFO | apply_quality_rules completed in 0.0s
+2026-07-24 08:25:50 | INFO | Silver rows : 3399866 -> 3211153
+2026-07-24 08:25:52 | INFO | run completed in 4.31s
+2026-07-24 08:25:52 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-24 08:25:52 | INFO | ========================================================================================================================
+2026-07-24 08:25:52 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-24 08:25:52 | INFO | get_fact_trips completed in 0.0s
+2026-07-24 08:25:52 | INFO | get_dim_date completed in 0.0s
+2026-07-24 08:25:52 | INFO | get_kpi_daily completed in 0.0s
+2026-07-24 08:25:52 | INFO | ============ Début Validation des schemas ============ 
+2026-07-24 08:25:53 | INFO | Missing columns: set()
+2026-07-24 08:25:53 | INFO | ============ Fin Validation des schemas ============ 
+2026-07-24 08:25:53 | INFO | ============ Chargement des données dans Delta ============ 
+2026-07-24 08:26:05 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-24 08:26:11 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-24 08:26:14 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-24 08:26:19 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-24 08:26:19 | INFO | ============ Optimisation des tables Delta ============ 
+2026-07-24 08:26:19 | INFO | ============ OPTIMIZE period ============ 
+2026-07-24 08:26:22 | INFO | ============ Optimisation ============ 
+2026-07-24 08:26:22 | INFO | OPTIMIZE completed on nyc_taxi.silver.silver_nyc_taxi for period 202602
+2026-07-24 08:26:22 | INFO | ============ OPTIMIZE period ============ 
+2026-07-24 08:26:28 | INFO | ============ Optimisation ============ 
+2026-07-24 08:26:28 | INFO | OPTIMIZE completed on nyc_taxi.gold.gold_fact_trips for period 202602
+2026-07-24 08:26:28 | INFO | ============ OPTIMIZE period ============ 
+2026-07-24 08:26:29 | WARNING | Table nyc_taxi.gold.gold_kpi_daily is not partitioned by periodPartitions found: []
+2026-07-24 08:26:29 | INFO | run completed in 36.62s
+2026-07-24 08:26:29 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-24 08:26:29 | INFO | ========================================================================================================================
+2026-07-24 08:26:29 | INFO | MaintenanceJob started
+2026-07-24 08:26:29 | INFO | Processing nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:26:30 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:26:30 | INFO | OPTIMIZE completed nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:26:52 | INFO | VACUUM completed on nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:26:52 | INFO | Maintenance completed for nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:26:52 | INFO | Processing nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:26:53 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:26:53 | INFO | OPTIMIZE completed nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:27:08 | INFO | VACUUM completed on nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:27:08 | INFO | Maintenance completed for nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:27:08 | INFO | Processing nyc_taxi.gold.gold_dim_date
+2026-07-24 08:27:11 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:27:11 | INFO | OPTIMIZE completed nyc_taxi.gold.gold_dim_date
+2026-07-24 08:27:23 | INFO | VACUUM completed on nyc_taxi.gold.gold_dim_date
+2026-07-24 08:27:23 | INFO | Maintenance completed for nyc_taxi.gold.gold_dim_date
+2026-07-24 08:27:23 | INFO | Processing nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:27:25 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:27:25 | INFO | OPTIMIZE completed nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:27:37 | INFO | VACUUM completed on nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:27:37 | INFO | Maintenance completed for nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:27:37 | INFO | MaintenanceJob finished
+2026-07-24 08:29:47 | INFO | ************************* periode : 202603, type = <class 'int'>
+2026-07-24 08:29:47 | INFO | ************************* taxi_type : yellow ************************* 
+2026-07-24 08:29:47 | INFO | ************************* periode : 202603 ************************* 
+2026-07-24 08:29:47 | INFO | ************************* table_name : silver_nyc_taxi ************************* 
+2026-07-24 08:29:47 | INFO | ** path_schema : /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/ ***** 
+2026-07-24 08:29:48 | INFO | ******************************************************* Starting UberBronze *******************************************************
+2026-07-24 08:29:48 | INFO | Extracting yellow_tripdata_2026-03.parquet from /Volumes/nyc_taxi/bronze/raw_files/yellow/2026/yellow_tripdata_2026-03.parquet
+2026-07-24 08:29:50 | INFO | ======================================================= Bronze rows : 3952451 ======================================================= 
+2026-07-24 08:29:50 | INFO | run completed in 1.8s
+2026-07-24 08:29:50 | INFO | ******************************************************* Finished UberBronze *******************************************************
+2026-07-24 08:29:50 | INFO | ========================================================================================================================
+2026-07-24 08:29:50 | INFO | ******************************************************* Starting UberSilver *******************************************************
+2026-07-24 08:29:50 | INFO | add_trip_duration completed in 0.03s
+2026-07-24 08:29:50 | INFO | add_date_key completed in 0.0s
+2026-07-24 08:29:50 | INFO | add_tip_percent completed in 0.0s
+2026-07-24 08:29:50 | INFO | add_average_speed completed in 0.0s
+2026-07-24 08:29:50 | INFO | add_date_features completed in 0.0s
+2026-07-24 08:29:50 | INFO | cast_columns completed in 0.0s
+2026-07-24 08:29:50 | INFO | apply_quality_rules completed in 0.0s
+2026-07-24 08:29:52 | INFO | Silver rows : 3952451 -> 3763580
+2026-07-24 08:29:54 | INFO | run completed in 3.98s
+2026-07-24 08:29:54 | INFO | ******************************************************* Finished UberSilver *******************************************************
+2026-07-24 08:29:54 | INFO | ========================================================================================================================
+2026-07-24 08:29:54 | INFO | ******************************************************* Starting UberGold *******************************************************
+2026-07-24 08:29:54 | INFO | get_fact_trips completed in 0.0s
+2026-07-24 08:29:54 | INFO | get_dim_date completed in 0.0s
+2026-07-24 08:29:54 | INFO | get_kpi_daily completed in 0.0s
+2026-07-24 08:29:54 | INFO | ============ Début Validation des schemas ============ 
+2026-07-24 08:29:54 | INFO | Missing columns: set()
+2026-07-24 08:29:54 | INFO | ============ Fin Validation des schemas ============ 
+2026-07-24 08:29:54 | INFO | ============ Chargement des données dans Delta ============ 
+2026-07-24 08:30:06 | INFO | Table nyc_taxi.silver.silver_nyc_taxi saved
+2026-07-24 08:30:12 | INFO | Table nyc_taxi.gold.gold_fact_trips saved
+2026-07-24 08:30:15 | INFO | Table nyc_taxi.gold.gold_dim_date saved
+2026-07-24 08:30:20 | INFO | Table nyc_taxi.gold.gold_kpi_daily saved
+2026-07-24 08:30:20 | INFO | ============ Optimisation des tables Delta ============ 
+2026-07-24 08:30:20 | INFO | ============ OPTIMIZE period ============ 
+2026-07-24 08:30:21 | INFO | ============ Optimisation ============ 
+2026-07-24 08:30:21 | INFO | OPTIMIZE completed on nyc_taxi.silver.silver_nyc_taxi for period 202603
+2026-07-24 08:30:21 | INFO | ============ OPTIMIZE period ============ 
+2026-07-24 08:30:23 | INFO | ============ Optimisation ============ 
+2026-07-24 08:30:23 | INFO | OPTIMIZE completed on nyc_taxi.gold.gold_fact_trips for period 202603
+2026-07-24 08:30:23 | INFO | ============ OPTIMIZE period ============ 
+2026-07-24 08:30:23 | WARNING | Table nyc_taxi.gold.gold_kpi_daily is not partitioned by periodPartitions found: []
+2026-07-24 08:30:23 | INFO | run completed in 29.06s
+2026-07-24 08:30:23 | INFO | ******************************************************* Finished UberGold *******************************************************
+2026-07-24 08:30:23 | INFO | ========================================================================================================================
+2026-07-24 08:30:23 | INFO | MaintenanceJob started
+2026-07-24 08:30:23 | INFO | Processing nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:30:24 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:30:24 | INFO | OPTIMIZE completed nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:30:35 | INFO | VACUUM completed on nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:30:35 | INFO | Maintenance completed for nyc_taxi.silver.silver_nyc_taxi
+2026-07-24 08:30:35 | INFO | Processing nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:30:36 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:30:36 | INFO | OPTIMIZE completed nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:30:46 | INFO | VACUUM completed on nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:30:46 | INFO | Maintenance completed for nyc_taxi.gold.gold_fact_trips
+2026-07-24 08:30:46 | INFO | Processing nyc_taxi.gold.gold_dim_date
+2026-07-24 08:30:48 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:30:48 | INFO | OPTIMIZE completed nyc_taxi.gold.gold_dim_date
+2026-07-24 08:30:57 | INFO | VACUUM completed on nyc_taxi.gold.gold_dim_date
+2026-07-24 08:30:57 | INFO | Maintenance completed for nyc_taxi.gold.gold_dim_date
+2026-07-24 08:30:57 | INFO | Processing nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:30:58 | INFO | ============ OPTIMIZE completed ============ 
+2026-07-24 08:30:58 | INFO | OPTIMIZE completed nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:31:07 | INFO | VACUUM completed on nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:31:07 | INFO | Maintenance completed for nyc_taxi.gold.gold_kpi_daily
+2026-07-24 08:31:07 | INFO | MaintenanceJob finished
+2026-07-24 17:50:49 | INFO | Schema nyc_taxi.dim created

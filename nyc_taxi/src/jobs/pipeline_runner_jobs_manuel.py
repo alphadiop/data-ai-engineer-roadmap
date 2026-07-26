@@ -4,7 +4,6 @@ import sys
 
 import uuid
 from datetime import datetime
-import argparse
 
 from nyc_taxi.src.setup.create_tables import CreateTables
 from nyc_taxi.src.setup.create_catalog import CreateCatalog
@@ -17,7 +16,7 @@ from nyc_taxi.src.gold.uber_gold import UberGold
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
 from nyc_taxi.src.common.decorators import log_execution
-
+from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 from nyc_taxi.src.jobs.maintenance_job import MaintenanceJob
@@ -48,30 +47,31 @@ class PipelineRunner:
 
         context = PipelineContext()
 
+        audit_manager = AuditManager(
+            spark=self.spark, 
+            logger=self.logger
+        )
+
         context.run_id = int(datetime.now().timestamp())
-
         context.start_time = datetime.now()
-        context.type_taxi = "yellow"
-
         bronze_step = self.steps[0]
-
+        context.taxi_type = "yellow"
+        context.table_name = "silver_nyc_taxi"
         context.periode = bronze_step.periode
 
-        context.taxi_type = bronze_step.taxi_type
-        context.table_name = "silver_nyc_taxi"
-
+        self.logger.info(
+            f"context.row_count = {context.row_count}"
+        )
+        
         self.logger.info(
             f"{'*' * 25} periode : {context.periode}, type = {type(context.periode)}"
         )
+        self.logger.info(f"bronze_step.periode = {bronze_step.periode}")
         self.logger.info(f"{'*' * 25} taxi_type : {context.taxi_type} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} periode : {context.periode} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} table_name : {context.table_name} {'*' * 25} ")
         self.logger.info(f"{'*' * 2} path_schema : {self.path_sql_schema} {'*' * 5} ")
 
-        audit_manager = AuditManager(
-            spark=self.spark, 
-            logger=self.logger
-        )
 
         if audit_manager.is_period_loaded(context):
 
@@ -123,70 +123,51 @@ class PipelineRunner:
             context.duration_seconds = (context.end_time - context.start_time).total_seconds()
 
             audit_manager.insert_audit(context)
+
             audit_manager.insert_row_counts(context)
             
         return context
 
-
 if __name__ == "__main__":
-    
+    # Je rend le parametre periode optionnel car il est renseigné automatiquement à partir de la table audit
+    import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--taxi_type",
-        type=str,
-        required=True,
-        help="yellow, green ou fhv"
-    )
-    parser.add_argument(
-        "--periode",
-        type=int,
-        required=False,
-        help="Format YYYYMM"
-    )
-    
-    logger = PipelineLogger("uber_pipeline")
+    parser.add_argument("--periode", type=int, required=False)
+    parser.add_argument("--taxi_type", type=str, default="yellow")
 
-    audit_manager = AuditManager(
-        spark=spark,
-        logger=logger
-    )
     args = parser.parse_args()
 
-    #taxi_type = "yellow"
-    #taxi_type = "green"
-    #taxi_type = "fhv"
-    #periode=202603
-
+    periode = args.periode
     taxi_type = args.taxi_type
 
-    if args.periode:
-        periode = args.periode
-    else:
-        periode = audit_manager.get_next_period()
+    logger = PipelineLogger("uber_pipeline")
 
-    logger.info(f"Job parameters : taxi_type={taxi_type}, periode={periode}")
+    logger.info(f"sys.argv : {sys.argv}")
+    logger.info(f"args      : {args}")
+    logger.info(f"periode   : {periode}")
+    logger.info(f"taxi_type : {taxi_type}")
 
     runner = PipelineRunner(
         spark=spark,
         logger=logger,
         steps=[
             UberBronze(
-                spark=spark, 
-                taxi_type=taxi_type, 
-                periode=periode, 
+                spark=spark,
+                taxi_type=taxi_type,
+                periode=periode,
                 logger=logger
             ),
             UberSilver(
-                spark=spark, 
+                spark=spark,
                 logger=logger
             ),
             UberGold(
-                spark=spark, 
+                spark=spark,
                 logger=logger
             )
-        ])
+        ]
+    )
+
     runner.run()
     
-    #context = runner.run()
-    #print(context.df_bronze.count())
-    #print(context.df_silver.count())
+    ## bash : python pipeline_runner.py --taxi_type yellow --periode 202603

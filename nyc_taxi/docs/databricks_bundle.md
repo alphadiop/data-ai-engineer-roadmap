@@ -78,6 +78,7 @@ nyc_taxi
 ```
 ---
 
+
 #### Structure actuelle de NYC Taxi
 ```text
 Metastore

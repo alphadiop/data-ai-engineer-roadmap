@@ -1,11 +1,6 @@
 import os
 import sys
-
-
-
-from nyc_taxi.src.common.logger import PipelineLogger 
-
-
+from nyc_taxi.src.common.logger import PipelineLogger
 
 class CatalogManager:
     """ 
@@ -29,6 +24,44 @@ class CatalogManager:
 
         self.logger.info(
             f"Catalog {catalog_name} created"
+        )
+
+    def catalog_exists(self, catalog_name: str) -> bool:
+        catalogs = [
+            row.catalog
+            for row in self.spark.sql("SHOW CATALOGS").collect()
+        ]
+        return catalog_name in catalogs
+
+
+    def rename_catalog(self, old_catalog: str, new_catalog: str):
+        """
+        Renomme un catalog Unity Catalog.
+        """
+
+        catalogs = [
+            row.catalog
+            for row in self.spark.sql("SHOW CATALOGS").collect()
+        ]
+
+        if old_catalog not in catalogs:
+            raise ValueError(
+                f"Le catalog '{old_catalog}' n'existe pas."
+            ) 
+
+        if new_catalog in catalogs:
+            raise ValueError(
+                f"Le catalog '{new_catalog}' existe déjà."
+            )
+
+        self.spark.sql(
+            f"""
+            ALTER CATALOG {old_catalog}
+            RENAME TO {new_catalog}
+            """
+        )
+        self.logger.info(
+            f"Catalog '{old_catalog}' renommé en '{new_catalog}'"
         )
 
 
@@ -93,25 +126,101 @@ class CatalogManager:
             f"Schema {catalog_name}.{schema_name} dropped"
         )
 
+    def schema_exists(
+        self,
+        catalog_name: str,
+        schema_name: str
+    ) -> bool:
+
+        schemas = self.spark.sql(
+            f"SHOW SCHEMAS IN {catalog_name}"
+        ).collect()
+
+        return any(
+            row.namespace == schema_name
+            for row in schemas
+        )
+
+        
     def rename_schema(
         self,
         catalog_name: str,
         old_schema: str,
         new_schema: str
     ):
+        """
+        Databricks ne supporte pas
+        ALTER SCHEMA ... RENAME TO ...
+
+        On recrée donc le schéma puis
+        on déplace les tables.
+        """
+
+        if not self.schema_exists(
+            catalog_name,
+            old_schema
+        ):
+            raise ValueError(
+                f"Schema '{old_schema}' introuvable"
+            )
+
+        if self.schema_exists(
+            catalog_name,
+            new_schema
+        ):
+            raise ValueError(
+                f"Schema '{new_schema}' existe déjà"
+            )
 
         self.spark.sql(
             f"""
-            ALTER SCHEMA
+            CREATE SCHEMA
+            {catalog_name}.{new_schema}
+            """
+        )
+
+        tables = self.spark.sql(
+            f"""
+            SHOW TABLES IN
             {catalog_name}.{old_schema}
-            RENAME TO {catalog_name}.{new_schema}
+            """
+        ).collect()
+
+        for table in tables:
+
+            old_name = (
+                f"{catalog_name}."
+                f"{old_schema}."
+                f"{table.tableName}"
+            )
+
+            new_name = (
+                f"{catalog_name}."
+                f"{new_schema}."
+                f"{table.tableName}"
+            )
+
+            self.spark.sql(
+                f"""
+                ALTER TABLE
+                {old_name}
+                RENAME TO
+                {new_name}
+                """
+            )
+
+        self.spark.sql(
+            f"""
+            DROP SCHEMA
+            {catalog_name}.{old_schema}
             """
         )
 
         self.logger.info(
-            f"Schema {old_schema} renamed to {new_schema}"
+            f"Schema '{old_schema}' "
+            f"renamed to '{new_schema}'"
         )
-
+        
 
     def catalog_exists(self, catalog_name: str) -> bool:
 
@@ -185,6 +294,58 @@ class CatalogManager:
             f"{catalog_name}.{schema_name}.{table_name}"
         )
 
+
+    def rename_table(
+        self,
+        catalog_name: str,
+        schema_name: str,
+        old_table_name: str,
+        new_table_name: str
+    ):
+        """
+        Renomme une table Databricks.
+        """
+
+        if not self.table_exists(
+            catalog_name,
+            schema_name,
+            old_table_name
+        ):
+            raise ValueError(
+                f"La table "
+                f"'{catalog_name}.{schema_name}.{old_table_name}' "
+                f"n'existe pas."
+            )
+
+        if self.table_exists(
+            catalog_name,
+            schema_name,
+            new_table_name
+        ):
+            raise ValueError(
+                f"La table "
+                f"'{catalog_name}.{schema_name}.{new_table_name}' "
+                f"existe déjà."
+            )
+
+        self.spark.sql(
+            f"""
+            ALTER TABLE
+            {catalog_name}.{schema_name}.{old_table_name}
+            RENAME TO
+            {catalog_name}.{schema_name}.{new_table_name}
+            """
+        )
+        self.spark.catalog.refreshTable(
+            f"{catalog_name}.{schema_name}.{new_table_name}"
+        )
+
+        self.logger.info(
+            f"Table renommée : "
+            f"{catalog_name}.{schema_name}.{old_table_name} "
+            f"-> "
+            f"{catalog_name}.{schema_name}.{new_table_name}"
+        )
 
     # ==================================================
     # Description

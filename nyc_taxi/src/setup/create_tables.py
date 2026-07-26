@@ -11,7 +11,7 @@ from nyc_taxi.src.utils.load_json import load_json
 
 class CreateTables:
 
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src/schema/"
+    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
     def __init__(self, spark, logger):
         self.spark = spark

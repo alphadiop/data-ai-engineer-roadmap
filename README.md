@@ -22,6 +22,10 @@
 - [ ] Unity Catalog : un grand espace de stockage métier
 - [ ] Delta Lake : Stockage (persistant) des données sous forme de fichiers Parquet
 - [ ] Cluster : Calcul (temporaire)
+- [ ] Jobs : servent à automatiser et orchestrer l'exécution de traitements
+- [ ] création manuelle des Jobs dans l'interface Databricks
+- [ ] ordonnancement automatique des Jobs
+- [ ] Databricks Asset Bundles
 - [ ] Maintenance
 - [ ] Industrialisation
 
@@ -50,18 +54,20 @@
 - [ ] Fine-tuning
 - [ ] Agents
 
+
 ## Validation
 - [ ] Théorie comprise
 - [ ] Exercices réalisés
 - [ ] Notebook Databricks créé
 - [ ] Commit GitHub effectué
 
+
 ## Le Bundle va gérer :
-- [ ] Toù déposer le code ;
-- [ ] Tquel job créer ;
-- [ ] Tquel cluster utiliser ;
-- [ ] Tquelles permissions appliquer ;
-- [ ] Tquels paramètres passer.
+- [ ] où déposer le code ;
+- [ ] quel job créer ;
+- [ ] quel cluster utiliser ;
+- [ ] quelles permissions appliquer ;
+- [ ] quels paramètres passer.
 
 ## déploiement des traitements
 - [ ] Aller dans Databricks
@@ -193,6 +199,66 @@
 ---
 
 
+---
+### Jobs : Lakeflow Jobs dans Databricks
+- [ ] automatiser et orchestrer l'exécution de traitements
+- [ ] Un job peut exécuter un notebook, un script Python, une pipeline ou plusieurs tâches liées entre elles dans un workflow
+
+
+### Vue DAG (workflow)
+- [ ] Databricks représente les tâches sous forme de graphe (DAG)
+- [ ] Les dépendances sont gérées automatiquement.
+
+
+### Pourquoi utiliser un Job ? un Job contient
+- [ ] des tâches (tasks) : une unité de travail
+- [ ] des paramètres : 
+- [ ] un planning (schedule)
+- [ ] des notifications
+- [ ] l'historique des exécutions
+
+
+### Une tâche peut exécuter :
+- [ ] un Notebook
+- [ ] un script Python
+- [ ] une pipeline
+- [ ] un autre Job
+- [ ] du SQL
+- [ ] dbt
+
+### Trigger
+- [ ] Le Trigger détermine quand lancer le Job
+- [ ] Tous les jours à 01:00
+- [ ] Toutes les heures
+- [ ] Lancement manuel
+---
+
+### comment transmettre les paramètres au script
+
+### Monitoring
+- [ ] L'un des gros avantages des Jobs est le suivi des exécutions.
+- [ ] Tu peux voir : SUCCESS
+- [ ] Tu peux voir : FAILED
+- [ ] Tu peux voir : SUCCESS
+
+
+
+### comment créer un Job ?
+- [ ] Jobs & Pipelines
+- [ ] Create
+- [ ] Job
+- [ ] Task type
+- [ ] Python Script
+- [ ] Chemin :
+- [ ] Choisir le compute puis
+- [ ] Run now
+
+
+### Lien avec Jeob et Databricks Asset Bundles
+- [ ] Today : GitHub <-> Databricks
+- [ ] Tomorrow : GitHub -> Databricks bundle deploy -> Databricks Job -> pipeline_runner
+---
+
 
 
 ---
@@ -212,6 +278,7 @@
 - [ ] VACUUM : Supprime les anciens fichiers nécessaires au Time Travel
 - [ ] ANALYZE TABLE
 - [ ] Bundle :
+
 
 ### Historique
 - [ ] Historique : permet de voir toutes les opérations effectuées sur une table Delta 
@@ -419,8 +486,6 @@ Version 3
 ```
 
 --- 
-
-
 #### Que signifie ACID ?
 - [ ] c'est cette garantie qui fait qu'une table Delta peut être utilisée pour des données critiques 
 - [ ] finance, santé, facturation, reporting...
@@ -586,4 +651,9 @@ Version 3
 | **Time Travel**     | Lire une ancienne version de la table                    |
 | **Delta Log**       | Stocke l'historique des versions                         |
 | **VACUUM**          | Supprime les anciens fichiers nécessaires au Time Travel |
+
+
+
+---
+---
 

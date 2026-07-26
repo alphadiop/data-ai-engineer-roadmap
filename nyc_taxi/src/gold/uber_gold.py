@@ -74,7 +74,7 @@ class UberGold(PipelineStep):
             self.logger.info(f"{'=' * 12} Début Validation des schemas {'=' * 12} ")
 
         schema_json = self.get_schema_json(
-                type_taxi=context.type_taxi, 
+                taxi_type=context.taxi_type, 
                 table_name="silver_nyc_taxi"
         )
         
@@ -99,12 +99,22 @@ class UberGold(PipelineStep):
 
         for schema_name, table_name, df in tables:
 
+            row_count = df.count()
+
+            context.row_count[table_name] = row_count
+
+            self.logger.info(
+                f"{table_name} : {row_count} rows"
+            )
+            
             delta_manager.sauvegarde_tables_delta(
                 df=df,
                 schema_name=schema_name,
                 table_name=table_name,
                 periode=context.periode
             )
+
+            
 
         if self.logger:
             self.logger.info(f"{'=' * 12} Optimisation des tables Delta {'=' * 12} ")
@@ -123,10 +133,10 @@ class UberGold(PipelineStep):
             )
 
 
-    def get_schema_json(self, type_taxi, table_name: str) -> dict:
+    def get_schema_json(self, taxi_type, table_name: str) -> dict:
         path = os.path.join(
             self.path_sql_schema,
-            type_taxi,
+            taxi_type,
             f"{table_name}.json"
         )
         return load_json(path)
@@ -161,13 +171,13 @@ class UberGold(PipelineStep):
             .withColumn("month_name", date_format("date", "MMMM"))
             .withColumn(
                 "trip_date",
-                year(col("date")) * 10000 
+                 year(col("date")) * 10000 
                  + month(col("date")) * 100 
                  + dayofmonth(col("date"))
             )
         )
 
-    # "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "gold_dim_location"
+    # "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "dim_location"
 
     @log_execution
     def get_fact_trips(self, df_silver: DataFrame) -> DataFrame:
@@ -218,7 +228,7 @@ class UberGold(PipelineStep):
             )
         )
 
-    def get_dim_location(self):
+    def get_dim_location(self)-> DataFrame:
         catalog = "nyc_taxi"
         schema = "ref"
         voulume = "ref_files"
@@ -251,7 +261,7 @@ class UberGold(PipelineStep):
         spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_kpi_daily").show(truncate=False)
         spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_fact_trips").show(truncate=False)
 
-        ### "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "gold_dim_location"
+        ### "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "dim_location"
 
 
 

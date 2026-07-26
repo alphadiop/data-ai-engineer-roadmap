@@ -1,7 +1,7 @@
 import os
 import sys
 import uuid
-
+from pyspark.sql import DataFrame
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution
@@ -94,7 +94,9 @@ class AuditManager:
     def insert_row_counts(self, context):
         data = []
         for table_name, row_count in context.row_count.items():
-
+            self.logger.info(
+                f"Inserting row count for {table_name} with {row_count} rows"
+            )
             data.append(
                 (
                     context.run_id,
@@ -123,13 +125,18 @@ class AuditManager:
             .saveAsTable("nyc_taxi.audit.audit_row_count")
         )
 
-    def get_next_period(self) -> int:
+    def get_next_period(self,table_name:str,taxi_type:str) -> int:
         try:
-            max_period = (
-                self.spark.table("nyc_taxi.audit.audit_load")
+            row = (
+                    self.spark.table("nyc_taxi.audit.audit_load")
+                    .filter(col("table_name") == table_name)
+                    .filter(col("taxi_type") == taxi_type)
+                    .filter(col("status") == "SUCCESS")
                     .select(spark_max("periode").alias("periode"))
-                    .collect()[0]["periode"]
-            )
+                    .first()["periode"]
+                    )
+
+            max_period = row["periode"] if row else None
 
             if max_period is None:
                 return 202401
