@@ -4,6 +4,25 @@
 ##### Objectif principal de Bundles : intégrer Databricks dans un processus CI/CD
 ---
 
+### Asset Bundle permet de 
+- [ ] décrire ton application Databricks (code + jobs + clusters + paramètres + permissions) dans des fichiers YAML, 
+- [ ] puis de la déployer automatiquement.
+
+
+### Tu exécutes manuellement :
+- [ ] ouvrir Databricks
+- [ ] attacher un cluster
+- [ ] lancer notebook
+- [ ] vérifier les résultats
+- [ ] Cela marche pour apprendre, mais ce n'est pas industrialisé.
+
+
+### Avec Asset Bundles
+- [ ] On ajoute une couche de déploiement
+
+
+
+
 ### Etapes principales
 - [ ] Installer la CLI Databricks
 - [ ] Structure du projet

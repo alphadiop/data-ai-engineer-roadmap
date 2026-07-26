@@ -1,4 +1,24 @@
 
+### Authentification 
+- [ ] databricks auth login
+- [ ] Supprimer le profil alphadiop : databricks auth logout alphadiop --delete
+- [ ] verifier : databricks auth profiles
+- [ ] Créer une nouvelle authentification OAuth : databricks auth login --profile alphadiop --host https://dbc-8c847397-3c66.cloud.databricks.com
+- [ ] verification : databricks auth describe --profile alphadiop
+
+- [ ] databricks workspace list / --profile alphadiop
+- [ ] databricks jobs list --profile alphadiop
+
+
+### test à ne pas executer
+- [ ] echo $env:DATABRICKS_TOKEN
+- [ ] Remove-Item Env:\DATABRICKS_TOKEN
+- [ ] [System.Environment]::SetEnvironmentVariable("DATABRICKS_TOKEN",$null, "User")
+---
+
+
+
+
 #### Déploiement d'une plateforme Data Lakehouse Databricks avec Asset Bundles et orchestration de pipelines Spark."
 ✅ Databricks Asset Bundles  
 ✅ Delta Lake  
@@ -25,6 +45,7 @@
 - [ ] databricks workspace list /
 - [ ] databricks configure --profile alphadiop
 ---
+
 
 
 ### comment Databricks vérifie ton identité avant de t'autoriser à accéder à un workspace, un cluster, un job ou une API ?

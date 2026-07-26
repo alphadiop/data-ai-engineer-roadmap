@@ -7,7 +7,7 @@
 * [ ] monitoring
 * [ ] qualité
 * [ ] orchestration
-* [ ] lineage
+* [ ] lineage : Montre le flux des données.
 
 ## Activités principales à 95%
 * [ ] Catalog
