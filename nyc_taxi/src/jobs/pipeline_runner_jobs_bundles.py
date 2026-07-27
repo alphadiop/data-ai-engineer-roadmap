@@ -6,7 +6,7 @@ from pathlib import Path
 import uuid
 from datetime import datetime
 
-#from nyc_taxi.src.setup.create_tables import CreateTables
+from nyc_taxi.src.setup.create_tables import CreateTables
 #from nyc_taxi.src.setup.create_catalog import CreateCatalog
 
 
@@ -44,9 +44,23 @@ class PipelineRunner:
     def run(self):
 
         ### CreateCatalog(spark=self.spark, logger=self.logger).run()
-        ## CreateTables(spark=self.spark, logger=self.logger).run() ## A faire une fois
+         ## A faire une fois
 
         context = PipelineContext()
+
+        ## CreateTables(spark=self.spark, logger=self.logger).run(context)
+
+        self.logger.info(
+            f"context.env = {context.env}"
+        )
+
+        catalog_manager = CatalogManager(
+            spark = self.spark,
+            logger=self.logger,
+            env=context.env
+        )
+
+        catalog_manager.create_environment_schemas()
 
         audit_manager = AuditManager(
             spark=self.spark, 
@@ -100,7 +114,7 @@ class PipelineRunner:
 
             MaintenanceJob(
                 spark=self.spark,
-                logger=self.logger).run()
+                logger=self.logger).run(context)
             
         except DataNotAvailableError as e:
             context.status = "NO_DATA"
@@ -133,12 +147,29 @@ if __name__ == "__main__":
     # Je rend le parametre periode optionnel car il est renseigné automatiquement à partir de la table audit
     from pyspark.sql import SparkSession
 
-    spark = (
+    #spark = SparkManager.get_spark()
+
+    from delta import configure_spark_with_delta_pip
+
+    builder = (
         SparkSession.builder
-        .appName("nyc_taxi_pipeline")
+        .appName("nyc_taxi")
         .master("local[*]")
-        .getOrCreate()
+        .config(
+            "spark.sql.extensions",
+            "io.delta.sql.DeltaSparkSessionExtension"
+        )
+        .config(
+            "spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        )
+        .config(
+            "spark.pyspark.python",
+            sys.executable
+        )
     )
+    spark = configure_spark_with_delta_pip(builder).getOrCreate()
+
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=["local", "databricks"],default='local')
@@ -152,6 +183,7 @@ if __name__ == "__main__":
     taxi_type = args.taxi_type
 
     logger = PipelineLogger("uber_pipeline")
+
 
     logger.info(f"sys.argv : {sys.argv}")
     logger.info(f"env      : {env}")

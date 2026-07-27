@@ -6,8 +6,11 @@ from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution
 from nyc_taxi.src.common.delta_manager import DeltaManager
+from nyc_taxi.src.common.catalog_manager import CatalogManager
+
 from nyc_taxi.src.common.schema_manager import SchemaManager
 from nyc_taxi.src.utils.load_json import load_json
+from nyc_taxi.src.common.path_manager import PathManager
 
 from nyc_taxi.src.silver.uber_silver import UberSilver
 
@@ -59,9 +62,15 @@ class UberGold(PipelineStep):
         context.df_fact_trips = self.get_fact_trips(df_silver)
         context.df_dim_date = self.get_dim_date(df_silver)
         context.df_kpi_daily = self.get_kpi_daily(df_silver)
-        
+
+        catalog_manager = CatalogManager(
+            spark = self.spark,
+            logger=self.logger,
+            env=context.env
+        )
         delta_manager = DeltaManager(
             spark=self.spark,
+            catalog_manager=catalog_manager,
             logger=self.logger
         )
        
@@ -73,10 +82,14 @@ class UberGold(PipelineStep):
         if self.logger:
             self.logger.info(f"{'=' * 12} Début Validation des schemas {'=' * 12} ")
 
-        schema_json = self.get_schema_json(
-                taxi_type=context.taxi_type, 
-                table_name="silver_nyc_taxi"
+
+        path_manager = PathManager(context.env,self.logger)
+
+        schema_file = path_manager.schema_path(
+            context.taxi_type,
+            "silver_nyc_taxi"
         )
+        schema_json = load_json(schema_file)
         
         schema_manager.validate_columns(
             df=context.df_silver, 
@@ -106,7 +119,7 @@ class UberGold(PipelineStep):
             self.logger.info(
                 f"{table_name} : {row_count} rows"
             )
-            
+
             delta_manager.sauvegarde_tables_delta(
                 df=df,
                 schema_name=schema_name,
@@ -114,21 +127,20 @@ class UberGold(PipelineStep):
                 periode=context.periode
             )
 
-            
 
         if self.logger:
             self.logger.info(f"{'=' * 12} Optimisation des tables Delta {'=' * 12} ")
 
         tables_to_optimize = [
-            "nyc_taxi.silver.silver_nyc_taxi",
-            "nyc_taxi.gold.gold_fact_trips",
-            "nyc_taxi.gold.gold_kpi_daily"
+            ("silver", "silver_nyc_taxi"),
+            ("gold", "gold_fact_trips"),
+            ("gold", "gold_kpi_daily")
         ]
-        
-        for table in tables_to_optimize:
 
+        for schema_name, table_name in tables_to_optimize:
             delta_manager.optimize_period(
-                table_name=table,
+                schema_name=schema_name,
+                table_name=table_name,
                 periode=context.periode
             )
 
@@ -158,7 +170,7 @@ class UberGold(PipelineStep):
         return (
             df_silver
             .select(
-                col("periode"),
+                col("periode").cast("string").alias("periode"),
                 col("tpep_pickup_datetime").cast("date").alias("date")
             )
             .distinct()
@@ -209,8 +221,8 @@ class UberGold(PipelineStep):
         return (
             df_silver
             .groupBy(
-                col("periode").cast("string"),
-                col("trip_date").cast("int")
+                col("periode").cast("string").alias("periode"),
+                col("trip_date").cast("int").alias("trip_date")
             ) 
             .agg(
                 count("*").alias("nb_trips"),
@@ -256,10 +268,10 @@ class UberGold(PipelineStep):
 
     @log_execution
     def purges_tables(self):
-        spark.sql("TRUNCATE TABLE nyc_taxi.silver.silver_nyc_taxi").show(truncate=False)
-        spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_dim_date").show(truncate=False)
-        spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_kpi_daily").show(truncate=False)
-        spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_fact_trips").show(truncate=False)
+        self.spark.sql("TRUNCATE TABLE nyc_taxi.silver.silver_nyc_taxi").show(truncate=False)
+        self.spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_dim_date").show(truncate=False)
+        self.spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_kpi_daily").show(truncate=False)
+        self.spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_fact_trips").show(truncate=False)
 
         ### "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "dim_location"
 
@@ -267,31 +279,56 @@ class UberGold(PipelineStep):
 
 
 if __name__ == "__main__":
-    
-    spark = SparkSession.builder.appName("NYC Taxi").getOrCreate()
-    silver = UberSilver(
-        spark = spark, 
-        logger = PipelineLogger('Silver')
-    )
+    import sys
+    from pyspark.sql import SparkSession
 
-    df = (
-        spark.table("nyc_taxi.silver.silver_nyc_taxi")
-        .where("periode = 202411")
+    spark = (
+        SparkSession.builder
+        .appName("nyc_taxi")
+        .config(
+            "spark.pyspark.python",
+            sys.executable
+        )
+        .getOrCreate()
     )
-        
-    df_silver = silver.run(df)
-
     gold = UberGold(
-        spark=spark,
-        logger=PipelineLogger('Gold')
+        spark = spark,
+        logger = PipelineLogger('Gold')
     )
+    spark.sql(
+        """
+        DESCRIBE DETAIL silver.silver_nyc_taxi
+        """
+    ).show(truncate=False)
 
-    df_fact_trips =gold.get_fact_trips(df_silver),
-    df_dim_date=gold.get_dim_date(df_silver),
-    df_kpi_daily=gold.get_kpi_daily(df_silver),
-    df_dim_location=gold.get_dim_location() 
+    spark.sql(
+        """
+        DESCRIBE DETAIL silver.silver_nyc_taxi
+        """
+    ).select(
+        "partitionColumns"
+    ).show()
 
-    display(df_fact_trips)
+
+#
+#     df = (
+#         spark.table("nyc_taxi.silver.silver_nyc_taxi")
+#         .where("periode = 202411")
+#     )
+#
+#     df_silver = silver.run(df)
+
+    # gold = UberGold(
+    #     spark=spark,
+    #     logger=PipelineLogger('Gold')
+    # )
+
+    # df_fact_trips =gold.get_fact_trips(df_silver),
+    # df_dim_date=gold.get_dim_date(df_silver),
+    # df_kpi_daily=gold.get_kpi_daily(df_silver),
+    # df_dim_location=gold.get_dim_location()
+    #
+    # display(df_fact_trips)
 
 
 

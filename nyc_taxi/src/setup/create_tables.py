@@ -1,13 +1,10 @@
-import os
-import sys
 
-
-
+from pathlib import Path
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
 from nyc_taxi.src.utils.sql_schema.get_columns_from_schema import get_columns_from_schema
 from nyc_taxi.src.utils.load_json import load_json
-
+from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 class CreateTables:
 
@@ -16,9 +13,10 @@ class CreateTables:
     def __init__(self, spark, logger):
         self.spark = spark
         self.logger = logger
+        self.project_root = Path.cwd() / "nyc_taxi"
 
 
-    def run(self):
+    def run(self, context):
 
         tables = [
             ("audit", "audit_load", None),
@@ -30,8 +28,15 @@ class CreateTables:
             ("silver", "silver_nyc_taxi", "periode")
         ]
 
+        catalog_manager = CatalogManager(
+            spark = self.spark,
+            logger=self.logger,
+            env=context.env
+        )
+
         delta_manager = DeltaManager(
             spark=self.spark,
+            catalog_manager=catalog_manager,
             logger=self.logger
         )
 
@@ -41,23 +46,30 @@ class CreateTables:
                 schema_name=schema_name,
                 table_name=table_name,
                 schema=self.get_schema(
-                        self.path_sql_schema,
-                        "yellow",
-                        table_name
+                    type_taxi=context.type_taxi,
+                    table_name=table_name
                 ),
                 partition_by=partition_by,
                 drop_table=True
             )
 
-
-    def get_schema(self, path_sql_schema, type_taxi, table_name):
-        path = os.path.join(
-            path_sql_schema,
+    def get_schema(
+            self,
             type_taxi,
-            f"{table_name}.json"
+            table_name
+    ):
+
+        path = (
+                self.project_root
+                / "schema"
+                / type_taxi
+                / f"{table_name}.json"
         )
 
         schema_json = load_json(path)
+
         return build_schema(schema_json)
+
+
 
 

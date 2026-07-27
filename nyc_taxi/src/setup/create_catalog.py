@@ -56,7 +56,21 @@ class CreateCatalog:
 
 if __name__ == "__main__":
     from pyspark.sql import SparkSession
+    import sys
+
+    spark = (
+        SparkSession.builder
+        .appName("nyc_taxi")
+        .config(
+            "spark.pyspark.python",
+            sys.executable
+        )
+        .getOrCreate()
+    )
     logger = PipelineLogger("Cretate Catalog")
-    create_catalog = CreateCatalog(spark=spark, logger=logger)
+    create_catalog = CreateCatalog(
+        spark=spark,
+        logger=logger
+    )
     create_catalog.run()
    

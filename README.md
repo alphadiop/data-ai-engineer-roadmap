@@ -1,6 +1,36 @@
 # Data Engineer & AI Engineer Learning Roadmap
 ## Framework Databricks ou environnement Databricks
 ### Progression
+```text
+              Pipeline
+                  |
+                  v
+           DeltaManager
+                  |
+                  v
+          CatalogManager
+             /       \
+        local       Databricks
+          |             |
+   schema.table   catalog.schema.table
+ ```
+
+
+```text
+    DeltaManager
+    │
+    ├── saveAsTable()
+    ├── delete_period()
+    ├── optimize_table()
+    ├── optimize_period()
+    ├── vacuum()
+    ├── vacuum_dry_run()
+    ├── describe_history()
+    └── describe_detail()
+    |
+    v
+    CatalogManager.get_table_name()
+ ```
 
 ## Databricks gère
 * [ ] dépendances

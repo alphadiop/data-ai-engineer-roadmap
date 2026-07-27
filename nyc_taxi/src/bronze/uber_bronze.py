@@ -1,13 +1,15 @@
 import os
 import sys
 
-import urllib
+from urllib.request import urlretrieve
 import re
 import sys
 from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (col, lit)
+from pyspark.sql.functions import (
+    col, lit
+)
 from urllib.error import HTTPError, URLError
 
 from nyc_taxi.src.common.pipeline_step import PipelineStep
@@ -80,7 +82,7 @@ class UberBronze(PipelineStep):
             )
 
             try:
-                urllib.request.urlretrieve(url, str(path_file))
+                urlretrieve(url, str(path_file))
 
             except HTTPError as e:
 

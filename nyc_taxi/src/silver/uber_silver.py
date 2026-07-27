@@ -27,6 +27,7 @@ from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution 
 from nyc_taxi.src.common.schema_manager import SchemaManager
+from nyc_taxi.src.common.path_manager import PathManager
 from nyc_taxi.src.utils.load_json import load_json
 
 #self.logger.info(f"Gold rows : {gold_df.count()}")
@@ -196,10 +197,17 @@ class UberSilver(PipelineStep):
             f"{rows_count_bronze} -> {df_silver.count()}"
         )
 
-        schema_json = load_json(
-            path = os.path.join(self.path_sql_schema,"yellow" ,"silver_nyc_taxi.json")
-        )
+        # schema_json = load_json(
+        #     path = os.path.join(self.path_sql_schema,"yellow" ,"silver_nyc_taxi.json")
+        # )
 
+        path_manager = PathManager(context.env,self.logger)
+
+        schema_file = path_manager.schema_path(
+            context.taxi_type,
+            "silver_nyc_taxi"
+        )
+        schema_json = load_json(schema_file)
         df_silver = SchemaManager.apply_schema(
                 df = df_silver,
                 schema_json = schema_json

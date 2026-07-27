@@ -43,6 +43,12 @@ class AuditManager:
         ## context.run_id = str(uuid.uuid4())
 
     def insert_audit(self, context):
+        catalog_manager = CatalogManager(
+            spark=self.spark,
+            logger=self.logger,
+            env=context.env
+        )
+        audit_table = catalog_manager.audit_load()
         data = [(
             context.run_id,
             int(context.periode),
@@ -76,7 +82,7 @@ class AuditManager:
         df.write
             .format("delta")
             .mode("append")
-            .saveAsTable("nyc_taxi.audit.audit_load")
+            .saveAsTable(audit_table)
         )
 
     ## table audit : nyc_taxi.audit.audit_load
@@ -102,6 +108,12 @@ class AuditManager:
 
     def insert_row_counts(self, context):
         data = []
+        catalog_manager = CatalogManager(
+            spark=self.spark,
+            logger=self.logger,
+            env=context.env
+        )
+        audit_row_table = catalog_manager.audit_row_count()
         for table_name, row_count in context.row_count.items():
             self.logger.info(
                 f"Inserting row count for {table_name} with {row_count} rows"
@@ -131,7 +143,7 @@ class AuditManager:
             df.write
             .format("delta")
             .mode("append")
-            .saveAsTable("nyc_taxi.audit.audit_row_count")
+            .saveAsTable(audit_row_table)
         )
 
     def get_next_period(self,table_name:str,taxi_type:str) -> int:

@@ -1,13 +1,16 @@
 import os
 import sys
-from nyc_taxi.src.common.logger import PipelineLogger
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nyc_taxi.src.common.logger import PipelineLogger
+
 
 class CatalogManager:
     """ 
     un catalog sert à isoler et organiser les données dans un espace de travail
     le schema est un sous dossier du catalog, il contient des :
     """
-
     def __init__(self,spark, logger: PipelineLogger, env: str = "local"):
         self.spark = spark
         self.logger = logger,
@@ -16,6 +19,26 @@ class CatalogManager:
     # ============================================================================
     # ============Catalogs========================================================
     # ============================================================================
+    def create_environment_schemas(self):
+        schemas = [
+            "bronze",
+            "silver",
+            "gold",
+            "audit"
+        ]
+
+        for schema in schemas:
+            if self.env == "local":
+                self.spark.sql(
+                    f"CREATE DATABASE IF NOT EXISTS {schema}"
+                )
+            else:
+                self.spark.sql(
+                    f"""
+                    CREATE SCHEMA IF NOT EXISTS
+                    nyc_taxi.{schema}
+                    """
+                )
 
     def get_table_name(
             self,
@@ -26,8 +49,17 @@ class CatalogManager:
 
         if self.env == "local":
             return f"{schema_name}.{table_name}"
-        return f"{catalog_name}.{schema_name}.{table_name}"
+        else:
+            return f"{catalog_name}.{schema_name}.{table_name}"
 
+
+
+
+    def audit_row_count(self):
+        return self.get_table_name(
+            schema_name="audit",
+            table_name="audit_row_count"
+        )
 
     def audit_load(self):
         return self.get_table_name(
@@ -46,6 +78,16 @@ class CatalogManager:
             schema_name="gold",
             table_name="gold_fact_trips"
         )
+
+    def get_schema_name(
+            self,
+            schema_name: str,
+            catalog_name: str = "nyc_taxi"
+    ):
+
+        if self.env == "local":
+            return schema_name
+        return f"{catalog_name}.{schema_name}"
 
 
     def create_catalog(self, catalog_name: str):
@@ -301,15 +343,17 @@ class CatalogManager:
     # ==================================================
 
     def show_tables(
-        self,
-        catalog_name: str,
-        schema_name: str
+            self,
+            schema_name: str,
+            catalog_name: str = "nyc_taxi"
     ):
-
+        schema_full_name = self.get_schema_name(
+            schema_name=schema_name,
+            catalog_name=catalog_name
+        )
         return self.spark.sql(
             f"""
-            SHOW TABLES IN
-            {catalog_name}.{schema_name}
+            SHOW TABLES IN {schema_full_name}
             """
         )
 
@@ -341,45 +385,23 @@ class CatalogManager:
         Renomme une table Databricks.
         """
 
-        if not self.table_exists(
-            catalog_name,
+        old_name = self.get_table_name(
             schema_name,
-            old_table_name
-        ):
-            raise ValueError(
-                f"La table "
-                f"'{catalog_name}.{schema_name}.{old_table_name}' "
-                f"n'existe pas."
-            )
+            old_table_name,
+            catalog_name
+        )
 
-        if self.table_exists(
-            catalog_name,
+        new_name = self.get_table_name(
             schema_name,
-            new_table_name
-        ):
-            raise ValueError(
-                f"La table "
-                f"'{catalog_name}.{schema_name}.{new_table_name}' "
-                f"existe déjà."
-            )
+            new_table_name,
+            catalog_name
+        )
 
         self.spark.sql(
             f"""
-            ALTER TABLE
-            {catalog_name}.{schema_name}.{old_table_name}
-            RENAME TO
-            {catalog_name}.{schema_name}.{new_table_name}
+            ALTER TABLE {old_name}
+            RENAME TO {new_name}
             """
-        )
-        self.spark.catalog.refreshTable(
-            f"{catalog_name}.{schema_name}.{new_table_name}"
-        )
-
-        self.logger.info(
-            f"Table renommée : "
-            f"{catalog_name}.{schema_name}.{old_table_name} "
-            f"-> "
-            f"{catalog_name}.{schema_name}.{new_table_name}"
         )
 
     # ==================================================
@@ -418,35 +440,63 @@ class CatalogManager:
         )
 
 
-
     def describe_table_columns(
-        self,
-        catalog_name: str,
-        schema_name: str,
-        table_name: str
+            self,
+            catalog_name,
+            schema_name,
+            table_name
     ):
+
+        full_name = self.get_table_name(
+            schema_name,
+            table_name,
+            catalog_name
+        )
 
         return self.spark.sql(
             f"""
-            DESCRIBE
-            {catalog_name}.{schema_name}.{table_name}
+            DESCRIBE {full_name}
             """
         )
 
 
 
+
 if __name__ == "__main__":
     from pyspark.sql import SparkSession
+    import sys
+    spark = (
+        SparkSession.builder
+        .appName("nyc_taxi")
+        .config(
+            "spark.pyspark.python",
+            sys.executable
+        )
+        .getOrCreate()
+    )
     logger = PipelineLogger("CatalogManager")
 
     catalog_manager = CatalogManager(
         spark=spark, 
         logger=logger
     )
-    catalog_manager.show_catalogs().show()
-    catalog_manager.show_schemas("nyc_taxi").show()
-    catalog_manager.show_tables("nyc_taxi","gold").show()
-    catalog_manager.describe_table_columns("nyc_taxi","audit", "audit_load").show()
+    cm = CatalogManager(
+        spark,
+        logger,
+        env="local"
+    )
+
+    print(
+        cm.get_table_name(
+            "silver",
+            "silver_nyc_taxi"
+        )
+    )
+
+    #catalog_manager.show_catalogs().show()
+    #catalog_manager.show_schemas("nyc_taxi").show()
+    #catalog_manager.show_tables("nyc_taxi","gold").show()
+    #catalog_manager.describe_table_columns("nyc_taxi","audit", "audit_load").show()
     #catalog_manager.create_catalog("test_catalog")
     #catalog_manager.create_schema("test_catalog", "test_schema")
     #catalog_manager.drop_schema("test_catalog", "test_schema")
