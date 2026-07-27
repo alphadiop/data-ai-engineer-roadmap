@@ -21,7 +21,7 @@ class MaintenanceJob:
             optimize periode est lancé tous les jours car stockage limité avec l'édition free de databricks
             cela compacte les fichiers delta pour diminuer la taille des fichiers
     """
-    def __init__(self, spark: SparkSession, logger: PipelineLogger):
+    def __init__(self, spark: SparkSession, logger):
         self.spark = spark
         self.logger = logger
         

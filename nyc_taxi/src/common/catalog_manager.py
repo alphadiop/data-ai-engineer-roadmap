@@ -11,7 +11,7 @@ class CatalogManager:
     un catalog sert à isoler et organiser les données dans un espace de travail
     le schema est un sous dossier du catalog, il contient des :
     """
-    def __init__(self,spark, logger: PipelineLogger, env: str = "local"):
+    def __init__(self,spark, logger: 'PipelineLogger', env: str = "local"):
         self.spark = spark
         self.logger = logger,
         self.env = env
@@ -49,8 +49,7 @@ class CatalogManager:
 
         if self.env == "local":
             return f"{schema_name}.{table_name}"
-        else:
-            return f"{catalog_name}.{schema_name}.{table_name}"
+        return f"{catalog_name}.{schema_name}.{table_name}"
 
 
 

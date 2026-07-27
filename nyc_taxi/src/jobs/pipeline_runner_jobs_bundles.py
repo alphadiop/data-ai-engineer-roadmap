@@ -1,6 +1,6 @@
 
 import os
-import sys
+
 from pathlib import Path
 
 import uuid
@@ -8,16 +8,17 @@ from datetime import datetime
 
 from nyc_taxi.src.setup.create_tables import CreateTables
 #from nyc_taxi.src.setup.create_catalog import CreateCatalog
-
-
+from nyc_taxi.src.common.decorators import log_execution
+from nyc_taxi.src.common.delta_manager import DeltaManager
+from pyspark.sql import SparkSession
+import sys
 from nyc_taxi.src.bronze.uber_bronze import UberBronze
 from nyc_taxi.src.silver.uber_silver import UberSilver
 from nyc_taxi.src.gold.uber_gold import UberGold
 
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
-from nyc_taxi.src.common.decorators import log_execution
-from nyc_taxi.src.common.delta_manager import DeltaManager
+
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 from nyc_taxi.src.jobs.maintenance_job import MaintenanceJob
@@ -26,7 +27,7 @@ from nyc_taxi.src.audit.audit_manager import AuditManager
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
 
 
-from pyspark.sql import SparkSession
+
 from datetime import datetime
 
 
@@ -43,10 +44,10 @@ class PipelineRunner:
 
     def run(self):
 
+        context = PipelineContext()
+
         ### CreateCatalog(spark=self.spark, logger=self.logger).run()
          ## A faire une fois
-
-        context = PipelineContext()
 
         ## CreateTables(spark=self.spark, logger=self.logger).run(context)
 
