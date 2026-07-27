@@ -26,5 +26,6 @@ class PipelineContext:
 
         self.message = ""
         self.current_step = ""
+        self.env: str = "local"
 
         self.row_count = {}

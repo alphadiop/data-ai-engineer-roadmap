@@ -8,16 +8,47 @@ class CatalogManager:
     le schema est un sous dossier du catalog, il contient des :
     """
 
-    def __init__(self, spark, logger: PipelineLogger):
+    def __init__(self,spark, logger: PipelineLogger, env: str = "local"):
         self.spark = spark
-        self.logger = logger
+        self.logger = logger,
+        self.env = env
 
     # ============================================================================
     # ============Catalogs========================================================
     # ============================================================================
 
-    def create_catalog(self, catalog_name: str):
+    def get_table_name(
+            self,
+            schema_name: str,
+            table_name: str,
+            catalog_name: str = "nyc_taxi"
+    ) -> str:
 
+        if self.env == "local":
+            return f"{schema_name}.{table_name}"
+        return f"{catalog_name}.{schema_name}.{table_name}"
+
+
+    def audit_load(self):
+        return self.get_table_name(
+            schema_name="audit",
+            table_name="audit_load"
+        )
+
+    def silver_nyc_taxi(self):
+        return self.get_table_name(
+            schema_name="silver",
+            table_name="silver_nyc_taxi"
+        )
+
+    def gold_fact_trips(self):
+        return self.get_table_name(
+            schema_name="gold",
+            table_name="gold_fact_trips"
+        )
+
+
+    def create_catalog(self, catalog_name: str):
         self.spark.sql(
             f"CREATE CATALOG IF NOT EXISTS {catalog_name}"
         )
@@ -289,9 +320,13 @@ class CatalogManager:
         schema_name: str,
         table_name: str
     ) -> bool:
-
+        full_name = self.get_table_name(
+            schema_name=schema_name,
+            table_name=table_name,
+            catalog_name=catalog_name
+        )
         return self.spark.catalog.tableExists(
-            f"{catalog_name}.{schema_name}.{table_name}"
+            full_name
         )
 
 
@@ -366,17 +401,20 @@ class CatalogManager:
 
 
     def describe_table(
-        self,
-        catalog_name: str,
-        schema_name: str,
-        table_name: str
+            self,
+            catalog_name: str,
+            schema_name: str,
+            table_name: str
     ):
 
+        full_name = self.get_table_name(
+            schema_name=schema_name,
+            table_name=table_name,
+            catalog_name=catalog_name
+        )
+
         return self.spark.sql(
-            f"""
-            DESCRIBE DETAIL
-            {catalog_name}.{schema_name}.{table_name}
-            """
+            f"DESCRIBE DETAIL {full_name}"
         )
 
 

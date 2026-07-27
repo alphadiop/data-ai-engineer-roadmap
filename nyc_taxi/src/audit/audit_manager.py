@@ -4,6 +4,7 @@ import uuid
 from pyspark.sql import DataFrame
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.decorators import log_execution
 from pyspark.sql.functions import max as spark_max
 
@@ -16,8 +17,16 @@ class AuditManager:
         self.spark = spark
         self.logger = logger
 
+
     def is_period_loaded(self,context):
-        if not self.spark.catalog.tableExists("nyc_taxi.audit.audit_load"):
+        catalog_manager = CatalogManager(
+            spark=self.spark,
+            logger=self.logger,
+            env=context.env
+        )
+        audit_table = catalog_manager.audit_load()
+
+        if not self.spark.catalog.tableExists(audit_table):
             return False
 
         query = f"""

@@ -1,12 +1,13 @@
+
 import os
 import sys
-
+from pathlib import Path
 
 import uuid
 from datetime import datetime
 
-from nyc_taxi.src.setup.create_tables import CreateTables
-from nyc_taxi.src.setup.create_catalog import CreateCatalog
+#from nyc_taxi.src.setup.create_tables import CreateTables
+#from nyc_taxi.src.setup.create_catalog import CreateCatalog
 
 
 from nyc_taxi.src.bronze.uber_bronze import UberBronze
@@ -130,19 +131,30 @@ class PipelineRunner:
 
 if __name__ == "__main__":
     # Je rend le parametre periode optionnel car il est renseigné automatiquement à partir de la table audit
+    from pyspark.sql import SparkSession
+
+    spark = (
+        SparkSession.builder
+        .appName("nyc_taxi_pipeline")
+        .master("local[*]")
+        .getOrCreate()
+    )
     import argparse
     parser = argparse.ArgumentParser()
+    parser.add_argument("--env", choices=["local", "databricks"],default='local')
     parser.add_argument("--periode", type=int, required=True)
     parser.add_argument("--taxi_type", type=str, default="yellow")
 
     args = parser.parse_args()
 
+    env = args.env
     periode = args.periode
     taxi_type = args.taxi_type
 
     logger = PipelineLogger("uber_pipeline")
 
     logger.info(f"sys.argv : {sys.argv}")
+    logger.info(f"env      : {env}")
     logger.info(f"args      : {args}")
     logger.info(f"periode   : {periode}")
     logger.info(f"taxi_type : {taxi_type}")

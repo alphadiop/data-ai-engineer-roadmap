@@ -10,5 +10,9 @@ workspace:
 targets:
   dev:
     default: true
+
+    variables:
+      catalog: nyc_taxi
+
     workspace:
       host: https://dbc-8c847397-3c66.cloud.databricks.com

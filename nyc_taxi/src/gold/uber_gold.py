@@ -9,7 +9,7 @@ from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.common.schema_manager import SchemaManager
 from nyc_taxi.src.utils.load_json import load_json
 
-from silver.uber_silver import UberSilver
+from nyc_taxi.src.silver.uber_silver import UberSilver
 
 
 from pyspark.sql import SparkSession

@@ -10,15 +10,14 @@ resources:
         - name: taxi_type
           default: "yellow"
 
-
       tasks:
-        - task_key: pipeline
+        - task_key: run_pipeline
           job_cluster_key: nyc_cluster
           python_wheel_task:
             package_name: nyc_taxi
-            entry_point: pipeline
-            parameters:
+            entry_point: run_pipeline
 
+            parameters:
               - "--periode"
               - "{{job.parameters.periode}}"
 
