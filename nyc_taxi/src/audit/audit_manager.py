@@ -3,6 +3,7 @@ import sys
 import uuid
 from pyspark.sql import DataFrame
 from nyc_taxi.src.common.pipeline_step import PipelineStep
+from decimal import Decimal
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.decorators import log_execution
@@ -11,6 +12,15 @@ from pyspark.sql.functions import max as spark_max
 from pyspark.sql.functions import col
 from datetime import datetime
 
+from pyspark.sql.types import (
+    StructType,
+    StructField,
+    LongType,
+    IntegerType,
+    StringType,
+    TimestampType,
+    DecimalType
+)
 
 class AuditManager:
     def __init__(self, spark, logger:PipelineLogger):
@@ -49,6 +59,7 @@ class AuditManager:
             env=context.env
         )
         audit_table = catalog_manager.audit_load()
+
         data = [(
             context.run_id,
             int(context.periode),
@@ -57,33 +68,38 @@ class AuditManager:
             context.status,
             context.start_time,
             context.end_time,
-            context.duration_seconds,
+            Decimal(str(context.duration_seconds))
+            if context.duration_seconds is not None
+            else None,
             context.error_step,
             context.message
         )]
 
-        df = self.spark.createDataFrame(
-            data,
-            schema=[
-                "run_id",
-                "periode",
-                "table_name",
-                "taxi_type",
-                "status",
-                "start_time",
-                "end_time",
-                "duration_seconds",
-                "error_step",
-                "message"
-            ]
+        schema = StructType([
+            StructField("run_id", LongType(), False),
+            StructField("periode", IntegerType(), False),
+            StructField("table_name", StringType(), False),
+            StructField("taxi_type", StringType(), False),
+            StructField("status", StringType(), False),
+            StructField("start_time", TimestampType(), False),
+            StructField("end_time", TimestampType(), False),
+            StructField("duration_seconds", DecimalType(18, 2), True),
+            StructField("error_step", StringType(), True),
+            StructField("message", StringType(), True)
+        ])
+
+        df_audit = self.spark.createDataFrame(
+            data=data,
+            schema=schema
         )
 
         (
-        df.write
+        df_audit.write
             .format("delta")
             .mode("append")
             .saveAsTable(audit_table)
         )
+
 
     ## table audit : nyc_taxi.audit.audit_load
     @log_execution
@@ -128,15 +144,17 @@ class AuditManager:
                 )
             )
 
+        schema = StructType([
+            StructField("run_id", LongType(), False),
+            StructField("periode", IntegerType(), False),
+            StructField("table_name", StringType(), False),
+            StructField("row_count", LongType(), False),
+            StructField("created_at", TimestampType(), False),
+        ])
+
         df = self.spark.createDataFrame(
             data,
-            schema=[
-                "run_id",
-                "periode",
-                "table_name",
-                "row_count",
-                "created_at"
-            ]
+            schema=schema
         )
 
         (
@@ -149,7 +167,7 @@ class AuditManager:
     def get_next_period(self,table_name:str,taxi_type:str) -> int:
         try:
             row = (
-                    self.spark.table("nyc_taxi.audit.audit_load")
+                self.spark.table("nyc_taxi.audit.audit_load")
                     .filter(col("table_name") == table_name)
                     .filter(col("taxi_type") == taxi_type)
                     .filter(col("status") == "SUCCESS")

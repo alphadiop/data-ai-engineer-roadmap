@@ -1,9 +1,11 @@
 class PipelineContext:
 
-    def __init__(self):
+    def __init__(self,env:str = "local", catalog_name:str='nyc_taxi',taxi_type:str=None):
+        self.env = env
+        self.taxi_type = taxi_type
+        self.catalog_name = catalog_name
         self.periode = None
         self.table_name = None
-        self.taxi_type = None
 
         self.catalogue= None
         self.schema= None
@@ -23,9 +25,9 @@ class PipelineContext:
 
         self.start_time=None
         self.end_time=None
+        self.path_sql_schema = None
 
         self.message = ""
         self.current_step = ""
-        self.env: str = "local"
 
         self.row_count = {}

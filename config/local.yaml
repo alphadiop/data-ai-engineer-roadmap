@@ -1,0 +1,3 @@
+env: local
+catalog_name: nyc_taxi
+path_sql_schema: D:/data-ai-engineer-roadmap/nyc_taxi/schema

@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime
 
 from nyc_taxi.src.setup.create_tables import CreateTables
-#from nyc_taxi.src.setup.create_catalog import CreateCatalog
+from nyc_taxi.src.setup.create_catalog import CreateCatalog
 from nyc_taxi.src.common.decorators import log_execution
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from pyspark.sql import SparkSession
@@ -20,23 +20,27 @@ from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
 
 from nyc_taxi.src.common.catalog_manager import CatalogManager
-
 from nyc_taxi.src.jobs.maintenance_job import MaintenanceJob
+
+from nyc_taxi.src.utils.config.load_config import load_config
+
+from nyc_taxi.src.common.spark_manager import SparkManager
 
 from nyc_taxi.src.audit.audit_manager import AuditManager
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
-
-
-
 from datetime import datetime
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nyc_taxi.src.common.logger import PipelineLogger
 
 
 class PipelineRunner:
 
     path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
-    def __init__(self, spark,logger,steps):
+    def __init__(self, spark,logger:PipelineLogger,steps):
         self.spark = spark
         self.logger = logger
         self.steps = steps
@@ -44,12 +48,19 @@ class PipelineRunner:
 
     def run(self):
 
-        context = PipelineContext()
+        context = PipelineContext(
+            env="local",
+            catalog_name="nyc_taxi",
+            taxi_type="yellow"
+        )
 
-        ### CreateCatalog(spark=self.spark, logger=self.logger).run()
-         ## A faire une fois
+        context.config = load_config(context.env)
 
-        ## CreateTables(spark=self.spark, logger=self.logger).run(context)
+        #context.catalog_name = config["catalog_name"]
+        #context.path_sql_schema = config["path_sql_schema"]
+        spark.sql(
+            "DROP TABLE IF EXISTS gold.gold_kpi_daily"
+        )
 
         self.logger.info(
             f"context.env = {context.env}"
@@ -61,6 +72,11 @@ class PipelineRunner:
             env=context.env
         )
 
+        self.logger.info(f"CATALOG : {context.config['catalog_name']}")
+
+        catalog_manager.create_catalog(
+            catalog_name=context.config["catalog_name"]
+        )
         catalog_manager.create_environment_schemas()
 
         audit_manager = AuditManager(
@@ -70,9 +86,19 @@ class PipelineRunner:
 
         context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()
-        bronze_step = self.steps[0]
+
+        self.logger.info(f"liste steps : {self.steps}")
+
+        bronze_step = next(
+            step
+            for step in self.steps
+            if isinstance(step, UberBronze)
+        )
+
         context.taxi_type = bronze_step.taxi_type
+
         context.table_name = "silver_nyc_taxi"
+
         context.periode = bronze_step.periode
 
         self.logger.info(
@@ -96,7 +122,7 @@ class PipelineRunner:
             self.logger.info(
                 f"Period {context.periode} already loaded {'=' * 85 }"
             )
-            return context
+            return
         
         try:
 
@@ -131,47 +157,30 @@ class PipelineRunner:
             self.logger.error(
                 f"Error in pipeline : {e}"
             )
-
             raise
 
         finally:
             context.end_time = datetime.now()
             context.duration_seconds = (context.end_time - context.start_time).total_seconds()
-
             audit_manager.insert_audit(context)
-
             audit_manager.insert_row_counts(context)
-            
         return context
 
 if __name__ == "__main__":
-    # Je rend le parametre periode optionnel car il est renseigné automatiquement à partir de la table audit
+    # Je rend le paramètre periode optionnel car il est renseigné automatiquement à partir de la table audit
     from pyspark.sql import SparkSession
-
+    from delta import configure_spark_with_delta_pip
     #spark = SparkManager.get_spark()
 
-    from delta import configure_spark_with_delta_pip
-
-    builder = (
-        SparkSession.builder
-        .appName("nyc_taxi")
-        .master("local[*]")
-        .config(
-            "spark.sql.extensions",
-            "io.delta.sql.DeltaSparkSessionExtension"
-        )
-        .config(
-            "spark.sql.catalog.spark_catalog",
-            "org.apache.spark.sql.delta.catalog.DeltaCatalog"
-        )
-        .config(
-            "spark.pyspark.python",
-            sys.executable
-        )
-    )
-    spark = configure_spark_with_delta_pip(builder).getOrCreate()
-
     import argparse
+    logger = PipelineLogger("uber_pipeline")
+
+    spark_manager = SparkManager(
+        app_name="nyc_taxi_pipeline",
+        logger=logger
+    )
+    spark = spark_manager.get_spark()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=["local", "databricks"],default='local')
     parser.add_argument("--periode", type=int, required=True)
@@ -183,9 +192,6 @@ if __name__ == "__main__":
     periode = args.periode
     taxi_type = args.taxi_type
 
-    logger = PipelineLogger("uber_pipeline")
-
-
     logger.info(f"sys.argv : {sys.argv}")
     logger.info(f"env      : {env}")
     logger.info(f"args      : {args}")
@@ -196,6 +202,14 @@ if __name__ == "__main__":
         spark=spark,
         logger=logger,
         steps=[
+            CreateCatalog(
+                spark=spark,
+                logger=logger
+            ),
+            CreateTables(
+                spark=spark,
+                logger=logger
+            ),
             UberBronze(
                 spark=spark,
                 taxi_type=taxi_type,

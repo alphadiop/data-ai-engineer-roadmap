@@ -1,9 +1,6 @@
-import os
-import sys
 
 from abc import ABC, abstractmethod
 from uuid import uuid4
-from nyc_taxi.src.common.logger import PipelineLogger
 
 import time
 

@@ -12,7 +12,7 @@
   "nullable": ""
   },
 "passenger_count": {
-  "sql_type": "BIGINT",
+  "sql_type": "INT",
   "nullable": ""
   },
 "trip_distance": {
@@ -36,7 +36,7 @@
   "nullable": ""
   },
 "payment_type": {
-  "sql_type": "BIGINT",
+  "sql_type": "TINYINT",
   "nullable": ""
   },
 "fare_amount": {

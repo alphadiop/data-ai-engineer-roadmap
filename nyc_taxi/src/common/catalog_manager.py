@@ -13,7 +13,7 @@ class CatalogManager:
     """
     def __init__(self,spark, logger: 'PipelineLogger', env: str = "local"):
         self.spark = spark
-        self.logger = logger,
+        self.logger = logger
         self.env = env
 
     # ============================================================================
@@ -24,7 +24,8 @@ class CatalogManager:
             "bronze",
             "silver",
             "gold",
-            "audit"
+            "audit",
+            "ref"
         ]
 
         for schema in schemas:
@@ -50,8 +51,6 @@ class CatalogManager:
         if self.env == "local":
             return f"{schema_name}.{table_name}"
         return f"{catalog_name}.{schema_name}.{table_name}"
-
-
 
 
     def audit_row_count(self):
@@ -90,13 +89,20 @@ class CatalogManager:
 
 
     def create_catalog(self, catalog_name: str):
+        self.logger.info(f"ENV = {self.env}")
+
+        if self.env == "local":
+
+            self.logger.info(
+                f"Mode local : catalog {catalog_name} ignoré"
+            )
+            return
+
         self.spark.sql(
             f"CREATE CATALOG IF NOT EXISTS {catalog_name}"
         )
 
-        self.logger.info(
-            f"Catalog {catalog_name} created"
-        )
+
 
     def catalog_exists(self, catalog_name: str) -> bool:
         catalogs = [
@@ -110,7 +116,6 @@ class CatalogManager:
         """
         Renomme un catalog Unity Catalog.
         """
-
         catalogs = [
             row.catalog
             for row in self.spark.sql("SHOW CATALOGS").collect()
@@ -161,21 +166,26 @@ class CatalogManager:
     # ====================================================================================================
 
     def create_schema(
-        self,
-        catalog_name: str,
-        schema_name: str
+            self,
+            schema_name: str,
+            env:str
     ):
 
-        self.spark.sql(
-            f"""
-            CREATE SCHEMA IF NOT EXISTS
-            {catalog_name}.{schema_name}
-            """
-        )
+        if env == "local":
+            self.spark.sql(
+                f"""
+                CREATE DATABASE IF NOT EXISTS
+                {schema_name}
+                """
+            )
+        else:
+            self.spark.sql(
+                f"""
+                CREATE SCHEMA IF NOT EXISTS
+                nyc_taxi.{schema_name}
+                """
+            )
 
-        self.logger.info(
-            f"Schema {catalog_name}.{schema_name} created"
-        )
 
     def drop_schema(
         self,
@@ -292,17 +302,6 @@ class CatalogManager:
             f"Schema '{old_schema}' "
             f"renamed to '{new_schema}'"
         )
-        
-
-    def catalog_exists(self, catalog_name: str) -> bool:
-
-        df = self.spark.sql("SHOW CATALOGS")
-
-        return (
-            df.filter(
-                f"catalog = '{catalog_name}'"
-            ).count() > 0
-        )
 
 
     def show_catalogs(self):
@@ -311,7 +310,7 @@ class CatalogManager:
         )
 
 
-    def schema_exists(
+    def schema_exists2(
         self,
         catalog_name: str,
         schema_name: str
@@ -320,13 +319,13 @@ class CatalogManager:
         df = self.spark.sql(
             f"SHOW SCHEMAS IN {catalog_name}"
         )
-
         return (
             df.filter(
                 f"databaseName = '{schema_name}'"
             ).count() > 0
         )
-        
+
+
     def show_schemas(
         self,
         catalog_name: str
@@ -381,7 +380,7 @@ class CatalogManager:
         new_table_name: str
     ):
         """
-        Renomme une table Databricks.
+            Renomme une table Databricks.
         """
 
         old_name = self.get_table_name(

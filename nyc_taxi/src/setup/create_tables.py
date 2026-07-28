@@ -46,7 +46,7 @@ class CreateTables:
                 schema_name=schema_name,
                 table_name=table_name,
                 schema=self.get_schema(
-                    type_taxi=context.type_taxi,
+                    context=context,
                     table_name=table_name
                 ),
                 partition_by=partition_by,
@@ -55,21 +55,12 @@ class CreateTables:
 
     def get_schema(
             self,
-            type_taxi,
+            context,
             table_name
     ):
-
-        path = (
-                self.project_root
-                / "schema"
-                / type_taxi
-                / f"{table_name}.json"
-        )
-
-        schema_json = load_json(path)
-
+        path_schema = Path(context.config["path_sql_schema"])
+        self.logger.info(f"path_schema: {path_schema}")
+        schema_json = load_json(path_schema / context.taxi_type / f"{table_name}.json")
         return build_schema(schema_json)
-
-
 
 

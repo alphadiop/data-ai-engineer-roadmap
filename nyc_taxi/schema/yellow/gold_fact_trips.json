@@ -20,7 +20,7 @@
     "nullable": ""
   },
   "trip_duration_minute": {
-    "sql_type": "INT",
+    "sql_type": "DECIMAL(19,5)",
     "nullable": ""
   },
   "trip_distance": {

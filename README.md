@@ -1,6 +1,8 @@
 # Data Engineer & AI Engineer Learning Roadmap
 ## Framework Databricks ou environnement Databricks
 ### Progression
+
+
 ```text
               Pipeline
                   |
@@ -13,6 +15,23 @@
         local       Databricks
           |             |
    schema.table   catalog.schema.table
+   
+   
+                   PipelineRunner
+                       |
+                       |
+                PipelineContext
+                       |
+              env = local / dev
+                       |
+        -------------------------------
+        |                             |
+        v                             v
+ Spark local                   Databricks
+        |                             |
+ database/schema               Unity Catalog
+        |                             |
+ silver.table             catalog.schema.table
  ```
 
 
@@ -683,7 +702,20 @@ Version 3
 | **VACUUM**          | Supprime les anciens fichiers nécessaires au Time Travel |
 
 
-
+#### l'ordre d'exécution de ton job
+- [ ] CreateCatalog
+- [ ] CreateSchemas
+- [ ] CreateTables
+- [ ] Bronze ingestion
+- [ ] Silver transformation
+- [ ] Gold aggregation
+- [ ] Maintenance VACUUM
 ---
 ---
 
+self.logger.info(f"TABLE = {full_table_name}")
+print("=== DATAFRAME ===")
+df.printSchema()
+
+print("=== TABLE DELTA ===")
+self.spark.table(full_table_name).printSchema()

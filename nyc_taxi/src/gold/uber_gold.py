@@ -155,37 +155,44 @@ class UberGold(PipelineStep):
     
 
 
-    @log_execution   
+    @log_execution
     def get_dim_date(self, df_silver: DataFrame) -> DataFrame:
         from pyspark.sql.functions import (
-                col,
-                year,
-                month,
-                dayofmonth,
-                quarter,
-                dayofweek,
-                date_format
-            )
+            col,
+            year,
+            month,
+            dayofmonth,
+            quarter,
+            dayofweek,
+            date_format
+        )
+
+        from pyspark.sql.types import (
+            ByteType,
+            ShortType
+        )
 
         return (
             df_silver
             .select(
-                col("periode").cast("string").alias("periode"),
+                col("periode").cast("int").alias("periode"),
                 col("tpep_pickup_datetime").cast("date").alias("date")
             )
             .distinct()
-            .withColumn("year", year("date"))
-            .withColumn("quarter", quarter("date"))
-            .withColumn("month", month("date"))
-            .withColumn("day", dayofmonth("date"))
-            .withColumn("day_of_week", dayofweek("date"))
+            .withColumn("year", year("date").cast(ShortType()))
+            .withColumn("quarter", quarter("date").cast(ByteType()))
+            .withColumn("month", month("date").cast(ByteType()))
+            .withColumn("day", dayofmonth("date").cast(ByteType()))
+            .withColumn("day_of_week", dayofweek("date").cast(ByteType()))
             .withColumn("day_name", date_format("date", "EEEE"))
             .withColumn("month_name", date_format("date", "MMMM"))
             .withColumn(
                 "trip_date",
-                 year(col("date")) * 10000 
-                 + month(col("date")) * 100 
-                 + dayofmonth(col("date"))
+                (
+                    year(col("date")) * 10000
+                        + month(col("date")) * 100
+                        + dayofmonth(col("date"))
+                ).cast("int")
             )
         )
 
@@ -218,12 +225,13 @@ class UberGold(PipelineStep):
 
     @log_execution
     def get_kpi_daily(self, df_silver: DataFrame) -> DataFrame:
+        from pyspark.sql.types import DecimalType
         return (
             df_silver
             .groupBy(
-                col("periode").cast("string").alias("periode"),
+                col("periode").cast("int").alias("periode"),
                 col("trip_date").cast("int").alias("trip_date")
-            ) 
+            )
             .agg(
                 count("*").alias("nb_trips"),
                 round(sum("total_amount"), 2).alias("revenue"),
@@ -238,7 +246,19 @@ class UberGold(PipelineStep):
                 round(avg("tip_percent"), 2).alias("avg_tip_percent"),
                 round(avg("average_speed"), 2).alias("avg_speed")
             )
+            .withColumn("revenue", col("revenue").cast(DecimalType(19,2)))
+            .withColumn("avg_distance", col("avg_distance").cast(DecimalType(19,2)))
+            .withColumn("avg_tip", col("avg_tip").cast(DecimalType(19,2)))
+            .withColumn("avg_revenue_per_trip", col("avg_revenue_per_trip").cast(DecimalType(19,2)))
+            .withColumn("total_tips", col("total_tips").cast(DecimalType(19,2)))
+            .withColumn("total_distance", col("total_distance").cast(DecimalType(19,2)))
+            .withColumn("revenue_per_distance", col("revenue_per_distance").cast(DecimalType(19,2)))
+            .withColumn("avg_passengers_per_trip", col("avg_passengers_per_trip").cast(DecimalType(19,2)))
+            .withColumn("avg_trip_duration", col("avg_trip_duration").cast(DecimalType(19,2)))
+            .withColumn("avg_tip_percent", col("avg_tip_percent").cast(DecimalType(19,2)))
+            .withColumn("avg_speed", col("avg_speed").cast(DecimalType(19,2)))
         )
+
 
     def get_dim_location(self)-> DataFrame:
         catalog = "nyc_taxi"
@@ -265,6 +285,7 @@ class UberGold(PipelineStep):
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_fact_trips")
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_kpi_daily")
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_dim_date")
+
 
     @log_execution
     def purges_tables(self):

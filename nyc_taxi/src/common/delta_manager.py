@@ -1,5 +1,9 @@
 import os
 import sys
+from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
+from nyc_taxi.src.utils.sql_schema.get_columns_from_schema import get_columns_from_schema
+from nyc_taxi.src.utils.load_json import load_json
+
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union,Tuple
 import shutil
 
@@ -7,10 +11,8 @@ from pathlib import Path
 from nyc_taxi.src.common.logger import PipelineLogger
 from pyspark.sql import DataFrame
 
-from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
-from nyc_taxi.src.utils.sql_schema.get_columns_from_schema import get_columns_from_schema
-from nyc_taxi.src.utils.load_json import load_json
 
+from nyc_taxi.src.common.spark_manager import SparkManager
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -53,7 +55,6 @@ class DeltaManager:
         )
 
         if drop_table:
-
             self.logger.info(
                 f"Dropping table {full_table_name}"
             )
@@ -398,6 +399,7 @@ class DeltaManager:
             schema_name=schema_name,
             table_name=table_name
         )
+
         if replace:
             (
                 df.write
@@ -603,17 +605,17 @@ class DeltaManager:
 if __name__ == "__main__":
     from pyspark.sql import SparkSession
     import sys
+    import os
+
     from nyc_taxi.src.common.catalog_manager import CatalogManager
     logger=PipelineLogger('DeltaManager')
-    spark = (
-        SparkSession.builder
-        .appName("nyc_taxi")
-        .config(
-            "spark.pyspark.python",
-            sys.executable
-        )
-        .getOrCreate()
+
+    spark_manager = SparkManager(
+        app_name="nyc_taxi_pipeline",
+        logger=logger
     )
+    spark = spark_manager.get_spark()
+
     catalog_manager = CatalogManager(
         spark=spark,
         logger=logger
@@ -632,6 +634,61 @@ if __name__ == "__main__":
     logger.info(
         f"CREATE TABLE TARGET = {full_table_name}"
     )
+
+    for schema_name in ["audit", "silver", "gold"]:
+        catalog_manager.create_schema(
+            schema_name=schema_name,
+            env='local'
+        )
+    logger.info(
+        spark.conf.get(
+            "spark.sql.warehouse.dir"
+        )
+    )
+    spark.sql("SHOW DATABASES").show(truncate=False)
+
+    warehouse = (
+        spark.conf.get("spark.sql.warehouse.dir")
+        .replace("file:/", "")
+    )
+
+    for root, dirs, files in os.walk(warehouse):
+        print(root)
+
+    spark.sql("SHOW TABLES IN audit").show()
+    spark.sql("SHOW TABLES IN gold").show()
+    spark.sql("SHOW TABLES IN silver").show()
+
+    warehouse = Path(
+        "D:/data-ai-engineer-roadmap/nyc_taxi/src/common/spark-warehouse"
+    )
+
+    for db in warehouse.iterdir():
+        print("\n", db)
+
+        if db.is_dir():
+            for child in db.iterdir():
+                print("   ", child.name)
+
+    spark.conf.get("spark.sql.warehouse.dir")
+
+    tab = "gold.gold_kpi_daily"
+    spark.sql("SHOW TABLES IN gold").show()
+
+    if spark.catalog.tableExists(tab):
+        df = spark.read.table(tab)
+        df.show()
+    else:
+        print(f"Table {tab} inexistante")
+    # df = spark.read.table(tab)
+    # print(df.count())
+    #spark.sql("DESCRIBE DETAIL audit.audit_load").show(truncate=False)
+    #spark.sql("CREATE DATABASE IF NOT EXISTS audit")
+    #spark.sql("CREATE DATABASE IF NOT EXISTS silver")
+    #spark.sql("CREATE DATABASE IF NOT EXISTS gold")
+    #spark.sql("SHOW DATABASES").show(truncate=False)
+
+
     # path = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc/schema/yellow/audit_load.json"
     # load_json = load_json(path)
     # schema = build_schema(load_json)

@@ -1,0 +1,3 @@
+env: dev
+catalog_name: nyc_taxi
+path_sql_schema: /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema

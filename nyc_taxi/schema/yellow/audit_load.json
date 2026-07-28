@@ -1,6 +1,6 @@
 {
   "run_id": {
-    "sql_type": "STRING",
+    "sql_type": "BIGINT",
     "nullable": "NOT NULL"
   },
   "periode": {

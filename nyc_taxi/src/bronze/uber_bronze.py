@@ -109,7 +109,8 @@ class UberBronze(PipelineStep):
 
         df_bronze = df.withColumn("periode", lit(self.periode))
 
-        context.df_bronze = df_bronze
+        context.df_bronze = df_bronze.limit(10000)
+
         context.row_count["bronze"] = df_bronze.count()
         
         context.periode = self.get_period(file_name)

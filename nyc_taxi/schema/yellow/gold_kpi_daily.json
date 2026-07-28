@@ -40,19 +40,19 @@
     "nullable": ""
   },
   "avg_passengers_per_trip": {
-    "sql_type": "DECIMAL(10,2)",
+    "sql_type": "DECIMAL(19,2)",
     "nullable": ""
   },
   "avg_trip_duration": {
-    "sql_type": "DECIMAL(10,2)",
+    "sql_type": "DECIMAL(19,2)",
     "nullable": ""
   },
   "avg_tip_percent": {
-    "sql_type": "DECIMAL(10,2)",
+    "sql_type": "DECIMAL(19,2)",
     "nullable": ""
   },
   "avg_speed": {
-    "sql_type": "DECIMAL(10,2)",
+    "sql_type": "DECIMAL(19,2)",
     "nullable": ""
   }
 }
