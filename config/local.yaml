@@ -1,3 +1,11 @@
 env: local
 catalog_name: nyc_taxi
 path_sql_schema: D:/data-ai-engineer-roadmap/nyc_taxi/schema
+
+local:
+  bronze_path: D:/data-ai-engineer-roadmap/data/bronze/raw_files
+
+
+databricks:
+  bronze_path: /Volumes/nyc_taxi/bronze/raw_files
+  path_sql_schema: /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema

@@ -3,7 +3,6 @@ import sys
 
 from urllib.request import urlretrieve
 import re
-import sys
 from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
@@ -11,13 +10,14 @@ from pyspark.sql.functions import (
     col, lit
 )
 from urllib.error import HTTPError, URLError
+from nyc_taxi.src.utils.config.load_config import load_config
 
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution 
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
 
-### Path(self.path_volume) / file_name
+
 class UberBronze(PipelineStep):
     """ 
      Télécharger les données Uber et les stocker dans le répertoire Bronze
@@ -26,16 +26,24 @@ class UberBronze(PipelineStep):
      Sinon, nous allons le télécharger à partir du répertoire Bronze.
     """
 
-    path_volume = Path("/Volumes/nyc_taxi/bronze/raw_files")
-
-    def __init__(self, spark,  taxi_type: str, periode:int, logger:PipelineLogger):
+    def __init__(self, spark,  taxi_type: str, periode:int, logger:PipelineLogger, env='local'):
         super().__init__(spark,self.__class__.__name__)
         self.spark = spark
         self.taxi_type = taxi_type
         self.periode = periode
         self.logger = logger
+        self.env = env
+
+        config = load_config(self.env)
+        path_volume = config[self.env]["bronze_path"]
+
+        self.logger.info(f"Bronze path : {path_volume}")
+
+        self.path_volume = Path(path_volume)
+
         self.year = int(self.periode // 100)
         self.month = int(self.periode % 100)
+
 
     def __repr__(self):
         return f"UberBronze(path_volume={self.path_volume})"
@@ -47,7 +55,7 @@ class UberBronze(PipelineStep):
     def get_file_name(self, taxi_type:str) -> str:
         return str(f"{taxi_type}_tripdata_{self.year}-{self.month:02}.parquet")
     
-    @log_execution
+
     def get_path_file(self) -> Path:
         return (
             self.path_volume
@@ -64,18 +72,17 @@ class UberBronze(PipelineStep):
             we supposed that file_name exists otherwise we download it from the internet
         """
 
-        file_name = f"{self.taxi_type}_tripdata_{self.year}-{self.month:02d}.parquet"
-        path_file = self.path_volume / self.taxi_type / str(self.year) / file_name
-        archive_dir = self.path_volume / self.taxi_type / str(self.year) / file_name
+        file_name = self.get_file_name(self.taxi_type)
+        path_file = self.get_path_file()
 
         self.logger.info(f"Extracting {file_name} from {path_file}")
 
-        path_file.parent.mkdir(
-            parents=True, exist_ok=True
-        )
+        path_file.parent.mkdir(parents=True, exist_ok=True)
 
         if not path_file.exists():
-            url = (f"https://d37ci6vzurychx.cloudfront.net/trip-data/{file_name}")
+            url = (
+                f"https://d37ci6vzurychx.cloudfront.net/trip-data/{file_name}"
+            )
             
             self.logger.info(
                 f"{'=' * 25} Downloading {file_name} {'=' * 25} "
@@ -99,7 +106,9 @@ class UberBronze(PipelineStep):
                 )
                 raise
 
-        archived = self.path_volume / self.taxi_type / str(self.year) / file_name
+        #archived = self.path_volume / self.taxi_type / str(self.year) / file_name
+
+        archived = self.get_path_file()
 
         if not archived.exists():
             path_file.replace(archived)
@@ -109,7 +118,7 @@ class UberBronze(PipelineStep):
 
         df_bronze = df.withColumn("periode", lit(self.periode))
 
-        context.df_bronze = df_bronze.limit(10000)
+        context.df_bronze = df_bronze
 
         context.row_count["bronze"] = df_bronze.count()
         
@@ -129,7 +138,6 @@ class UberBronze(PipelineStep):
             raise ValueError(f"Période introuvable dans {file_name}")
         return f"{match.group(1)}{match.group(2)}"
     
-
 
 
 if __name__ == "__main__":

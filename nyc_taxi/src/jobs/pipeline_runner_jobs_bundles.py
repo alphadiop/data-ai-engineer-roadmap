@@ -58,9 +58,7 @@ class PipelineRunner:
 
         #context.catalog_name = config["catalog_name"]
         #context.path_sql_schema = config["path_sql_schema"]
-        spark.sql(
-            "DROP TABLE IF EXISTS gold.gold_kpi_daily"
-        )
+
 
         self.logger.info(
             f"context.env = {context.env}"
@@ -112,7 +110,6 @@ class PipelineRunner:
         self.logger.info(f"{'*' * 25} taxi_type : {context.taxi_type} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} periode : {context.periode} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} table_name : {context.table_name} {'*' * 25} ")
-        self.logger.info(f"{'*' * 2} path_schema : {self.path_sql_schema} {'*' * 5} ")
 
 
         if audit_manager.is_period_loaded(context):
@@ -214,7 +211,8 @@ if __name__ == "__main__":
                 spark=spark,
                 taxi_type=taxi_type,
                 periode=periode,
-                logger=logger
+                logger=logger,
+                env=env
             ),
             UberSilver(
                 spark=spark,

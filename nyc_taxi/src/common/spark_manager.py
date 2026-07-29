@@ -5,56 +5,41 @@ from delta import configure_spark_with_delta_pip
 
 
 class SparkManager:
-    """
-    Gestionnaire de SparkSession.
-
-    Supporte :
-    - Local Spark
-    - Databricks
-    - Delta Lake
-    """
 
     def __init__(
             self,
-            app_name: str = "nyc_taxi",
-            env: str = "local",
+            app_name="nyc_taxi",
+            env="local",
             logger=None
     ):
-
         self.app_name = app_name
         self.env = env
         self.logger = logger
 
 
-    def get_spark(self) -> SparkSession:
-        """
-        Création ou récupération d'une SparkSession.
-        """
+    def get_spark(self):
 
         builder = (
             SparkSession.builder
             .appName(self.app_name)
-
-            # Delta Lake
             .config(
                 "spark.sql.extensions",
                 "io.delta.sql.DeltaSparkSessionExtension"
             )
-
             .config(
                 "spark.sql.catalog.spark_catalog",
                 "org.apache.spark.sql.delta.catalog.DeltaCatalog"
             )
+            .config(
+                "spark.sql.warehouse.dir",
+                "D:/data-ai-engineer-roadmap/spark-warehouse"
+            )
         )
 
-
-        # Configuration spécifique local
         if self.env == "local":
             builder = (
                 builder
                 .master("local[*]")
-
-                # utilise le Python de ton environnement conda
                 .config(
                     "spark.pyspark.python",
                     sys.executable
@@ -63,31 +48,25 @@ class SparkManager:
                     "spark.pyspark.driver.python",
                     sys.executable
                 )
+                .config(
+                    "javax.jdo.option.ConnectionURL",
+                    "jdbc:derby:D:/data-ai-engineer-roadmap/metastore_db;create=true"
+                )
             )
-
 
         spark = (
             configure_spark_with_delta_pip(builder)
+            .enableHiveSupport()
             .getOrCreate()
         )
-
-
-        # Réduction des logs Spark
-        spark.sparkContext.setLogLevel(
-            "ERROR"
-        )
-
-
+        spark.sparkContext.setLogLevel("ERROR")
         if self.logger:
             self.logger.info(
-                f"SparkSession created "
-                f"(env={self.env})"
+                f"SparkSession created env={self.env}"
             )
-
             self.logger.info(
-                f"Spark version : {spark.version}"
+                f"warehouse={spark.conf.get('spark.sql.warehouse.dir')}"
             )
-
-
         return spark
+
 

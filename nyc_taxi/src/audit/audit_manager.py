@@ -36,12 +36,14 @@ class AuditManager:
         )
         audit_table = catalog_manager.audit_load()
 
+        self.logger.info(f"audit_table : {audit_table}")
+
         if not self.spark.catalog.tableExists(audit_table):
             return False
 
         query = f"""
             SELECT COUNT(*) as cnt
-            FROM nyc_taxi.audit.audit_load
+            FROM {audit_table}
             WHERE table_name = '{context.table_name}'
             AND taxi_type = '{context.taxi_type}'
             AND periode = {context.periode}

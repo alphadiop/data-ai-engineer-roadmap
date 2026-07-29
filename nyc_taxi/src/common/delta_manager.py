@@ -6,7 +6,6 @@ from nyc_taxi.src.utils.load_json import load_json
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union,Tuple
 import shutil
-
 from pathlib import Path
 from nyc_taxi.src.common.logger import PipelineLogger
 from pyspark.sql import DataFrame
@@ -49,7 +48,6 @@ class DeltaManager:
         exists = self.spark.catalog.tableExists(
             full_table_name
         )
-
         self.logger.info(
             f"Table exists {full_table_name} = {exists}"
         )
@@ -87,35 +85,40 @@ class DeltaManager:
         )
 
 
+
+
     def drop_table(
             self,
             schema_name,
-            table_name
+            table_name,
+            delete_files=True
     ):
-
         full_table_name = (
             self.catalog_manager.get_table_name(
                 schema_name,
                 table_name
             )
         )
-
         self.spark.sql(
-            f"""
-            DROP TABLE IF EXISTS {full_table_name}
-            """
+            f"DROP TABLE IF EXISTS {full_table_name}"
         )
+        if (self.catalog_manager.env == "local" and delete_files):
 
-        if self.catalog_manager.env == "local":
+            warehouse_dir = self.spark.conf.get(
+                "spark.sql.warehouse.dir"
+            )
 
             warehouse_path = (
-                    Path("spark-warehouse")
+                    Path(warehouse_dir)
                     / f"{schema_name}.db"
                     / table_name
             )
 
             if warehouse_path.exists():
 
+                self.logger.info(
+                    f"Deleting {warehouse_path}"
+                )
                 shutil.rmtree(
                     warehouse_path
                 )
@@ -600,6 +603,19 @@ class DeltaManager:
                 f"Stream written to {full_table_name}"
             )
 
+    def register_table(
+            self,
+            schema_name: str,
+            table_name: str,
+            location: str
+    ):
+
+        self.spark.sql(f"""
+            CREATE TABLE IF NOT EXISTS
+            {schema_name}.{table_name}
+            USING DELTA
+            LOCATION '{location}'
+        """)
 
 
 if __name__ == "__main__":

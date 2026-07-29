@@ -8,7 +8,7 @@ from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 class CreateTables:
 
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
+
 
     def __init__(self, spark, logger):
         self.spark = spark
@@ -17,7 +17,7 @@ class CreateTables:
 
 
     def run(self, context):
-
+        """ Faire attention à : drop_table=False ou True"""
         tables = [
             ("audit", "audit_load", None),
             ("audit", "audit_row_count", None),
@@ -50,7 +50,7 @@ class CreateTables:
                     table_name=table_name
                 ),
                 partition_by=partition_by,
-                drop_table=True
+                drop_table=False
             )
 
     def get_schema(
