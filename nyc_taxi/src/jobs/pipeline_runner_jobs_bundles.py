@@ -5,13 +5,14 @@ from pathlib import Path
 
 import uuid
 from datetime import datetime
-
-from nyc_taxi.src.setup.create_tables import CreateTables
-from nyc_taxi.src.setup.create_catalog import CreateCatalog
 from nyc_taxi.src.common.decorators import log_execution
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from pyspark.sql import SparkSession
+
 import sys
+from nyc_taxi.src.setup.create_tables import CreateTables
+from nyc_taxi.src.setup.create_catalog import CreateCatalog
+
 from nyc_taxi.src.bronze.uber_bronze import UberBronze
 from nyc_taxi.src.silver.uber_silver import UberSilver
 from nyc_taxi.src.gold.uber_gold import UberGold
@@ -44,6 +45,7 @@ class PipelineRunner:
         self.spark = spark
         self.logger = logger
         self.steps = steps
+        self.config = load_config('variable_environnement', self.logger)
 
 
     def run(self):
@@ -53,9 +55,8 @@ class PipelineRunner:
             catalog_name="nyc_taxi",
             taxi_type="yellow"
         )
-        config = load_config(context.env)
 
-        context.config = config[context.env]
+        context.config = self.config[context.env]
 
         #context.catalog_name = config["catalog_name"]
         #context.path_sql_schema = config["path_sql_schema"]
@@ -190,8 +191,8 @@ if __name__ == "__main__":
     periode = args.periode
     taxi_type = args.taxi_type
 
-    logger.info(f"sys.argv : {sys.argv}")
-    logger.info(f"env      : {env}")
+    logger.info(f"sys.argv  : {sys.argv}")
+    logger.info(f"env       : {env}")
     logger.info(f"args      : {args}")
     logger.info(f"periode   : {periode}")
     logger.info(f"taxi_type : {taxi_type}")

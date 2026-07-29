@@ -12,7 +12,7 @@ from nyc_taxi.src.common.schema_manager import SchemaManager
 from nyc_taxi.src.utils.load_json import load_json
 from nyc_taxi.src.common.path_manager import PathManager
 
-from nyc_taxi.src.silver.uber_silver import UberSilver
+from nyc_taxi.src.utils.config.load_config import load_config
 
 
 from pyspark.sql import SparkSession
@@ -48,6 +48,8 @@ class UberGold(PipelineStep):
         super().__init__(spark, self.__class__.__name__)
         self.spark = spark
         self.logger = logger
+
+        self.config_table = load_config("pilotage_tables", self.logger)
 
 
     @log_execution
@@ -276,7 +278,6 @@ class UberGold(PipelineStep):
                 "service_zone"
             )
         )
-
 
 
     @log_execution

@@ -114,10 +114,10 @@ class UberSilver(PipelineStep):
         ### 1400 minutes = 23h20 minutes
         return (
             df
-            .filter(col("trip_duration_minute") > 0)
-            .filter(col("trip_duration_minute") < 1400)
-            .filter(col("trip_distance") > 0)
-            .filter(col("total_amount") > 0)
+            .filter((col("trip_duration_minute") > 0))
+            .filter((col("trip_duration_minute") < 1400))
+            .filter((col("trip_distance") > 0))
+            .filter((col("total_amount") > 0))
         )
 
     
@@ -220,7 +220,7 @@ class UberSilver(PipelineStep):
 
     
 
-    def add_flag(df):
+    def add_flag(self, df):
         from pyspark.sql import functions as F
         return df.withColumn(
             "is_positive",

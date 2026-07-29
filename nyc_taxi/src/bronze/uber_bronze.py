@@ -10,7 +10,7 @@ from pyspark.sql.functions import (
     col, lit
 )
 from urllib.error import HTTPError, URLError
-from nyc_taxi.src.utils.config.load_config import load_config
+from nyc_taxi.src.utils.config import load_config
 
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
@@ -19,6 +19,7 @@ from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
 
 
 class UberBronze(PipelineStep):
+
     """ 
      Télécharger les données Uber et les stocker dans le répertoire Bronze
      Mais avant de le télécharger, nous allons vérifier si le fichier existe dans le répertoire Bronze.
@@ -33,9 +34,9 @@ class UberBronze(PipelineStep):
         self.periode = periode
         self.logger = logger
         self.env = env
+        self.config = load_config('variable_environnement', self.logger)
 
-        config = load_config(self.env)
-        path_volume = config[self.env]["bronze_path"]
+        path_volume = self.config[self.env]["bronze_path"]
 
         self.logger.info(f"Bronze path : {path_volume}")
 
@@ -53,6 +54,7 @@ class UberBronze(PipelineStep):
     
     @log_execution
     def get_file_name(self, taxi_type:str) -> str:
+
         return str(f"{taxi_type}_tripdata_{self.year}-{self.month:02}.parquet")
     
 
@@ -71,6 +73,10 @@ class UberBronze(PipelineStep):
             we supposed that path_volume exists otherwise we create it in SQL
             we supposed that file_name exists otherwise we download it from the internet
         """
+        context.env = self.env
+        context.path_volume =self.path_volume
+        context.taxi_type = self.taxi_type
+        context.periode = self.periode
 
         file_name = self.get_file_name(self.taxi_type)
         path_file = self.get_path_file()
@@ -123,7 +129,7 @@ class UberBronze(PipelineStep):
         context.row_count["bronze"] = df_bronze.count()
         
         context.periode = self.get_period(file_name)
-        context.taxi_type = self.taxi_type
+
         context.table_name = "silver_nyc_taxi"
 
         self.logger.info(
@@ -141,14 +147,26 @@ class UberBronze(PipelineStep):
 
 
 if __name__ == "__main__":
-    path_volume = "/Volumes/nyc_taxi/bronze/raw_files"
-    taxi_type = "yellow"
-    #taxi_type = "green"
-    #taxi_type = "fhv"
+    from nyc_taxi.src.common.spark_manager import SparkManager
+    from nyc_taxi.src.utils.config import load_config
     logger = PipelineLogger('Bronze')
-    extractor = UberBronze(
-        spark, 
-        taxi_type, 
-        periode=202607,
-        logger=logger
-    )
+
+    config = load_config('pilotage_tables', logger)
+    logger.info(f"Bronze config : {config}")
+    logger.info(f"Bronze config : {config['tables']}")
+    logger.info(f"Bronze config : {config['tables']['silver_nyc_taxi']}")
+    # spark_manager = SparkManager(
+    #     app_name="nyc_taxi_pipeline",
+    #     logger=logger
+    # )
+    # path_volume = "/Volumes/nyc_taxi/bronze/raw_files"
+    # taxi_type = "yellow"
+    # #taxi_type = "green"
+    # #taxi_type = "fhv"
+    #
+    # extractor = UberBronze(
+    #     spark = spark_manager.get_spark(),
+    #     taxi_type=taxi_type,
+    #     periode=202607,
+    #     logger=logger
+    # )
