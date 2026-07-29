@@ -53,8 +53,9 @@ class PipelineRunner:
             catalog_name="nyc_taxi",
             taxi_type="yellow"
         )
+        config = load_config(context.env)
 
-        context.config = load_config(context.env)
+        context.config = config[context.env]
 
         #context.catalog_name = config["catalog_name"]
         #context.path_sql_schema = config["path_sql_schema"]
