@@ -41,26 +41,30 @@ class PipelineRunner:
 
     path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
-    def __init__(self, spark,logger:PipelineLogger,steps):
+    def __init__(self, spark,logger:PipelineLogger,env, taxi_type, periode, catalog_name,steps):
         self.spark = spark
         self.logger = logger
+        self.env = env
+        self.taxi_type = taxi_type
+        self.periode = periode
+        self.catalog_name=catalog_name
         self.steps = steps
         self.config = load_config('variable_environnement', self.logger)
-
+###
 
     def run(self):
 
         context = PipelineContext(
-            env="local",
-            catalog_name="nyc_taxi",
-            taxi_type="yellow"
+            env=self.env,
+            catalog_name=self.catalog_name,
+            taxi_type=self.taxi_type
         )
 
         context.config = self.config[context.env]
-
-        #context.catalog_name = config["catalog_name"]
-        #context.path_sql_schema = config["path_sql_schema"]
-
+        context.env = self.env
+        context.taxi_type = self.taxi_type
+        context.catalog_name = self.catalog_name
+        context.periode = self.periode
 
         self.logger.info(
             f"context.env = {context.env}"
@@ -86,6 +90,7 @@ class PipelineRunner:
 
         context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()
+        context.table_name = "silver_nyc_taxi"
 
         self.logger.info(f"liste steps : {self.steps}")
 
@@ -94,12 +99,8 @@ class PipelineRunner:
             for step in self.steps
             if isinstance(step, UberBronze)
         )
-
-        context.taxi_type = bronze_step.taxi_type
-
-        context.table_name = "silver_nyc_taxi"
-
-        context.periode = bronze_step.periode
+        #context.taxi_type = bronze_step.taxi_type
+        #context.periode = bronze_step.periode
 
         self.logger.info(
             f"context.row_count = {context.row_count}"
@@ -108,7 +109,7 @@ class PipelineRunner:
         self.logger.info(
             f"{'*' * 25} periode : {context.periode}, type = {type(context.periode)}"
         )
-        self.logger.info(f"bronze_step.periode = {bronze_step.periode}")
+        self.logger.info(f"bronze_step.periode = {context.periode}")
         self.logger.info(f"{'*' * 25} taxi_type : {context.taxi_type} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} periode : {context.periode} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} table_name : {context.table_name} {'*' * 25} ")
@@ -179,7 +180,7 @@ if __name__ == "__main__":
         logger=logger
     )
     spark = spark_manager.get_spark()
-
+    catalog_name = "nyc_taxi"
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=["local", "databricks"],default='local')
     parser.add_argument("--periode", type=int, required=True)
@@ -200,6 +201,10 @@ if __name__ == "__main__":
     runner = PipelineRunner(
         spark=spark,
         logger=logger,
+        env= env,
+        taxi_type = taxi_type,
+        periode = periode,
+        catalog_name = catalog_name,
         steps=[
             CreateCatalog(
                 spark=spark,
@@ -211,10 +216,7 @@ if __name__ == "__main__":
             ),
             UberBronze(
                 spark=spark,
-                taxi_type=taxi_type,
-                periode=periode,
                 logger=logger,
-                env=env
             ),
             UberSilver(
                 spark=spark,
