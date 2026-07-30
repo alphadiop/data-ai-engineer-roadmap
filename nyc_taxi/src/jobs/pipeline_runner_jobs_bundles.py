@@ -41,13 +41,13 @@ class PipelineRunner:
 
     path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
-    def __init__(self, spark,logger:PipelineLogger,env, taxi_type, periode, catalog_name,steps):
+    def __init__(self, spark,env, taxi_type, periode, catalog_name,logger,steps):
         self.spark = spark
-        self.logger = logger
         self.env = env
         self.taxi_type = taxi_type
         self.periode = periode
         self.catalog_name=catalog_name
+        self.logger = logger
         self.steps = steps
         self.config = load_config('variable_environnement', self.logger)
 ###
@@ -173,13 +173,7 @@ if __name__ == "__main__":
     #spark = SparkManager.get_spark()
 
     import argparse
-    logger = PipelineLogger("uber_pipeline")
 
-    spark_manager = SparkManager(
-        app_name="nyc_taxi_pipeline",
-        logger=logger
-    )
-    spark = spark_manager.get_spark()
     catalog_name = "nyc_taxi"
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=["local", "databricks"],default='local')
@@ -192,6 +186,14 @@ if __name__ == "__main__":
     periode = args.periode
     taxi_type = args.taxi_type
 
+    logger = PipelineLogger("uber_pipeline")
+
+    spark_manager = SparkManager(
+        app_name="nyc_taxi_pipeline",
+        logger=logger
+    )
+    spark = spark_manager.get_spark()
+
     logger.info(f"sys.argv  : {sys.argv}")
     logger.info(f"env       : {env}")
     logger.info(f"args      : {args}")
@@ -200,11 +202,11 @@ if __name__ == "__main__":
 
     runner = PipelineRunner(
         spark=spark,
-        logger=logger,
         env= env,
         taxi_type = taxi_type,
         periode = periode,
         catalog_name = catalog_name,
+        logger=logger,
         steps=[
             CreateCatalog(
                 spark=spark,

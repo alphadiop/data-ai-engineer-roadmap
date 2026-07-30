@@ -18,7 +18,18 @@ class SparkManager:
 
 
     def get_spark(self):
+        # ==========================
+        # DATABRICKS
+        # ==========================
+        if self.env == "databricks":
+            spark = SparkSession.getActiveSession()
+            if spark is None:
+                spark = SparkSession.builder.getOrCreate()
+            return spark
 
+    # =======================================
+        # LOCAL
+        # ======================================
         builder = (
             SparkSession.builder
             .appName(self.app_name)
@@ -60,6 +71,7 @@ class SparkManager:
             .getOrCreate()
         )
         spark.sparkContext.setLogLevel("ERROR")
+
         if self.logger:
             self.logger.info(
                 f"SparkSession created env={self.env}"
