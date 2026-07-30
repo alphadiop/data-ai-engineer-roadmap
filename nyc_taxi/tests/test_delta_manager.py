@@ -28,13 +28,15 @@ if __name__ == "__main__":
         if "_delta_log" in dirs:
             logger.info(root)
 
-    spark.read.table("audit.audit_load").limit(4).show(truncate=False)
-    spark.read.table("audit.audit_row_count").limit(4).show(truncate=False)
-    spark.read.table("silver.silver_nyc_taxi").limit(4).show(truncate=False)
-    spark.read.table("gold.gold_fact_trips").limit(4).show(truncate=False)
-    spark.read.table("gold.gold_dim_date").limit(4).show(truncate=False)
-    spark.read.table("gold.gold_kpi_daily").limit(4).show(truncate=False)
+    # spark.read.table("audit.audit_load").limit(4).show(truncate=False)
+    # spark.read.table("audit.audit_row_count").limit(4).show(truncate=False)
+    # spark.read.table("silver.silver_nyc_taxi").limit(4).show(truncate=False)
+    # spark.read.table("gold.gold_fact_trips").limit(4).show(truncate=False)
+    # spark.read.table("gold.gold_dim_date").limit(4).show(truncate=False)
+    # spark.read.table("gold.gold_kpi_daily").limit(4).show(truncate=False)
 
+    df = spark.sql("SELECT periode, count(*) as Count FROM silver.silver_nyc_taxi group by periode order by periode desc")
+    df.show(truncate=False)
 
     # df_dim_date = spark.read.format("delta").load(
     #     "D:/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_dim_date"
