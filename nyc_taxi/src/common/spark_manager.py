@@ -18,7 +18,7 @@ class SparkManager:
 
 
     def get_spark(self):
-        # ==========================
+        # =======================================
         # DATABRICKS
         # ==========================
         if self.env == "databricks":
