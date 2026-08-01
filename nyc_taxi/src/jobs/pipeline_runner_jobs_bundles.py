@@ -54,6 +54,7 @@ class PipelineRunner:
 
     def run(self):
 
+
         context = PipelineContext(
             env=self.env,
             catalog_name=self.catalog_name,
@@ -180,6 +181,7 @@ if __name__ == "__main__":
     parser.add_argument("--periode", type=int, required=True)
     parser.add_argument("--taxi_type", type=str, default="yellow")
 
+
     args = parser.parse_args()
 
     env = args.env
@@ -187,6 +189,7 @@ if __name__ == "__main__":
     taxi_type = args.taxi_type
 
     logger = PipelineLogger("uber_pipeline")
+    logger.info(f"env = {env}")
 
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",

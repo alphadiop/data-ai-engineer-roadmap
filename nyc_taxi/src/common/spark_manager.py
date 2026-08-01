@@ -18,18 +18,18 @@ class SparkManager:
 
 
     def get_spark(self):
-        # =======================================
+        # ==========================================================
         # DATABRICKS
-        # ==========================
+        # ==========================================================
         if self.env == "databricks":
             spark = SparkSession.getActiveSession()
             if spark is None:
                 spark = SparkSession.builder.getOrCreate()
             return spark
 
-    # =======================================
+        # ===========================================================
         # LOCAL
-        # ======================================
+        # =============================================================
         builder = (
             SparkSession.builder
             .appName(self.app_name)
