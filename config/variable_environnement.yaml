@@ -6,5 +6,6 @@ local:
 
 
 databricks:
+  catalog_name: nyc_taxi
   bronze_path: /Volumes/nyc_taxi/bronze/raw_files
   path_sql_schema: /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema
