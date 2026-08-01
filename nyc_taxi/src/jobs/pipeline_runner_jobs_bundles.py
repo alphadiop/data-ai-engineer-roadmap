@@ -193,8 +193,10 @@ if __name__ == "__main__":
 
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",
+        env=env,
         logger=logger
     )
+
     spark = spark_manager.get_spark()
 
     logger.info(f"sys.argv  : {sys.argv}")
