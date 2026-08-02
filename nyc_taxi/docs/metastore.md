@@ -1,3 +1,20 @@
+### metastore
+- [ ] c'est le catalogue des métadonnées de Spark/Hive
+- [ ] il ne contient pas les données
+- [ ] il contient les informations permettant de trouver les données
+
+- [ ] lorsque tu fait spark.read.table("gold.gold_dim_date")
+- [ ] Spark regarde d'abord dans le metastore
+- [ ] Database : gold
+- [ ] Table : gold_dim_date
+- [ ] Format : DELTA
+- [ ] Location: D:/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_dim_date
+- [ ] Colonnes : ...
+- [ ] Partition : periode
+
+- [ ] puis Spark va lire les fichiers Delta présents dans D:/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_dim_date
+
+
 #### C'est très proche de ce que Databricks fait avec Unity Catalog :
 - [ ] Metastore → catalogue des objets
 - [ ] Location → stockage physique
@@ -20,6 +37,7 @@
 - [ ] Les données réelles restent dans les fichiers Delta/Parquet
 - [ ] Le metastore contient uniquement les références
 
+
 ### Pourquoi read.table() a besoin du metastore ?
 - [ ] Quand tu fais : spark.read.table("gold.gold_dim_date")
 - [ ] Spark demande au metastore : Où se trouve gold.gold_dim_date ?
@@ -39,6 +57,7 @@
 - [ ] spark.read.format("delta").load(path_warehouse).show(200, truncate=False)
 - [ ] Si cela fonctionne, les données sont intactes
 - [ ] Réenregistrer une table
+
 
 #### Réenregistrer une table
 - [ ] Delta va créer l'entrée dans le metastore en pointant vers le dossier existant
