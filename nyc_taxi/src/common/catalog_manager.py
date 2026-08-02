@@ -457,6 +457,81 @@ class CatalogManager:
             """
         )
 
+    def repair_local_metastore(self):
+        if self.env != "local":
+            self.logger.info(
+                "repair_local_metastore skipped (not local)"
+            )
+            return
+
+        import os
+        from pathlib import Path
+
+        warehouse = Path(
+            "D:/data-ai-engineer-roadmap/spark-warehouse"
+        )
+        self.logger.info(
+            spark.conf.get("spark.sql.warehouse.dir")
+        )
+        self.logger.info(
+            f"Scanning warehouse : {warehouse}"
+        )
+
+        for root, dirs, files in os.walk(warehouse):
+            if "_delta_log" not in dirs:
+                continue
+
+            table_path = Path(root)
+            schema_name = (
+                table_path.parent.name
+                .replace(".db", "")
+            )
+
+            table_name = table_path.name
+
+            full_table_name = (
+                f"{schema_name}.{table_name}"
+            )
+
+            try:
+
+                if self.spark.catalog.tableExists(
+                        full_table_name
+                ):
+                    self.logger.info(
+                        f"Already registered : "
+                        f"{full_table_name}"
+                    )
+                    continue
+
+                self.spark.sql(
+                    f"""
+                    CREATE DATABASE IF NOT EXISTS
+                    {schema_name}
+                    """
+                )
+
+                self.spark.sql(
+                    f"""
+                    CREATE TABLE
+                    {full_table_name}
+                    USING DELTA
+                    LOCATION
+                    '{table_path.as_posix()}'
+                    """
+                )
+
+                self.logger.info(
+                    f"Registered : "
+                    f"{full_table_name}"
+                )
+
+            except Exception as e:
+
+                self.logger.error(
+                    f"Error registering "
+                    f"{full_table_name} : {e}"
+                )
 
 
 

@@ -2,6 +2,7 @@ import sys
 
 from pyspark.sql import SparkSession
 from delta import configure_spark_with_delta_pip
+from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 class SparkManager:
 
@@ -49,12 +50,16 @@ class SparkManager:
                 sys.executable
             )
         )
-
-        return (
+        spark = (
             configure_spark_with_delta_pip(builder)
             .enableHiveSupport()
             .getOrCreate()
         )
 
+        CatalogManager(
+            spark=spark,
+            env="local",
+            logger=self.logger
+        ).repair_local_metastore()
 
-
+        return spark

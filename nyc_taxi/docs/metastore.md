@@ -41,12 +41,19 @@
 - [ ] Réenregistrer une table
 
 #### Réenregistrer une table
+- [ ] Delta va créer l'entrée dans le metastore en pointant vers le dossier existant
+- [ ] parcourir le spark_warehouse
+- [ ] Trouver le dossier contenant _delta_log
+- [ ] déduire le nom du schema (silver, gold, audit)
+- [ ] déduire le nom de la table
+- [ ] Vérifier si la table existe dans le métastore
+- [ ] sinon : réenrégistrer automatiquement la table dans le metastore
+- [ ] comme delta stocke son vrai schema dans _delta_log, alors le CREATE TABLE USING DELTA LOCATION ... récupère automatiquement la structure de la table
 spark.sql("""  
   CREATE TABLE IF NOT EXISTS gold.gold_dim_date  
   USING DELTA  
   LOCATION 'D:/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_dim_date'  
   """)  
-- [ ] Delta va créer l'entrée dans le metastore en pointant vers le dossier existant 
 
 
 #### Resumé
