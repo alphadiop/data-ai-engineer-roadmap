@@ -1,6 +1,7 @@
 import os
 import sys
 
+from datetime import datetime
 from urllib.request import urlretrieve
 import re
 from pathlib import Path
@@ -40,6 +41,15 @@ class UberBronze(PipelineStep):
     # def __str__(self):
     #     return f"UberBronze(path_volume={self.path_volume})"
 
+    def avoid_future_period(self, periode:int):
+        current_period = int(datetime.now().strftime("%Y%m"))
+        if periode >= current_period:
+            raise DataNotAvailableError(
+                f"La période {periode} n'est pas encore publiée"
+            )
+
+
+
     @log_execution
     def get_file_name(self, taxi_type:str, year:int, month:int) -> str:
         file = f"{taxi_type}_tripdata_{year}-{month:02}.parquet"
@@ -63,6 +73,7 @@ class UberBronze(PipelineStep):
             we supposed that path_volume exists otherwise we create it in SQL
             we supposed that file_name exists otherwise we download it from the internet
         """
+        self.avoid_future_period(context.periode)
 
         config = load_config('variable_environnement', self.logger)
 
