@@ -471,7 +471,7 @@ class CatalogManager:
             "D:/data-ai-engineer-roadmap/spark-warehouse"
         )
         self.logger.info(
-            spark.conf.get("spark.sql.warehouse.dir")
+            self.spark.conf.get("spark.sql.warehouse.dir")
         )
         self.logger.info(
             f"Scanning warehouse : {warehouse}"
@@ -492,9 +492,7 @@ class CatalogManager:
             full_table_name = (
                 f"{schema_name}.{table_name}"
             )
-
             try:
-
                 if self.spark.catalog.tableExists(
                         full_table_name
                 ):

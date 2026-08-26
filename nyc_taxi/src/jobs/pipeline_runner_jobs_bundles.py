@@ -41,7 +41,7 @@ class PipelineRunner:
 
     path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
-    def __init__(self, spark,env, taxi_type, periode, catalog_name,logger,steps):
+    def __init__(self, spark, env, taxi_type, periode, catalog_name, logger, steps):
         self.spark = spark
         self.env = env
         self.taxi_type = taxi_type
@@ -53,8 +53,6 @@ class PipelineRunner:
 ###
 
     def run(self):
-
-
         context = PipelineContext(
             env=self.env,
             catalog_name=self.catalog_name,
@@ -114,7 +112,6 @@ class PipelineRunner:
         self.logger.info(f"{'*' * 25} taxi_type : {context.taxi_type} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} periode : {context.periode} {'*' * 25} ")
         self.logger.info(f"{'*' * 25} table_name : {context.table_name} {'*' * 25} ")
-
 
         if audit_manager.is_period_loaded(context):
 

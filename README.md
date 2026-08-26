@@ -72,8 +72,8 @@
 - [ ] Delta Lake : Stockage (persistant) des données sous forme de fichiers Parquet
 - [ ] Cluster : Calcul (temporaire)
 - [ ] Jobs : servent à automatiser et orchestrer l'exécution de traitements
-- [ ] création manuelle des Jobs dans l'interface Databricks
-- [ ] ordonnancement automatique des Jobs
+- [ ] Création manuelle des Jobs dans l'interface Databricks
+- [ ] Ordonnancement automatique des Jobs
 - [ ] Databricks Asset Bundles
 - [ ] Maintenance
 - [ ] Industrialisation
@@ -220,8 +220,8 @@
 - [ ] Fichiers du Workspace
 - [ ] Permissions utilisateur
 - [ ] Repos Git
-- [ ] chaque workspaces est rattaché à un metastore
-- [ ] un workspaces utilise un metastore pour acceder aux catalog, auxtables, aux schemas...
+- [ ] Chaque workspaces est rattaché à un metastore
+- [ ] Un workspaces utilise un metastore pour acceder aux catalog, aux tables, aux schemas...
 
 ### Metastore
 - [ ] Workspace A
@@ -303,7 +303,7 @@
 - [ ] Run now
 
 
-### Lien avec Jeob et Databricks Asset Bundles
+### Lien avec Job et Databricks Asset Bundles
 - [ ] Today : GitHub <-> Databricks
 - [ ] Tomorrow : GitHub -> Databricks bundle deploy -> Databricks Job -> pipeline_runner
 ---
@@ -332,7 +332,8 @@
 ### Historique
 - [ ] Historique : permet de voir toutes les opérations effectuées sur une table Delta 
 - [ ] Exemple : "DESCRIBE HISTORY nyc_taxi.silver.silver_nyc_taxi;"
-- [ ] cas d'usage : audit ; Débogage ; Time Travel ; comprendre qui a modifié la table
+- [ ] Cas d'usage : audit ; Débogage ; Time Travel ; comprendre qui a modifié la table
+
 
 ### DESCRIBE DETAIL
 - [ ] Afficher les métadonnées d'une table Delta;
@@ -393,19 +394,39 @@
 - [ ] Lineage
 - [ ] Delta Live Tables
 - [ ] Lakeflow
+---
 
-
+---
 ## Projet Uber Taxi
+- [ ] se connecter aux données publiques de NYC Taxi
+- [ ] choisir une période données (année et mois)
+- [ ] vérifier que les données ne sont pas présentes en local
+- [ ] télécharger les données de la période concernée
+- [ ] archiver les données télécharger
+- [ ] réaliser les traitements attendus
+- [ ] stocker les données Dans Delta Lake
+---
+
+
+---
+## Environnements
+- [ ] Spark local avec Delta
+- [ ] Databricks Community Edition
+- [ ] Databricks Workspace payant avec Unity Catalog
+---
 
 ## Paramètres à choisir
 - [ ] type_taxi
 - [ ] periode
 
+#### Gestion de la configuration selon l'environnement (local, dev Databricks, prod Databricks).
+
+
 ## setup
 - [ ] catalog : nyc_taxi
 - [ ] schema  : gold
 - [ ] table   : gold_fact_trips
-- [ ] volumes : stocker les fichiers télechargés
+- [ ] volumes : stocker les fichiers téléchargés
 
 ## catalog
 - [ ] nyc_taxi
@@ -480,12 +501,12 @@
 ---
 
 ### concept
-- [ ] partionner les tables avec un grand volume
+- [ ] partitionner les tables avec un grand volume
 
 
-* note :
-* distinguer un cas métier attendu d'une vraie erreur technique
-* par exemple : sur le projet taxi_nyc : voiloir télécharger une période qui n'existe pas est différent d'une vraie erreur
+### note :
+- [ ] distinguer un cas métier attendu d'une vraie erreur technique
+- [ ] par exemple : sur le projet taxi_nyc : vouloir télécharger une période qui n'existe pas est différent d'une vraie erreur
 ---
 
 ---
@@ -494,19 +515,22 @@
 - [ ] UPDATE
 - [ ] DELETE
 - [ ] INSERT
+---
 
+---
 ### Notion VACUUM : 
 - [ ] Opération de maintenance qui sert à supprimer physiquement les anciens fichiers de données qui ne sont plus utilisée par une table Delta
 - [ ] Lorsque l'on fait DELETE FROM Table WHERE trip_distance < 0
 - [ ] Delta Lake crée de nouveau fichiers Parquet
 - [ ] Les données disparaissent de la table, mais les fichiers restent physiquement présents
-- [ ] Delta Lake marque les anciens fichiers comme obsollètes dans le journal Delta
+- [ ] Delta Lake marque les anciens fichiers comme obsolètes dans le journal Delta
 - [ ] Delta conserve pendant 7 jours les anciens fichiers pour permettre le Time Travel
 - [ ] Toute nouvelle opération sur la table utilise les fichiers récents
 - [ ] les anciens fichiers restent stockés et consomment de l'espace
-- [ ] VACUUM parcour le journal Delta et supprime les fichiers devenus inutiles
+- [ ] VACUUM parcourt le journal Delta et supprime les fichiers devenus inutiles
+---
 
-
+---
 ```text
 Table Delta
 
@@ -522,17 +546,25 @@ Version 3
 ├── part-005.parquet
 └── part-006.parquet
 ```
+---
 
+---
 ## Après le VACUUM :
 - [ ] spark.sql("VACUUM nyc_taxi.bronze.bronze_nyc_taxi")
 - [ ] spark.sql("VACUUM nyc_taxi.silver.silver_nyc_taxi")
 - [ ] spark.sql("VACUUM nyc_taxi.gold.gold_fact_trips")
+---
 
+---
+## Voilà ce qui reste après l'opération VACUUM
 ```text
 Version 3
 ├── part-005.parquet
 └── part-006.parquet
 ```
+---
+
+
 
 --- 
 #### Que signifie ACID ?
@@ -540,13 +572,15 @@ Version 3
 - [ ] finance, santé, facturation, reporting...
 - [ ] niveau de fiablilité proche d'une base de données classique
 
+
+---
 ### Proprieté ACID
 - [ ] Atomicity : une transaction est indivisible
 - [ ] Consistency : une table Delta doit rester cohérente
 - [ ] Isolation : une transaction doit se comporter comme si elle était seule.
 - [ ] plusieurs utilisateurs peuvent travailler ensemble sans que les données ne soient corrompues
-- [ ] Durability : Après une transaction validée, les données doivent suirvivre aux ereurs eventuelles
-
+- [ ] Durability : Après une transaction validée, les données doivent survivre aux erreurs eventuelles
+---
 
 | Propriété           | Question à laquelle elle répond                                                |
 | ------------------- | ------------------------------------------------------------------------------ |
@@ -586,7 +620,7 @@ Version 3
 - [ ] L'historique complet est conservé.
 
 ### À retenir
-- [ ] Rollback  = annuler une transaction avant son commit
+- [ ] Rollback = annuler une transaction avant son commit
 - [ ] Time Travel = consulter une ancienne version
 - [ ] Restore = recréer une ancienne version comme nouvelle version active
 - [ ] Restore crée une nouvelle version, alors que Rollback ne crée aucune version
@@ -672,16 +706,16 @@ Version 3
 
 
 
-
 ---
 ### Time Travel
 - [ ] lire une ancienne version
 - [ ] SELECT * FROM silver_nyc_taxi VERSION AS OF 5;
+- [ ] SELECT * FROM silver_nyc_taxi@5;
 - [ ] SELECT * FROM silver_nyc_taxi TIMESTAMP AS OF '2026-07-01';
 - [ ] Mais si les fichiers nécessaires ont été supprimés par VACUUM :
 - [ ] alors le Time Travel vers ces anciennes versions ne fonctionnera plus.
-
 ---
+
 ---
 | Concept              | Description                                                                    |
 | -------------------- | ------------------------------------------------------------------------------ |
@@ -700,8 +734,10 @@ Version 3
 | **Time Travel**     | Lire une ancienne version de la table                    |
 | **Delta Log**       | Stocke l'historique des versions                         |
 | **VACUUM**          | Supprime les anciens fichiers nécessaires au Time Travel |
+---
 
 
+---
 #### l'ordre d'exécution de ton job
 - [ ] CreateCatalog
 - [ ] CreateSchemas
@@ -711,11 +747,17 @@ Version 3
 - [ ] Gold aggregation
 - [ ] Maintenance VACUUM
 ---
+
+
 ---
+#### Technique de debogage
+- [ ] self.logger.info(f"TABLE = {full_table_name}")
+- [ ] print("=== DATAFRAME ===")
+- [ ] df.printSchema()
 
-self.logger.info(f"TABLE = {full_table_name}")
-print("=== DATAFRAME ===")
-df.printSchema()
+- [ ] print("=== TABLE DELTA ===")
+- [ ] self.spark.table(full_table_name).printSchema()
 
-print("=== TABLE DELTA ===")
-self.spark.table(full_table_name).printSchema()
+
+
+la gestion de la configuration selon l'environnement (local, dev Databricks, prod Databricks).
