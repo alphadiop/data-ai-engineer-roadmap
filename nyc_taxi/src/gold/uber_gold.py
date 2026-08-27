@@ -1,7 +1,5 @@
 import os
 import sys
-
-
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution
@@ -85,7 +83,10 @@ class UberGold(PipelineStep):
             self.logger.info(f"{'=' * 12} Début Validation des schemas {'=' * 12} ")
 
 
-        path_manager = PathManager(context.env,self.logger)
+        path_manager = PathManager(
+            config=context.config,
+            logger=self.logger
+        )
 
         schema_file = path_manager.schema_path(
             context.taxi_type,
@@ -351,10 +352,3 @@ if __name__ == "__main__":
     # df_dim_location=gold.get_dim_location()
     #
     # display(df_fact_trips)
-
-
-
-
-
-
-

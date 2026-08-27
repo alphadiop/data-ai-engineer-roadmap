@@ -73,9 +73,13 @@ class UberBronze(PipelineStep):
             we supposed that path_volume exists otherwise we create it in SQL
             we supposed that file_name exists otherwise we download it from the internet
         """
-        self.avoid_future_period(context.periode)
+        self.avoid_future_period(int(context.periode))
 
         config = load_config('variable_environnement', self.logger)
+
+        context.config = config[context.env]
+
+        self.logger.info(f"Config ici: {config[context.env]}")
 
         path_volume = config[context.env]["bronze_path"]
 

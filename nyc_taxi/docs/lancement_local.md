@@ -7,8 +7,6 @@ echo %PYTHONPATH%
 python -c "import nyc_taxi.src.jobs.pipeline_runner_jobs_bundles; print('OK')"
 
 python nyc_taxi\src\jobs\pipeline_runner_jobs_bundles.py --periode 202605 --taxi_type yellow
-python -m nyc_taxi\src\jobs\pipeline_runner_jobs_bundles.py --periode 202605 --taxi_type yellow
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundle.py --periode 202605 --taxi_type yellow
 python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles --periode 202605 --taxi_type yellow --env local
 
 conda deactivate

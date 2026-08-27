@@ -6,23 +6,22 @@ if TYPE_CHECKING:
 
 class PathManager:
 
-    def __init__(self, env, logger:'PipelineLogger'):
-        self.env = env
+    def __init__(self, config, logger:'PipelineLogger'=None):
         self.logger = logger
 
-        if env == "local":
-            self.root = Path.cwd() / "nyc_taxi"
+        self.schema_root  = Path(
+            config["path_sql_schema"]
+        )
 
-        elif env == "databricks":
-            self.root = Path(
-                "/Workspace/Users/alphadiop@gmail.com/"
-                "Learning workspace/nyc_taxi"
-            )
         if self.logger:
             self.logger.info(
-                f"Path manager initialized at {self.root}"
+                f"Path.cwd(): {Path.cwd()}"
             )
 
+        if self.logger:
+            self.logger.info(
+                f"Path manager initialized at {self.schema_root}"
+            )
 
     def schema_path(
             self,
@@ -30,8 +29,7 @@ class PathManager:
             table_name
     ):
         return (
-                self.root
-                / "schema"
+                self.schema_root
                 / taxi_type
                 / f"{table_name}.json"
         )

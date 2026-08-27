@@ -1,12 +1,12 @@
 ### %pip install tabulate
 import os
 import sys
-
-
-from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
 import re
 from pyspark.sql.functions import lit
+#from tabulate import tabulate
+from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame
+
 from pyspark.sql import functions as F
 from pyspark.sql.functions import (
     unix_timestamp,
@@ -22,7 +22,7 @@ from pyspark.sql.functions import (
     when
 )
 
-#from tabulate import tabulate
+
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution 
@@ -192,20 +192,23 @@ class UberSilver(PipelineStep):
             .transform(self.apply_quality_rules)
         )
 
-        self.logger.info(
-            f"Silver rows : "
-            f"{rows_count_bronze} -> {df_silver.count()}"
+        if self.logger:
+            self.logger.info(
+                f"Silver rows : "
+                f"{rows_count_bronze} -> {df_silver.count()}"
+            )
+
+        path_manager = PathManager(
+            config=context.config,
+            logger=self.logger
         )
 
-        # schema_json = load_json(
-        #     path = os.path.join(self.path_sql_schema,"yellow" ,"silver_nyc_taxi.json")
-        # )
-
-        path_manager = PathManager(context.env,self.logger)
+        if self.logger:
+            self.logger.info(f"path_manager : {path_manager}")
 
         schema_file = path_manager.schema_path(
-            context.taxi_type,
-            "silver_nyc_taxi"
+            taxi_type = context.taxi_type,
+            table_name="silver_nyc_taxi"
         )
         schema_json = load_json(schema_file)
         df_silver = SchemaManager.apply_schema(
