@@ -3,9 +3,12 @@ local:
   catalog_name: nyc_taxi
   path_sql_schema: D:/data-ai-engineer-roadmap/nyc_taxi/schema
   bronze_path: D:/data-ai-engineer-roadmap/data/bronze/raw_files
-
+  dataset_url: https://d37ci6vzurychx.cloudfront.net/trip-data
+  ref_path : D:/data-ai-engineer-roadmap/data/ref/taxi_zone_lookup.csv
 
 databricks:
   catalog_name: nyc_taxi
   bronze_path: /Volumes/nyc_taxi/bronze/raw_files
   path_sql_schema: /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema
+  dataset_url: https://d37ci6vzurychx.cloudfront.net/trip-data
+  ref_path : /Volumes/nyc_taxi/ref/ref_files/taxi_zone_lookup.csv

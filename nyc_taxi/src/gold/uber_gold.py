@@ -9,21 +9,21 @@ from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.schema_manager import SchemaManager
 from nyc_taxi.src.utils.load_json import load_json
 from nyc_taxi.src.common.path_manager import PathManager
-
-from nyc_taxi.src.utils.config.load_config import load_config
-
+import logging
 
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 import re
 from pyspark.sql.functions import lit
 from pyspark.sql import functions as F
+from pyspark.sql.functions import to_date
 from pyspark.sql.functions import (
     unix_timestamp,
     year,
     month,
     dayofmonth,
     hour, dayofweek,
+    to_date,
     sum,
     avg,
     count,
@@ -40,14 +40,13 @@ class UberGold(PipelineStep):
     Attention : vacuum est dans le module maintenace_job dans jobs
     """
 
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
 
     def __init__(self, spark: SparkSession, logger: PipelineLogger):
         super().__init__(spark, self.__class__.__name__)
         self.spark = spark
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
 
-        self.config_table = load_config("pilotage_tables", self.logger)
+        #self.config_table = load_config("pilotage_tables", self.logger)
 
 
     @log_execution
@@ -55,106 +54,131 @@ class UberGold(PipelineStep):
 
         """ 
             attention : ["nyc_taxi.gold.gold_dim_date", "nyc_taxi.ref.gold_dim_location"]
-            ne sont pas des tables optimisable par période
+            ne sont pas des tables optimisables par période
         """
+        self.ref_path = context.config["ref_path"]
+
         df_silver = context.df_silver
-
-        context.df_fact_trips = self.get_fact_trips(df_silver)
-        context.df_dim_date = self.get_dim_date(df_silver)
-        context.df_kpi_daily = self.get_kpi_daily(df_silver)
-
-        catalog_manager = CatalogManager(
-            spark = self.spark,
-            logger=self.logger,
-            env=context.env
-        )
-        delta_manager = DeltaManager(
-            spark=self.spark,
-            catalog_manager=catalog_manager,
-            logger=self.logger
-        )
-       
-        schema_manager = SchemaManager(
-            spark=self.spark,
-            logger=self.logger
-        )
-         
-        if self.logger:
-            self.logger.info(f"{'=' * 12} Début Validation des schemas {'=' * 12} ")
-
-
-        path_manager = PathManager(
-            config=context.config,
-            logger=self.logger
+        self.logger.info(
+            f"{'=' * 12} Construction des DataFrames Gold {'=' * 12}"
         )
 
-        schema_file = path_manager.schema_path(
-            context.taxi_type,
-            "silver_nyc_taxi"
-        )
-        schema_json = load_json(schema_file)
-        
-        schema_manager.validate_columns(
-            df=context.df_silver, 
-            schema_json=schema_json
-        )
+        context.df_fact_trips = self.get_fact_trips(df_silver).persist()
+        context.df_dim_date = self.get_dim_date(df_silver).persist()
+        context.df_kpi_daily = self.get_kpi_daily(df_silver).persist()
 
-        if self.logger:
-            self.logger.info(f"{'=' * 12} Fin Validation des schemas {'=' * 12} ")
-
-
-        if self.logger:
-            self.logger.info(f"{'=' * 12} Chargement des données dans Delta {'=' * 12} ")
-
-        tables = [
-            ("silver", "silver_nyc_taxi", context.df_silver),
-            ("gold", "gold_fact_trips", context.df_fact_trips),
-            ("gold", "gold_dim_date", context.df_dim_date),
-            ("gold", "gold_kpi_daily", context.df_kpi_daily),
+        context.tables_to_load = [
+            (
+                "silver",
+                "silver_nyc_taxi",
+                context.df_silver
+            ),
+            (
+                "gold",
+                "gold_fact_trips",
+                context.df_fact_trips
+            ),
+            (
+                "gold",
+                "gold_dim_date",
+                context.df_dim_date
+            ),
+            (
+                "gold",
+                "gold_kpi_daily",
+                context.df_kpi_daily
+            )
         ]
 
-        for schema_name, table_name, df in tables:
-
-            row_count = df.count()
-
-            context.row_count[table_name] = row_count
-
-            self.logger.info(
-                f"{table_name} : {row_count} rows"
-            )
-
-            delta_manager.sauvegarde_tables_delta(
-                df=df,
-                schema_name=schema_name,
-                table_name=table_name,
-                periode=context.periode
-            )
-
-
-        if self.logger:
-            self.logger.info(f"{'=' * 12} Optimisation des tables Delta {'=' * 12} ")
-
-        tables_to_optimize = [
-            ("silver", "silver_nyc_taxi"),
-            ("gold", "gold_fact_trips"),
-            ("gold", "gold_kpi_daily")
-        ]
-
-        for schema_name, table_name in tables_to_optimize:
-            delta_manager.optimize_period(
-                schema_name=schema_name,
-                table_name=table_name,
-                periode=context.periode
-            )
-
-
-    def get_schema_json(self, taxi_type, table_name: str) -> dict:
-        path = os.path.join(
-            self.path_sql_schema,
-            taxi_type,
-            f"{table_name}.json"
+        self.logger.info(
+            f"{'=' * 12} Fin Construction Gold {'=' * 12}"
         )
-        return load_json(path)
+
+
+        # catalog_manager = CatalogManager(
+        #     spark = self.spark,
+        #     logger=self.logger,
+        #     env=context.env
+        # )
+        # delta_manager = DeltaManager(
+        #     spark=self.spark,
+        #     catalog_manager=catalog_manager,
+        #     logger=self.logger
+        # )
+        #
+        # schema_manager = SchemaManager(
+        #     spark=self.spark,
+        #     logger=self.logger
+        # )
+        #
+        # self.logger.info(
+        #     f"{'=' * 12} Début Validation des schemas {'=' * 12}"
+        # )
+        #
+        # path_manager = PathManager(
+        #     config=context.config,
+        #     logger=self.logger
+        # )
+        #
+        # schema_file = path_manager.schema_path(
+        #     context.taxi_type,
+        #     "silver_nyc_taxi"
+        # )
+        # schema_json = load_json(schema_file)
+        #
+        # schema_manager.validate_columns(
+        #     df=context.df_silver,
+        #     schema_json=schema_json
+        # )
+        #
+        # self.logger.info(f"{'=' * 12} Fin Validation des schemas {'=' * 12} ")
+        #
+        # self.logger.info(f"{'=' * 120}")
+        #
+        # self.logger.info(f"{'=' * 120}")
+        # self.logger.info(f"{'=' * 12} Chargement des données dans Delta {'=' * 12} ")
+        #
+        # tables = [
+        #     ("silver", "silver_nyc_taxi", context.df_silver),
+        #     ("gold", "gold_fact_trips", context.df_fact_trips),
+        #     ("gold", "gold_dim_date", context.df_dim_date),
+        #     ("gold", "gold_kpi_daily", context.df_kpi_daily),
+        # ]
+        #
+        # for schema_name, table_name, df in tables:
+        #     row_count = df.count()
+        #
+        #     context.row_count[table_name] = row_count
+        #
+        #     self.logger.info(
+        #         f"{table_name} : {row_count} rows"
+        #     )
+        #
+        #     delta_manager.sauvegarde_tables_delta(
+        #         df=df,
+        #         schema_name=schema_name,
+        #         table_name=table_name,
+        #         periode=context.periode
+        #     )
+        #
+        # self.logger.info(f"{'=' * 120}")
+        # self.logger.info(f"{'=' * 120}")
+        # self.logger.info(f"{'=' * 12} Optimisation des tables Delta {'=' * 12} ")
+        #
+        # tables_to_optimize = [
+        #     ("silver", "silver_nyc_taxi"),
+        #     ("gold", "gold_fact_trips"),
+        #     ("gold", "gold_kpi_daily")
+        # ]
+        #
+        # for schema_name, table_name in tables_to_optimize:
+        #     delta_manager.optimize_period(
+        #         schema_name=schema_name,
+        #         table_name=table_name,
+        #         periode=context.periode
+        #     )
+        #
+
     
 
 
@@ -203,7 +227,7 @@ class UberGold(PipelineStep):
 
     @log_execution
     def get_fact_trips(self, df_silver: DataFrame) -> DataFrame:
-        from pyspark.sql.functions import to_date
+
         return (
             df_silver
                 .withColumn(
@@ -264,11 +288,9 @@ class UberGold(PipelineStep):
 
 
     def get_dim_location(self)-> DataFrame:
-        catalog = "nyc_taxi"
-        schema = "ref"
-        voulume = "ref_files"
         return (
-            self.spark.read.csv("/Volumes/nyc_taxi/ref/ref_files/taxi_zone_lookup.csv", header=True)
+
+            self.spark.read.csv(self.ref_path, header=True)
             .withColumn(
                 "location_id", col("LocationID").cast("int")
             )
@@ -303,52 +325,33 @@ class UberGold(PipelineStep):
 
 if __name__ == "__main__":
     import sys
-    from pyspark.sql import SparkSession
+    from nyc_taxi.src.common.spark_manager import SparkManager
+    from nyc_taxi.src.utils.config import load_config
 
-    spark = (
-        SparkSession.builder
-        .appName("nyc_taxi")
-        .config(
-            "spark.pyspark.python",
-            sys.executable
-        )
-        .getOrCreate()
-    )
+    taxi_type = "yellow"
+    # #taxi_type = "green"
+    # #taxi_type = "fhv"
+    logger = PipelineLogger('Gold')
+
+    spark_manager = SparkManager(
+        app_name="nyc_taxi_pipeline",
+        logger=logger
+    ).get_spark()
+
     gold = UberGold(
-        spark = spark,
+        spark = spark_manager,
         logger = PipelineLogger('Gold')
     )
-    spark.sql(
+    spark_manager.sql(
         """
         DESCRIBE DETAIL silver.silver_nyc_taxi
         """
     ).show(truncate=False)
 
-    spark.sql(
+    spark_manager.sql(
         """
         DESCRIBE DETAIL silver.silver_nyc_taxi
         """
     ).select(
         "partitionColumns"
     ).show()
-
-
-#
-#     df = (
-#         spark.table("nyc_taxi.silver.silver_nyc_taxi")
-#         .where("periode = 202411")
-#     )
-#
-#     df_silver = silver.run(df)
-
-    # gold = UberGold(
-    #     spark=spark,
-    #     logger=PipelineLogger('Gold')
-    # )
-
-    # df_fact_trips =gold.get_fact_trips(df_silver),
-    # df_dim_date=gold.get_dim_date(df_silver),
-    # df_kpi_daily=gold.get_kpi_daily(df_silver),
-    # df_dim_location=gold.get_dim_location()
-    #
-    # display(df_fact_trips)

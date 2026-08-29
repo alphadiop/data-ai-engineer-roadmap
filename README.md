@@ -50,6 +50,8 @@
     v
     CatalogManager.get_table_name()
  ```
+## self.logger.info(f"{'='*120}")
+
 
 ## Databricks gère
 * [ ] dépendances
@@ -408,6 +410,19 @@
 ---
 
 
+## UberGold
+- [ ] Construit les DataFrames.
+
+## DataLoader
+- [ ] Valide les schémas.
+- [ ] Calcule les row counts.
+- [ ] Charge Delta.
+
+## MaintenanceJob
+- [ ] Optimize.
+- [ ] Vacuum.
+
+
 ---
 ## Environnements
 - [ ] Spark local avec Delta
@@ -760,4 +775,4 @@ Version 3
 
 
 
-la gestion de la configuration selon l'environnement (local, dev Databricks, prod Databricks).
+### la gestion de la configuration selon l'environnement (local, dev Databricks, prod Databricks).

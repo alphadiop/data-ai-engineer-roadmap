@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ class CatalogManager:
     """
     def __init__(self,spark, logger: 'PipelineLogger', env: str = "local"):
         self.spark = spark
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
         self.env = env
 
     # ============================================================================
@@ -47,6 +48,9 @@ class CatalogManager:
             table_name: str,
             catalog_name: str = "nyc_taxi"
     ) -> str:
+        """
+        le nom d'une table Delta est structurée différemment en local ou sur databricks
+        """
 
         if self.env == "local":
             return f"{schema_name}.{table_name}"

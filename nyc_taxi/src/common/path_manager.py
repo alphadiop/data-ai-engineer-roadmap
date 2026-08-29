@@ -1,3 +1,6 @@
+
+import os
+from nyc_taxi.src.utils.load_json import load_json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -33,3 +36,12 @@ class PathManager:
                 / taxi_type
                 / f"{table_name}.json"
         )
+
+
+    def get_schema_json(self, path_sql_schema, taxi_type, table_name: str) -> dict:
+        path = os.path.join(
+            path_sql_schema,
+            taxi_type,
+            f"{table_name}.json"
+        )
+        return load_json(str(path))

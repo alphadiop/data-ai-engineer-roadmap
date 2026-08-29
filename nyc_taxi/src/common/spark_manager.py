@@ -1,10 +1,13 @@
 import sys
+import logging
 
 from pyspark.sql import SparkSession
 from delta import configure_spark_with_delta_pip
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 class SparkManager:
+    """
+    """
 
     def __init__(
             self,
@@ -14,7 +17,8 @@ class SparkManager:
     ):
         self.app_name = app_name
         self.env = env
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
+        self.nombre_coeur = 2
 
     def get_spark(self):
 
@@ -24,7 +28,7 @@ class SparkManager:
         builder = (
             SparkSession.builder
             .appName(self.app_name)
-            .master("local[*]")
+            .master(f"local[{self.nombre_coeur}]")
             .config(
                 "spark.sql.extensions",
                 "io.delta.sql.DeltaSparkSessionExtension"
@@ -49,6 +53,8 @@ class SparkManager:
                 "spark.pyspark.driver.python",
                 sys.executable
             )
+            .config("spark.driver.memory", "8g")
+            .config("spark.executor.memory", "8g")
         )
         spark = (
             configure_spark_with_delta_pip(builder)

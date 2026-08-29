@@ -23,7 +23,7 @@ class DeltaManager:
         self.spark = spark
         self.catalog_manager = catalog_manager
         self.logger = logger
-
+        self.nombre_partition = 8
 
     def create_table(
             self,
@@ -402,6 +402,9 @@ class DeltaManager:
             schema_name=schema_name,
             table_name=table_name
         )
+        self.logger.info(
+            f"Table TO SAVE : {full_table_name}"
+        )
 
         if replace:
             (
@@ -417,7 +420,8 @@ class DeltaManager:
 
         else:
             (
-                df.write
+            df.coalesce(self.nombre_partition)
+                .write
                 .format("delta")
                 .mode("append")
                 .saveAsTable(full_table_name)

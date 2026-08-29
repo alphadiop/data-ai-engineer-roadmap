@@ -16,6 +16,7 @@ from nyc_taxi.src.setup.create_catalog import CreateCatalog
 from nyc_taxi.src.bronze.uber_bronze import UberBronze
 from nyc_taxi.src.silver.uber_silver import UberSilver
 from nyc_taxi.src.gold.uber_gold import UberGold
+from nyc_taxi.src.loader.data_loader import DataLoader
 
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
@@ -38,8 +39,17 @@ if TYPE_CHECKING:
 
 
 class PipelineRunner:
-
-    path_sql_schema = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema/"
+    """
+    PipelineRunner
+        ↓
+    PipelineContext
+        ↓
+    Bronze
+        ↓
+    Silver
+        ↓
+    Gold
+    """
 
     def __init__(self, spark, env, taxi_type, periode, catalog_name, logger, steps):
         self.spark = spark
@@ -50,24 +60,27 @@ class PipelineRunner:
         self.logger = logger
         self.steps = steps
         self.config = load_config('variable_environnement', self.logger)
-###
+
+
+    # def set_row_count(self,layer,count):
+    #     self.row_count[layer] = count
+
 
     def run(self):
+
         context = PipelineContext(
             env=self.env,
             catalog_name=self.catalog_name,
             taxi_type=self.taxi_type
         )
-
+        context.spark = self.spark
+        context.logger = self.logger
         context.config = self.config[context.env]
+
         context.env = self.env
         context.taxi_type = self.taxi_type
         context.catalog_name = self.catalog_name
-        context.periode = self.periode
-
-        self.logger.info(
-            f"context.env = {context.env}"
-        )
+        context.periode = int(self.periode)
 
         catalog_manager = CatalogManager(
             spark = self.spark,
@@ -75,7 +88,13 @@ class PipelineRunner:
             env=context.env
         )
 
-        self.logger.info(f"CATALOG : {context.config['catalog_name']}")
+        self.logger.info(
+            f"context.env = {context.env}"
+        )
+
+        self.logger.info(
+            f"CATALOG : {context.config['catalog_name']}"
+        )
 
         catalog_manager.create_catalog(
             catalog_name=context.config["catalog_name"]
@@ -93,25 +112,28 @@ class PipelineRunner:
 
         self.logger.info(f"liste steps : {self.steps}")
 
-        bronze_step = next(
-            step
-            for step in self.steps
-            if isinstance(step, UberBronze)
-        )
-        #context.taxi_type = bronze_step.taxi_type
-        #context.periode = bronze_step.periode
 
+        self.logger.info(f"{'='*120}")
         self.logger.info(
             f"context.row_count = {context.row_count}"
         )
-        
+
+        # self.logger.info(f"{'='*120}")
+        # self.logger.info(
+        #     f"Run pipeline {'='*12}"
+        #     f"periode={context.periode}"
+        #     f"taxi_type={context.taxi_type}"
+        #     f"taxi_type={context.table_name}"
+        # )
+
+        self.logger.info(f"{'='*120}")
         self.logger.info(
             f"{'*' * 25} periode : {context.periode}, type = {type(context.periode)}"
         )
-        self.logger.info(f"bronze_step.periode = {context.periode}")
-        self.logger.info(f"{'*' * 25} taxi_type : {context.taxi_type} {'*' * 25} ")
-        self.logger.info(f"{'*' * 25} periode : {context.periode} {'*' * 25} ")
-        self.logger.info(f"{'*' * 25} table_name : {context.table_name} {'*' * 25} ")
+        self.logger.info(f"{'*' * 20} taxi_type : {context.taxi_type} {'*' * 20} ")
+        self.logger.info(f"{'*' * 20} periode : {context.periode} {'*' * 20} ")
+        self.logger.info(f"{'*' * 20} table_name : {context.table_name} {'*' * 20} ")
+        self.logger.info(f"{'='*120}")
 
         if audit_manager.is_period_loaded(context):
 
@@ -120,17 +142,18 @@ class PipelineRunner:
             self.logger.info(
                 f"Period {context.periode} already loaded {'=' * 85 }"
             )
+            self.logger.info(f"{'='*120}")
             return
         
         try:
 
             for step in self.steps:
                 context.current_step = step.__class__.__name__
-                self.logger.info(f"{'*' * 55} Starting {context.current_step} {'*' * 55}")
+                self.logger.info(f"{'*' * 45} Starting {context.current_step} {'*' * 45}")
 
                 step.run(context)
                 
-                self.logger.info(f"{'*' * 55} Finished {context.current_step} {'*' * 55}")
+                self.logger.info(f"{'*' * 45} Finished {context.current_step} {'*' * 45}")
                 self.logger.info(f"{'='*120}")
 
             context.status = "SUCCESS"
@@ -160,8 +183,18 @@ class PipelineRunner:
         finally:
             context.end_time = datetime.now()
             context.duration_seconds = (context.end_time - context.start_time).total_seconds()
-            audit_manager.insert_audit(context)
-            audit_manager.insert_row_counts(context)
+            try:
+                audit_manager.insert_audit(context)
+            except Exception as e:
+                self.logger.error(
+                    f"Audit insert failed: {e}"
+                )
+            try:
+                audit_manager.insert_row_counts(context)
+            except Exception as e:
+                self.logger.error(
+                    f"Row count insert failed: {e}"
+                )
         return context
 
 if __name__ == "__main__":
@@ -227,6 +260,10 @@ if __name__ == "__main__":
                 logger=logger
             ),
             UberGold(
+                spark=spark,
+                logger=logger
+            ),
+            DataLoader(
                 spark=spark,
                 logger=logger
             )

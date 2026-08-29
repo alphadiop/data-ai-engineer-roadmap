@@ -4,6 +4,9 @@ import yaml
 
 def load_config(file_name: str, logger=None) -> dict:
     project_root = Path(__file__).parents[4]
+    if logger:
+        logger.info(f"project_root {project_root}")
+
     config_file = (
             project_root
             / "config"

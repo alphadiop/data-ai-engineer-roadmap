@@ -94,6 +94,9 @@ class AuditManager:
             data=data,
             schema=schema
         )
+        self.logger.info(f"audit_table = {audit_table}")
+        df_audit.printSchema()
+        df_audit.show(truncate=False)
 
         (
         df_audit.write
@@ -196,11 +199,11 @@ class AuditManager:
 
 if __name__ == "__main__":
     logger = PipelineLogger("uber_pipeline")
-    audit_manager = AuditManager(
-        spark=spark,
-        logger=logger
-    )
-    logger.info(f"Periode choisie : {audit_manager.get_next_period()}")
+    # audit_manager = AuditManager(
+    #     spark=spark,
+    #     logger=logger
+    # )
+    # logger.info(f"Periode choisie : {audit_manager.get_next_period()}")
 
 
     
