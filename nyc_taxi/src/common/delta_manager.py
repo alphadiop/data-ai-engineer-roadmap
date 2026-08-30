@@ -25,7 +25,90 @@ class DeltaManager:
         self.logger = logger
         self.nombre_partition = 8
 
+
     def create_table(
+            self,
+            schema_name: str,
+            table_name: str,
+            schema: list[tuple[str, str, str]],
+            partition_by: str | None = None,
+            drop_table: bool = False
+    ) -> None:
+
+        full_table_name = self.catalog_manager.get_table_name(
+            schema_name=schema_name,
+            table_name=table_name
+        )
+
+        exists = self.spark.catalog.tableExists(
+            full_table_name
+        )
+
+        self.logger.info(
+            f"Table exists {full_table_name} = {exists}"
+        )
+
+        if exists and not drop_table:
+
+            self.logger.info(
+                f"Table already exists : {full_table_name}"
+            )
+            return
+
+        if drop_table and exists:
+
+            self.logger.info(
+                f"Dropping table : {full_table_name}"
+            )
+
+            self.drop_table(
+                schema_name=schema_name,
+                table_name=table_name
+            )
+
+        columns_sql = ",\n".join(
+            [
+                " ".join(
+                    filter(
+                        None,
+                        column
+                    )
+                )
+                for column in schema
+            ]
+        )
+
+        partition_clause = ""
+
+        if partition_by:
+            partition_clause = (
+                f"PARTITIONED BY ({partition_by})"
+            )
+
+        ddl = f"""
+        CREATE TABLE IF NOT EXISTS {full_table_name}
+        (
+            {columns_sql}
+        )
+        USING DELTA
+        {partition_clause}
+        """
+
+        self.logger.info(
+            f"Creating table : {full_table_name}"
+        )
+
+        self.logger.info(ddl)
+
+        self.spark.sql(ddl)
+
+        self.logger.info(
+            f"Table created : {full_table_name}"
+        )
+
+
+
+    def create_table2(
             self,
             schema_name: str,
             table_name: str,
@@ -83,7 +166,6 @@ class DeltaManager:
         self.logger.info(
             f"Table created : {full_table_name}"
         )
-
 
 
 

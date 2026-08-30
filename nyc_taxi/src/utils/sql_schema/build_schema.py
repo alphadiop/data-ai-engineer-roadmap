@@ -2,7 +2,7 @@ from typing import Iterator, List, Tuple
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from common.logger import PipelineLogger
+    from nyc_taxi.src.common.logger import PipelineLogger
 
 
 def build_schema(json_schema:dict, format:dict = None, logger:'PipelineLogger'=None) -> List[Tuple[str, str, str]]:

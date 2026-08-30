@@ -8,7 +8,6 @@ from nyc_taxi.src.common.catalog_manager import CatalogManager
 class SparkManager:
     """
     """
-
     def __init__(
             self,
             app_name="nyc_taxi",

@@ -5,8 +5,12 @@ local:
   bronze_path: D:/data-ai-engineer-roadmap/data/bronze/raw_files
   dataset_url: https://d37ci6vzurychx.cloudfront.net/trip-data
   ref_path : D:/data-ai-engineer-roadmap/data/ref/taxi_zone_lookup.csv
+  warehouse_dir: D:/data-ai-engineer-roadmap/spark-warehouse
+  metastore_dir: D:/data-ai-engineer-roadmap/metastore_db
+
 
 databricks:
+  env: databricks
   catalog_name: nyc_taxi
   bronze_path: /Volumes/nyc_taxi/bronze/raw_files
   path_sql_schema: /Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema

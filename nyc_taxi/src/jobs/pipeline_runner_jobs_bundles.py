@@ -118,14 +118,6 @@ class PipelineRunner:
             f"context.row_count = {context.row_count}"
         )
 
-        # self.logger.info(f"{'='*120}")
-        # self.logger.info(
-        #     f"Run pipeline {'='*12}"
-        #     f"periode={context.periode}"
-        #     f"taxi_type={context.taxi_type}"
-        #     f"taxi_type={context.table_name}"
-        # )
-
         self.logger.info(f"{'='*120}")
         self.logger.info(
             f"{'*' * 25} periode : {context.periode}, type = {type(context.periode)}"

@@ -8,8 +8,6 @@ from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 class CreateTables:
 
-
-
     def __init__(self, spark, logger):
         self.spark = spark
         self.logger = logger
