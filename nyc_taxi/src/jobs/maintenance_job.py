@@ -2,9 +2,7 @@ import os
 import sys
 from pyspark.sql import SparkSession
 
-    
 from nyc_taxi.src.common.delta_manager import DeltaManager
-
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 from typing import TYPE_CHECKING

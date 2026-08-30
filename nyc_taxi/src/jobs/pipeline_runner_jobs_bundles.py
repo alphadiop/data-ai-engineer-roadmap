@@ -8,10 +8,11 @@ from datetime import datetime
 from nyc_taxi.src.common.decorators import log_execution
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from pyspark.sql import SparkSession
-
+from datetime import datetime
+from typing import TYPE_CHECKING
 import sys
-from nyc_taxi.src.setup.create_tables import CreateTables
-from nyc_taxi.src.setup.create_catalog import CreateCatalog
+
+from nyc_taxi.src.setup.environment_setup import EnvironmentSetup
 
 from nyc_taxi.src.bronze.uber_bronze import UberBronze
 from nyc_taxi.src.silver.uber_silver import UberSilver
@@ -21,18 +22,17 @@ from nyc_taxi.src.loader.data_loader import DataLoader
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
 
-from nyc_taxi.src.common.catalog_manager import CatalogManager
+from nyc_taxi.src.common.spark_manager import SparkManager
+
 from nyc_taxi.src.jobs.maintenance_job import MaintenanceJob
 
 from nyc_taxi.src.utils.config.load_config import load_config
 
-from nyc_taxi.src.common.spark_manager import SparkManager
-
 from nyc_taxi.src.audit.audit_manager import AuditManager
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
-from datetime import datetime
 
-from typing import TYPE_CHECKING
+
+
 
 if TYPE_CHECKING:
     from nyc_taxi.src.common.logger import PipelineLogger
@@ -51,42 +51,43 @@ class PipelineRunner:
     Gold
     """
 
-    def __init__(self, spark, env, taxi_type, periode, catalog_name, logger, steps):
+    def __init__(self, spark, env, taxi_type, periode, logger, steps):
         self.spark = spark
         self.env = env
         self.taxi_type = taxi_type
         self.periode = periode
-        self.catalog_name=catalog_name
         self.logger = logger
         self.steps = steps
         self.config = load_config('variable_environnement', self.logger)
 
-
     # def set_row_count(self,layer,count):
     #     self.row_count[layer] = count
-
 
     def run(self):
 
         context = PipelineContext(
             env=self.env,
-            catalog_name=self.catalog_name,
             taxi_type=self.taxi_type
         )
+
+        setup_env = EnvironmentSetup(
+            spark=self.spark,
+            env=self.env,
+            logger=self.logger
+        )
+        if not setup_env.environment_exists():
+            setup_env.run(
+                path_sql_schema=context.config["path_sql_schema"],
+                taxi_type=self.taxi_type
+            )
+
         context.spark = self.spark
         context.logger = self.logger
         context.config = self.config[context.env]
 
         context.env = self.env
         context.taxi_type = self.taxi_type
-        context.catalog_name = self.catalog_name
         context.periode = int(self.periode)
-
-        catalog_manager = CatalogManager(
-            spark = self.spark,
-            logger=self.logger,
-            env=context.env
-        )
 
         self.logger.info(
             f"context.env = {context.env}"
@@ -96,10 +97,17 @@ class PipelineRunner:
             f"CATALOG : {context.config['catalog_name']}"
         )
 
-        catalog_manager.create_catalog(
-            catalog_name=context.config["catalog_name"]
-        )
-        catalog_manager.create_environment_schemas()
+        # catalog_manager = CatalogManager(
+        #     spark = self.spark,
+        #     logger=self.logger,
+        #     env=context.env
+        # )
+        #
+        # catalog_manager.create_catalog(
+        #     catalog_name=context.config["catalog_name"]
+        # )
+        # catalog_manager.create_environment_schemas()
+
 
         audit_manager = AuditManager(
             spark=self.spark, 
@@ -111,7 +119,6 @@ class PipelineRunner:
         context.table_name = "silver_nyc_taxi"
 
         self.logger.info(f"liste steps : {self.steps}")
-
 
         self.logger.info(f"{'='*120}")
         self.logger.info(
@@ -197,7 +204,6 @@ if __name__ == "__main__":
 
     import argparse
 
-    catalog_name = "nyc_taxi"
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=["local", "databricks"],default='local')
     parser.add_argument("--periode", type=int, required=True)
@@ -232,17 +238,8 @@ if __name__ == "__main__":
         env= env,
         taxi_type = taxi_type,
         periode = periode,
-        catalog_name = catalog_name,
         logger=logger,
         steps=[
-            CreateCatalog(
-                spark=spark,
-                logger=logger
-            ),
-            CreateTables(
-                spark=spark,
-                logger=logger
-            ),
             UberBronze(
                 spark=spark,
                 logger=logger,

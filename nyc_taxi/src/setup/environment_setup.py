@@ -2,18 +2,20 @@ from pathlib import Path
 
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.delta_manager import DeltaManager
+from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.common.spark_manager import SparkManager
 
 from nyc_taxi.src.utils.config.load_config import load_config
 from nyc_taxi.src.utils.load_json import load_json
 
 from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
-from nyc_taxi.src.common.logger import PipelineLogger
-from nyc_taxi.src.common.spark_manager import SparkManager
+
 
 
 class EnvironmentSetup:
     """
     Initialise complètement l'environnement.
+    c'est une opération d'initialisation.
 
     - création du catalogue
     - création des schémas
@@ -81,19 +83,40 @@ class EnvironmentSetup:
 
 
 
+    def environment_exists(self):
+        required_tables = [
+            ("audit", "audit_load"),
+            ("audit", "audit_row_count"),
+            ("silver", "silver_nyc_taxi"),
+            ("gold", "gold_fact_trips"),
+            ("gold", "gold_dim_date"),
+            ("gold", "gold_kpi_daily")
+        ]
+
+        for schema_name, table_name in required_tables:
+            full_table_name = (
+                self.catalog_manager.get_table_name(
+                    schema_name=schema_name,
+                    table_name=table_name
+                )
+            )
+
+            if not self.spark.catalog.tableExists(
+                    full_table_name
+            ):
+                return False
+        return True
+
+
     def create_catalog(self):
-
         if self.env == "local":
-
             if self.logger:
                 self.logger.info(
                     "Local mode : catalogue ignoré"
                 )
-
             return
 
         catalog_name = self.config[self.env]["catalog_name"]
-
         self.catalog_manager.create_catalog(
             catalog_name=catalog_name
         )
@@ -214,6 +237,6 @@ if __name__=='__main__':
         env="local",
         logger=logger
     ).run(
-        path_sql_schema="D:/data-ai-engineer-roadmap/nyc_taxi/schema",
+        path_sql_schema="/nyc_taxi/schema",
         taxi_type="yellow"
     )

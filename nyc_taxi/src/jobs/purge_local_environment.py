@@ -1,7 +1,6 @@
 from nyc_taxi.src.common.spark_manager import SparkManager
 from nyc_taxi.src.common.logger import PipelineLogger
 from purge_delta_storage import PurgeDeltaStorage
-from environment_setup import EnvironmentSetup
 
 logger = PipelineLogger("PURGE")
 

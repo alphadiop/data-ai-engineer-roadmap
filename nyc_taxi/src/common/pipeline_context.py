@@ -1,9 +1,8 @@
 class PipelineContext:
 
-    def __init__(self,env:str = "local", catalog_name:str='nyc_taxi',taxi_type:str=None):
+    def __init__(self,env:str = "local",taxi_type:str=None):
         self.env = env
         self.taxi_type = taxi_type
-        self.catalog_name = catalog_name
         self.periode = None
         self.table_name = None
 

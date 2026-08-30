@@ -28,7 +28,6 @@ class MetadataExplorer:
         )
 
     def run(self):
-
         if self.env == "local":
             self.show_local()
         else:
@@ -58,6 +57,7 @@ class MetadataExplorer:
             self.spark.sql(
                 f"SHOW TABLES IN {schema_name}"
             ).show(truncate=False)
+
 
     def show_databricks(self):
 
@@ -144,42 +144,16 @@ class MetadataExplorer:
         )
 
 
+    def get_all_row_counts3(self):
+        """
+        Retourne le nombre de lignes de toutes les tables
+        présentes dans les schémas de l'environnement.
 
-    def get_all_row_counts(self):
-
-        rows = []
-
-        schemas = ["audit", "silver", "gold", "ref"]
-
-        for schema_name in schemas:
-
-            tables = self.spark.sql(
-                f"SHOW TABLES IN {schema_name}"
-            ).collect()
-
-            for table in tables:
-
-                table_name = table.tableName
-
-                full_table_name = self.get_table_name(
-                    schema_name=schema_name,
-                    table_name=table_name
-                )
-
-                rows.append(
-                    Row(
-                        schema_name=schema_name,
-                        table_name=table_name,
-                        row_count=self.spark.table(
-                            full_table_name
-                        ).count()
-                    )
-                )
-
-        return self.spark.createDataFrame(rows)
-
-
-    def get_all_row_counts2(self):
+        Attention :
+        - count() déclenche une lecture complète de la table.
+        - Cette méthode peut donc être coûteuse sur de grosses tables.
+        - Elle est destinée principalement au diagnostic local.
+        """
 
         rows = []
 
@@ -192,12 +166,20 @@ class MetadataExplorer:
 
         for schema_name in schemas:
 
-            tables = (
-                self.spark.sql(
+            try:
+                tables = self.spark.sql(
                     f"SHOW TABLES IN {schema_name}"
-                )
-                .collect()
-            )
+                ).collect()
+
+            except Exception as e:
+
+                if self.logger:
+                    self.logger.warning(
+                        f"Impossible de lire le schéma "
+                        f"{schema_name} : {e}"
+                    )
+
+                continue
 
             for table in tables:
 
@@ -210,36 +192,110 @@ class MetadataExplorer:
                     )
                 )
 
-                row_count = (
-                    self.spark.table(
-                        full_table_name
+                if self.logger:
+                    self.logger.info(
+                        f"Calcul row count : {full_table_name}"
                     )
+
+                try:
+                    row_count = (
+                        self.spark
+                        .table(full_table_name)
+                        .count()
+                    )
+
+                    rows.append(
+                        Row(
+                            schema_name=schema_name,
+                            table_name=table_name,
+                            row_count=row_count,
+                            status="OK"
+                        )
+                    )
+
+                except Exception as e:
+
+                    if self.logger:
+                        self.logger.error(
+                            f"Erreur count {full_table_name} : {e}"
+                        )
+
+                    rows.append(
+                        Row(
+                            schema_name=schema_name,
+                            table_name=table_name,
+                            row_count=None,
+                            status="ERROR"
+                        )
+                    )
+        return self.spark.createDataFrame(rows)
+
+
+    def get_real_row_counts(self):
+        """
+        garder get_real_row_counts() uniquement comme outil de contrôle qualité permettant de comparer :
+
+        """
+        rows = []
+        schemas = [
+            "audit",
+            "silver",
+            "gold",
+            "ref"
+        ]
+
+        for schema_name in schemas:
+            tables = self.spark.sql(
+                f"SHOW TABLES IN {schema_name}"
+            ).collect()
+
+            for table in tables:
+                table_name = table.tableName
+
+                full_table_name = (
+                    self.catalog_manager.get_table_name(
+                        schema_name=schema_name,
+                        table_name=table_name
+                    )
+                )
+
+                self.logger.info(
+                    f"COUNT(*) : {full_table_name}"
+                )
+
+                count = (
+                    self.spark
+                    .table(full_table_name)
                     .count()
                 )
 
                 rows.append(
-                    (
-                        schema_name,
-                        table_name,
-                        row_count
+                    Row(
+                        schema_name=schema_name,
+                        table_name=table_name,
+                        row_count=count
                     )
                 )
 
-        return self.spark.createDataFrame(
-            rows,
-            [
-                "schema_name",
-                "table_name",
-                "row_count"
-            ]
+        return self.spark.createDataFrame(rows)
+
+
+
+    def get_all_row_counts(self):
+        return (
+            self.spark.table("audit.audit_row_count")
+            .orderBy(
+                "periode",
+                "table_name"
+            )
         )
 
     def show_all_row_counts(self):
-        self.get_all_row_counts() \
-            .orderBy("schema_name", "table_name") \
-            .show(
+        df = self.get_all_row_counts()
+        df.show(
             truncate=False
         )
+        return df
 
 
 if __name__ == "__main__":
@@ -257,7 +313,6 @@ if __name__ == "__main__":
         env="local",
         logger=logger
     ).run()
-
 
     MetadataExplorer(
         spark=spark,
