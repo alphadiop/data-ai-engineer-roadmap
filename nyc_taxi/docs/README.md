@@ -580,12 +580,11 @@ Version 3
 ---
 
 
-
 --- 
 #### Que signifie ACID ?
 - [ ] c'est cette garantie qui fait qu'une table Delta peut être utilisée pour des données critiques 
 - [ ] finance, santé, facturation, reporting...
-- [ ] niveau de fiablilité proche d'une base de données classique
+- [ ] niveau de fiabililité proche d'une base de données classique
 
 
 ---
