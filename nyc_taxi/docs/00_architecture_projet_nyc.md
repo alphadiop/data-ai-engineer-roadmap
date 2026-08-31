@@ -37,6 +37,23 @@
       Audit tables
 ```
 
+```text
+Windows 11
+│
+├── D:\data-ai-engineer-roadmap\nyc_taxi
+│       └── ton projet actuel
+│
+└── WSL2
+└── Ubuntu
+│
+├── airflow_env
+│     └── Airflow
+│
+└── spark_local
+└── NYC Taxi + PySpark + Delta
+```
+
+
 
 ## Classes principales
 
