@@ -1,5 +1,7 @@
 import os
 import sys
+import os
+from pathlib import Path
 import logging
 from typing import TYPE_CHECKING
 
@@ -461,42 +463,68 @@ class CatalogManager:
             """
         )
 
+
     def repair_local_metastore(self):
+
         if self.env != "local":
             self.logger.info(
                 "repair_local_metastore skipped (not local)"
             )
             return
 
-        import os
-        from pathlib import Path
-
         warehouse = Path(
-            "D:/data-ai-engineer-roadmap/spark-warehouse"
+            "/mnt/d/data-ai-engineer-roadmap/spark-warehouse"
         )
-        self.logger.info(
-            self.spark.conf.get("spark.sql.warehouse.dir")
-        )
+
         self.logger.info(
             f"Scanning warehouse : {warehouse}"
         )
 
+        if not warehouse.exists():
+            self.logger.warning(
+                f"Warehouse does not exist : {warehouse}"
+            )
+            return
+
         for root, dirs, files in os.walk(warehouse):
+
             if "_delta_log" not in dirs:
                 continue
 
             table_path = Path(root)
+
+            print("=" * 80)
+            print(f"table_path  = {table_path}")
+            print(f"parent      = {table_path.parent}")
+            print(f"parent.name = {table_path.parent.name}")
+
             schema_name = (
                 table_path.parent.name
                 .replace(".db", "")
             )
+
+            print(f"schema_name = {schema_name}")
+            print(f"table_name  = {table_path.name}")
 
             table_name = table_path.name
 
             full_table_name = (
                 f"{schema_name}.{table_name}"
             )
+
+            print(f"full_table_name = {full_table_name}")
+
             try:
+
+                # 1. Créer le schéma
+                self.spark.sql(
+                    f"""
+                    CREATE DATABASE IF NOT EXISTS
+                    `{schema_name}`
+                    """
+                )
+
+                # 2. Vérifier si la table est déjà connue
                 if self.spark.catalog.tableExists(
                         full_table_name
                 ):
@@ -506,20 +534,12 @@ class CatalogManager:
                     )
                     continue
 
+                # 3. Enregistrer la table Delta existante
                 self.spark.sql(
                     f"""
-                    CREATE DATABASE IF NOT EXISTS
-                    {schema_name}
-                    """
-                )
-
-                self.spark.sql(
-                    f"""
-                    CREATE TABLE
-                    {full_table_name}
+                    CREATE TABLE `{full_table_name}`
                     USING DELTA
-                    LOCATION
-                    '{table_path.as_posix()}'
+                    LOCATION '{table_path.as_posix()}'
                     """
                 )
 
@@ -531,25 +551,314 @@ class CatalogManager:
             except Exception as e:
 
                 self.logger.error(
-                    f"Error registering "
+                    f"Error repairing "
                     f"{full_table_name} : {e}"
                 )
+
+
+
+    #
+    # def repair_local_metastore(self):
+    #     """
+    #     Répare le metastore Hive local à partir des tables Delta
+    #     physiquement présentes dans le Spark warehouse.
+    #
+    #     Cas gérés :
+    #         1. Table absente du metastore
+    #            -> création de la table dans le metastore.
+    #         2. Table présente avec une location correcte
+    #            -> aucune action.
+    #         3. Table présente avec une location incorrecte
+    #            -> correction de la location dans le metastore.
+    #     Important :
+    #         Cette méthode ne déplace ni ne supprime les données Delta.
+    #         Elle synchronise uniquement le metastore avec le warehouse.
+    #     """
+    #     if self.env != "local":
+    #         self.logger.info("repair_local_metastore skipped (not local)")
+    #         return
+    #
+    #     # warehouse = Path(
+    #     #     self.spark.conf.get("spark.sql.warehouse.dir").replace("file:", "")
+    #     # )
+    #
+    #     warehouse = Path(
+    #         "/mnt/d/data-ai-engineer-roadmap/spark-warehouse"
+    #     )
+    #
+    #     self.logger.info(f"Scanning warehouse : {warehouse}")
+    #
+    #     if not warehouse.exists():
+    #         self.logger.warning(f"Warehouse does not exist : {warehouse}")
+    #         return
+    #
+    #     for root, dirs, files in os.walk(warehouse):
+    #
+    #         # On cherche uniquement les répertoires Delta
+    #         if "_delta_log" not in dirs:
+    #             continue
+    #
+    #         table_path = Path(root)
+    #
+    #         # Exemple :
+    #         # .../spark-warehouse/audit.db/audit_load
+    #         #
+    #         # parent.name = audit.db
+    #         # table_path.name = audit_load
+    #
+    #         schema_name = (
+    #             table_path.parent.name.replace(".db", "")
+    #         )
+    #
+    #         table_name = table_path.name
+    #
+    #         full_table_name = (
+    #             f"{schema_name}.{table_name}"
+    #         )
+    #
+    #         expected_location = (
+    #             table_path.resolve().as_posix()
+    #         )
+    #
+    #         self.logger.info(
+    #             f"Checking table : {full_table_name}"
+    #         )
+    #
+    #         try:
+    #             # --------------------------------------------------
+    #             # 1. Vérifier si la table existe dans le metastore
+    #             # --------------------------------------------------
+    #
+    #             if not self.spark.catalog.tableExists(
+    #                     full_table_name
+    #             ):
+    #
+    #                 self.logger.info(
+    #                     f"Table absent from metastore : "
+    #                     f"{full_table_name}"
+    #                 )
+    #
+    #                 self.spark.sql(
+    #                     f"""
+    #                     CREATE DATABASE IF NOT EXISTS
+    #                     {schema_name}
+    #                     """
+    #                 )
+    #
+    #                 self.spark.sql(
+    #                     f"""
+    #                     CREATE TABLE {full_table_name}
+    #                     USING DELTA
+    #                     LOCATION '{expected_location}'
+    #                     """
+    #                 )
+    #
+    #                 self.logger.info(
+    #                     f"Registered : {full_table_name}"
+    #                 )
+    #
+    #                 continue
+    #
+    #             # --------------------------------------------------
+    #             # 2. La table existe : récupérer sa location
+    #             # --------------------------------------------------
+    #             describe_df = self.spark.sql(
+    #                 f"""
+    #                 DESCRIBE TABLE EXTENDED
+    #                 {full_table_name}
+    #                 """
+    #             )
+    #
+    #             location_row = (
+    #                 describe_df
+    #                 .filter(
+    #                     "col_name = 'Location'"
+    #                 )
+    #                 .select("data_type")
+    #                 .first()
+    #             )
+    #
+    #             if location_row is None:
+    #                 self.logger.warning(
+    #                     f"Unable to determine location : "
+    #                     f"{full_table_name}"
+    #                 )
+    #
+    #                 continue
+    #
+    #             current_location = (
+    #                 location_row["data_type"]
+    #                 .replace("file:", "")
+    #             )
+    #
+    #             current_location = (
+    #                 Path(current_location)
+    #                 .resolve()
+    #                 .as_posix()
+    #             )
+    #
+    #             # --------------------------------------------------
+    #             # 3. Comparer les locations
+    #             # --------------------------------------------------
+    #
+    #             self.logger.info(
+    #                 f"Current location   : "
+    #                 f"{current_location}"
+    #             )
+    #
+    #             self.logger.info(
+    #                 f"Expected location  : "
+    #                 f"{expected_location}"
+    #             )
+    #
+    #             if current_location == expected_location:
+    #
+    #                 self.logger.info(
+    #                     f"Already registered correctly : "
+    #                     f"{full_table_name}"
+    #                 )
+    #
+    #                 continue
+    #
+    #             # --------------------------------------------------
+    #             # 4. Mauvaise location
+    #             # --------------------------------------------------
+    #
+    #             self.logger.warning(
+    #                 f"Incorrect location detected for "
+    #                 f"{full_table_name}"
+    #             )
+    #
+    #             self.logger.warning(
+    #                 f"Changing location from "
+    #                 f"{current_location} "
+    #                 f"to "
+    #                 f"{expected_location}"
+    #             )
+    #
+    #             self.spark.sql(
+    #                 f"""
+    #                 ALTER TABLE {full_table_name}
+    #                 SET LOCATION '{expected_location}'
+    #                 """
+    #             )
+    #
+    #             self.logger.info(
+    #                 f"Location repaired : "
+    #                 f"{full_table_name}"
+    #             )
+    #
+    #         except Exception as e:
+    #             self.logger.error(
+    #                 f"Error repairing "
+    #                 f"{full_table_name} : {e}"
+    #             )
+
+    #
+    # def repair_local_metastore(self):
+    #     """
+    #     Au démarrage local, si mon warehouse contient déjà des tables Delta
+    #     mais que le metastore local ne les connaît plus, je tente de les réenregistrer
+    #     le problème est que le metastore local n'a pas la connaissance des tables qui existent encore physiquement dans le warehouse.
+    #     Spark va enregistrer cette table Delta existante dans son metastore gràce à cette fonction
+    #
+    #     1. table absente du metastore
+    #     2. table présente et location correcte
+    #     3. table présente mais location incorrecte
+    #     """
+    #     if self.env != "local":
+    #         self.logger.info(
+    #             "repair_local_metastore skipped (not local)"
+    #         )
+    #         return
+    #
+    #     # warehouse = Path(
+    #     #     self.spark.conf.get(
+    #     #         "spark.sql.warehouse.dir"
+    #     #     )
+    #     # )
+    #
+    #     warehouse = Path(
+    #         self.spark.conf.get("spark.sql.warehouse.dir").replace("file:", "")
+    #     )
+    #
+    #     self.logger.info(
+    #         f"Scanning warehouse : {warehouse}"
+    #     )
+    #
+    #     if not warehouse.exists():
+    #         self.logger.warning(
+    #             f"warehouse {warehouse} doesn't exist"
+    #         )
+    #         return
+    #
+    #     for root, dirs, files in os.walk(warehouse):
+    #         if "_delta_log" not in dirs:
+    #             continue
+    #
+    #         table_path = Path(root)
+    #
+    #         schema_name = (
+    #             table_path.parent.name
+    #             .replace(".db", "")
+    #         )
+    #
+    #
+    #         table_name = table_path.name
+    #
+    #         full_table_name = (
+    #             f"{schema_name}.{table_name}"
+    #         )
+    #
+    #         try:
+    #
+    #
+    #             if self.spark.catalog.tableExists(
+    #                     full_table_name
+    #             ):
+    #                 self.logger.info(
+    #                     f"Already registered : "
+    #                     f"{full_table_name}"
+    #                 )
+    #                 continue
+    #
+    #             self.spark.sql(
+    #                 f"""
+    #                 CREATE DATABASE IF NOT EXISTS
+    #                 {schema_name}
+    #                 """
+    #             )
+    #
+    #             self.spark.sql(
+    #                 f"""
+    #                 CREATE TABLE {full_table_name}
+    #                 USING DELTA
+    #                 LOCATION '{table_path.as_posix()}'
+    #                 """
+    #             )
+    #
+    #             self.logger.info(
+    #                 f"Registered : "
+    #                 f"{full_table_name}"
+    #             )
+    #
+    #         except Exception as e:
+    #
+    #             self.logger.error(
+    #                 f"Error registering "
+    #                 f"{full_table_name} : {e}"
+    #             )
 
 
 
 if __name__ == "__main__":
     from pyspark.sql import SparkSession
     import sys
-    spark = (
-        SparkSession.builder
-        .appName("nyc_taxi")
-        .config(
-            "spark.pyspark.python",
-            sys.executable
-        )
-        .getOrCreate()
+    spark =""
+    logger = PipelineLogger(
+        "CatalogManager",
+        env="local"
     )
-    logger = PipelineLogger("CatalogManager")
 
     catalog_manager = CatalogManager(
         spark=spark, 

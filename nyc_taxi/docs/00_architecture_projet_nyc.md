@@ -5,6 +5,9 @@
 * [ ] PipelineRunner = orchestrateur métier
 * [ ] Bronze/Silver/Gold = logique de traitement
 
+local + Windows
+local + WSL
+databricks
 
 ```text
                     Airflow
@@ -52,7 +55,21 @@ Windows 11
 └── spark_local
 └── NYC Taxi + PySpark + Delta
 ```
+---
 
+```text
+env
+│
+├── SparkManager
+│
+├── CatalogManager
+│
+├── PipelineLogger
+│
+├── PathManager
+│
+└── configuration
+```
 
 
 ## Classes principales

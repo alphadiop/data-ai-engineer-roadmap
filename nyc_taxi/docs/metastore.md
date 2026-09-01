@@ -1,3 +1,10 @@
+- [ ] spark-warehouse/ = données physiques + Delta transaction log
+
+- [ ] metastore_db/ = catalogue Hive local
+- [ ] qui sait que audit.audit_load existe
+- [ ] et où se trouve sa location
+
+
 ### metastore
 - [ ] c'est le catalogue des métadonnées de Spark/Hive
 - [ ] il ne contient pas les données
@@ -79,3 +86,110 @@ spark.sql("""
 - [ ] Delta Lake = stocke les données et les logs (_delta_log).
 - [ ] Hive Metastore = stocke les métadonnées des tables.
 - [ ] enableHiveSupport() = active ce metastore pour que saveAsTable() et read.table() fonctionnent correctement
+---
+
+---
+```text
+WSL
+│
+├── Python 3.14.4
+├── Java 17
+├── PySpark 3.5.1
+└── Delta Spark 3.2.0
+│
+▼
+Hive Metastore
+│
+▼
+metastore_db
+│
+▼
+spark-warehouse
+│
+├── audit/
+│    ├── audit_load
+│    └── audit_row_count
+│
+├── silver/
+│    └── silver_nyc_taxi
+│
+├── gold/
+│    ├── gold_dim_date
+│    ├── gold_fact_trips
+│    └── gold_kpi_daily
+│
+└── ref/
+└── gold_dim_location
+```
+
+
+```text
+WSL
+│
+├── Python
+│   └── /home/alpha/nyc_taxi_env/bin/python
+│
+├── metastore Derby
+│   └── /mnt/d/data-ai-engineer-roadmap/metastore_db
+│
+└── Spark warehouse
+└── /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+```
+
+
+
+##### Etape pour reparer une table : synchronisation entre wharesouse et metastore
+```text
+          Situation exceptionnelle
+                   │
+                   ▼
+       Tables Delta existent sur disque
+                   │
+                   ▼
+       Metastore ne les connaît plus
+                   │
+                   ▼
+      repair_local_metastore()
+                   │
+                   ▼
+       Tables réenregistrées
+```
+
+
+---
+```text
+       Table trouvée dans warehouse
+                  │
+                  ▼
+       tableExists(full_name) ?
+        /                    \
+      NON                    OUI
+      │                       │
+      ▼                       ▼
+CREATE TABLE             récupérer LOCATION
+                              │
+                  ┌───────────┴───────────┐
+                  ▼                       ▼
+               correcte               incorrecte
+                  │                       │
+                  ▼                       ▼
+                rien                  réparer
+```
+
+
+---
+```text
+SparkManager
+│
+├── warehouse = /mnt/d/.../spark-warehouse
+│
+├── Hive Metastore local
+│
+└── repair_local_metastore()
+│
+├── table absente → CREATE TABLE
+│
+├── location correcte → rien
+│
+└── mauvaise location → SET LOCATION
+```

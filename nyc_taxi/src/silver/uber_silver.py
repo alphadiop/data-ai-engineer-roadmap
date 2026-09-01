@@ -199,6 +199,7 @@ class UberSilver(PipelineStep):
             )
 
         path_manager = PathManager(
+            env=context.env,
             config=context.config,
             logger=self.logger
         )

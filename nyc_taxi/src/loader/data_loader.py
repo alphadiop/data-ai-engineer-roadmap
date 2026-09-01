@@ -58,9 +58,6 @@ class DataLoader(PipelineStep):
             )
             df.persist()
 
-            self.logger.info(
-                df.explain()
-            )
             row_count = df.count()
 
             context.row_count[table_name] = row_count
@@ -112,7 +109,6 @@ class DataLoader(PipelineStep):
         )
 
         schema_json = load_json(schema_file)
-
         schema_manager.validate_columns(
             df=df,
             schema_json=schema_json

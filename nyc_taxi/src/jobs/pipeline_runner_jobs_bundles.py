@@ -40,47 +40,83 @@ if TYPE_CHECKING:
 
 class PipelineRunner:
     """
-    PipelineRunner
-        ↓
-    PipelineContext
-        ↓
-    Bronze
-        ↓
-    Silver
-        ↓
-    Gold
+        PipelineRunner
+            ↓
+        PipelineContext
+            ↓
+        Bronze
+            ↓
+        Silver
+            ↓
+        Gold
     """
 
-    def __init__(self, spark, env, taxi_type, periode, logger, steps):
+    def __init__(self, spark, env, taxi_type="yellow", periode=None, logger=None, steps=None):
         self.spark = spark
         self.env = env
         self.taxi_type = taxi_type
         self.periode = periode
         self.logger = logger
         self.steps = steps
-        self.config = load_config('variable_environnement', self.logger)
 
-    # def set_row_count(self,layer,count):
-    #     self.row_count[layer] = count
+        self.audit_manager = AuditManager(
+            spark=self.spark,
+            logger=self.logger
+        )
+        self.maintenance = MaintenanceJob(
+            spark=self.spark,
+            logger=self.logger)
+
+        self.setup_env = EnvironmentSetup(
+            spark=self.spark,
+            env=self.env,
+            logger=self.logger
+        )
+
+        self.config = load_config(
+            'variable_environnement', self.logger
+        )
+
 
     def run(self):
+
+        # ==========================================================
+        # DÉTERMINATION DE LA PÉRIODE
+        # ==========================================================
+
+        if self.periode is None:
+
+            self.periode = self.audit_manager.get_next_period(
+                table_name="silver_nyc_taxi",
+                taxi_type=self.taxi_type
+            )
+            self.logger.info(
+                f"Période déterminée automatiquement : "
+                f"{self.periode}"
+            )
+        else:
+            self.logger.info(
+                f"Période fournie explicitement : "
+                f"{self.periode}"
+            )
+
+        # ==========================================================
+        # CONTEXTE
+        # ==========================================================
 
         context = PipelineContext(
             env=self.env,
             taxi_type=self.taxi_type
         )
 
-        setup_env = EnvironmentSetup(
-            spark=self.spark,
-            env=self.env,
-            logger=self.logger
+        self.logger.info(
+            f"Période sélectionnée automatiquement : "
+            f"{context.periode}"
         )
-        if not setup_env.environment_exists():
-            setup_env.run(
-                path_sql_schema=context.config["path_sql_schema"],
-                taxi_type=self.taxi_type
-            )
 
+        # ==========================================================
+        # PIPELINE
+        # ==========================================================
         context.spark = self.spark
         context.logger = self.logger
         context.config = self.config[context.env]
@@ -89,52 +125,46 @@ class PipelineRunner:
         context.taxi_type = self.taxi_type
         context.periode = int(self.periode)
 
-        self.logger.info(
-            f"context.env = {context.env}"
-        )
 
         self.logger.info(
-            f"CATALOG : {context.config['catalog_name']}"
+            f"path_sql_schema : {context.config['path_sql_schema']}"
+        )
+        if not self.setup_env.environment_exists():
+            self.setup_env.run(
+                path_sql_schema=context.config["path_sql_schema"],
+                taxi_type=self.taxi_type
+            )
+
+        self.logger.info(
+            f"Environnement = {context.env}"
         )
 
-        # catalog_manager = CatalogManager(
-        #     spark = self.spark,
-        #     logger=self.logger,
-        #     env=context.env
-        # )
-        #
-        # catalog_manager.create_catalog(
-        #     catalog_name=context.config["catalog_name"]
-        # )
-        # catalog_manager.create_environment_schemas()
-
-
-        audit_manager = AuditManager(
-            spark=self.spark, 
-            logger=self.logger
+        self.logger.info(
+            f"catalog_name : {context.config['catalog_name']}"
         )
+
 
         context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()
         context.table_name = "silver_nyc_taxi"
 
-        self.logger.info(f"liste steps : {self.steps}")
+        ## self.logger.info(f"liste steps : {self.steps}")
 
-        self.logger.info(f"{'='*120}")
+        self.logger.info(f"\n {'='*120}")
         self.logger.info(
             f"context.row_count = {context.row_count}"
         )
 
-        self.logger.info(f"{'='*120}")
+        self.logger.info(f"\n {'='*120}")
         self.logger.info(
-            f"{'*' * 25} periode : {context.periode}, type = {type(context.periode)}"
+            f"{'*' * 25} periode : {context.periode}"
         )
         self.logger.info(f"{'*' * 20} taxi_type : {context.taxi_type} {'*' * 20} ")
         self.logger.info(f"{'*' * 20} periode : {context.periode} {'*' * 20} ")
         self.logger.info(f"{'*' * 20} table_name : {context.table_name} {'*' * 20} ")
         self.logger.info(f"{'='*120}")
 
-        if audit_manager.is_period_loaded(context):
+        if self.audit_manager.is_period_loaded(context):
 
             context.status = "ALREADY_LOADED"
             context.message = f"Period {context.periode} already loaded"
@@ -159,9 +189,7 @@ class PipelineRunner:
             context.message = "OK"
             context.error_step = ""
 
-            MaintenanceJob(
-                spark=self.spark,
-                logger=self.logger).run(context)
+            self.maintenance.run(context)
             
         except DataNotAvailableError as e:
             context.status = "NO_DATA"
@@ -183,13 +211,13 @@ class PipelineRunner:
             context.end_time = datetime.now()
             context.duration_seconds = (context.end_time - context.start_time).total_seconds()
             try:
-                audit_manager.insert_audit(context)
+                self.audit_manager.insert_audit(context)
             except Exception as e:
                 self.logger.error(
                     f"Audit insert failed: {e}"
                 )
             try:
-                audit_manager.insert_row_counts(context)
+                self.audit_manager.insert_row_counts(context)
             except Exception as e:
                 self.logger.error(
                     f"Row count insert failed: {e}"
@@ -206,7 +234,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=["local", "databricks"],default='local')
-    parser.add_argument("--periode", type=int, required=True)
+    parser.add_argument("--periode", type=int, default=None)
     parser.add_argument("--taxi_type", type=str, default="yellow")
 
 
@@ -216,8 +244,10 @@ if __name__ == "__main__":
     periode = args.periode
     taxi_type = args.taxi_type
 
-    logger = PipelineLogger("uber_pipeline")
-    logger.info(f"env = {env}")
+    logger = PipelineLogger(
+        "uber_pipeline",
+        env=env
+    )
 
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",
@@ -262,3 +292,7 @@ if __name__ == "__main__":
     runner.run()
     
     ## bash : python pipeline_runner.py --taxi_type yellow --periode 202603
+    # next_period = audit_manager.get_next_period(
+    #     table_name="silver_nyc_taxi",
+    #     taxi_type="yellow"
+    # )

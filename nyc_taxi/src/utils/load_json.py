@@ -4,7 +4,6 @@ import sys
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
-from nyc_taxi.src.common.logger import PipelineLogger
 
 if TYPE_CHECKING:
     from nyc_taxi.src.common.logger import PipelineLogger

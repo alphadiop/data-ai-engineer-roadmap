@@ -151,6 +151,10 @@ class UberBronze(PipelineStep):
 
         df = self.spark.read.parquet(str(path_file))
 
+        print("\n =============================================")
+        self.logger.info(f"path_file = {path_file}")
+        print("\n =============================================")
+
         df_bronze = df.withColumn("periode", lit(context.periode)).cache()
         row_count = df_bronze.count()
 

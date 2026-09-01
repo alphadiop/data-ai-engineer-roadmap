@@ -1,24 +1,39 @@
 import logging
 import os
 from pathlib import Path
+from nyc_taxi.src.utils.config.load_config import load_config
+
 
 class PipelineLogger:
 
-    PROJECT_ROOT = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/"
-
-    def __init__(self, name, level:int=logging.INFO):
+    def __init__(self, name, env="local", level:int=logging.INFO):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(level)
         
         self.logger.propagate = False
 
+        config = load_config(
+            "variable_environnement",
+            self.logger
+        )
+
+        self.logger.info(
+            f"path_logs : {config[env]['path_logs']}"
+        )
+
         path_log = os.path.join(
-            self.PROJECT_ROOT,
-            "logs",
+            config[env]["path_logs"],
             "pipeline.log"
         )
 
         self.path_log = self.get_path_logs(path_log)
+
+        self.logger.info(
+            f"Log file : {self.path_log}"
+        )
+
+        print(f"LOGGER ENV = {env}")
+        print(f"LOG_DIR = {config[env]['path_logs']}")
 
         for handler in self.logger.handlers[:]:
             handler.close()
@@ -91,7 +106,39 @@ class PipelineLogger:
 
 
 if __name__ == "__main__":
-    logger = PipelineLogger("test")
-    logger.info("test")
-    logger.error("test")
-    logger.warning("test")
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--env",
+        choices=["local", "databricks"],
+        default="local"
+    )
+
+    parser.add_argument(
+        "--periode",
+        type=int,
+        required=True
+    )
+
+    parser.add_argument(
+        "--taxi_type",
+        type=str,
+        default="yellow"
+    )
+
+    args = parser.parse_args()
+
+    env = args.env
+    periode = args.periode
+    taxi_type = args.taxi_type
+
+    logger = PipelineLogger(
+        "uber_pipeline",
+        env=env
+    )
+
+    logger.info(f"env = {env}")
+    logger.info(f"periode = {periode}")
+    logger.info(f"taxi_type = {taxi_type}")

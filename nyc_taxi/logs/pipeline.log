@@ -699,3 +699,1777 @@
 2026-07-24 08:31:07 | INFO | Maintenance completed for nyc_taxi.gold.gold_kpi_daily
 2026-07-24 08:31:07 | INFO | MaintenanceJob finished
 2026-07-24 17:50:49 | INFO | Schema nyc_taxi.dim created
+2026-08-31 15:17:34 | INFO | file:/D:/data-ai-engineer-roadmap/nyc_taxi/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 15:17:35 | INFO | Scanning warehouse : file:\D:\data-ai-engineer-roadmap\nyc_taxi\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 15:17:35 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202502', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 15:17:35 | INFO | env       : local
+2026-08-31 15:17:35 | INFO | args      : Namespace(env='local', periode=202502, taxi_type='yellow')
+2026-08-31 15:17:35 | INFO | periode   : 202502
+2026-08-31 15:17:35 | INFO | taxi_type : yellow
+2026-08-31 15:17:35 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 15:17:35 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 15:17:35 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 15:17:35 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 15:17:35 | INFO | CATALOG : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 15:17:35 | INFO | full_table_name : audit.audit_load
+2026-08-31 15:17:42 | INFO | ================================================================================
+2026-08-31 15:17:42 | INFO | Initialisation environnement
+2026-08-31 15:17:42 | INFO | ================================================================================
+2026-08-31 15:17:42 | INFO | Création des schémas
+2026-08-31 15:17:43 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\audit_load.json
+2026-08-31 15:17:43 | INFO | Création table : audit.audit_load
+2026-08-31 15:17:43 | INFO | Table exists audit.audit_load = False
+2026-08-31 15:17:43 | INFO | Creating table : audit.audit_load
+2026-08-31 15:17:43 | INFO | 
+        CREATE TABLE IF NOT EXISTS audit.audit_load
+        (
+            run_id BIGINT NOT NULL,
+periode INT NOT NULL,
+table_name STRING NOT NULL,
+taxi_type STRING NOT NULL,
+status STRING NOT NULL,
+start_time TIMESTAMP NOT NULL,
+end_time TIMESTAMP NOT NULL,
+duration_seconds DECIMAL(18,2),
+error_step STRING,
+message STRING
+        )
+        USING DELTA
+        
+        
+2026-08-31 15:17:52 | INFO | Table created : audit.audit_load
+2026-08-31 15:17:52 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\audit_row_count.json
+2026-08-31 15:17:52 | INFO | Création table : audit.audit_row_count
+2026-08-31 15:17:52 | INFO | Table exists audit.audit_row_count = False
+2026-08-31 15:17:52 | INFO | Creating table : audit.audit_row_count
+2026-08-31 15:17:52 | INFO | 
+        CREATE TABLE IF NOT EXISTS audit.audit_row_count
+        (
+            run_id BIGINT NOT NULL,
+periode INT NOT NULL,
+table_name STRING NOT NULL,
+row_count BIGINT NOT NULL,
+created_at TIMESTAMP NOT NULL
+        )
+        USING DELTA
+        
+        
+2026-08-31 15:17:53 | INFO | Table created : audit.audit_row_count
+2026-08-31 15:17:53 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\silver_nyc_taxi.json
+2026-08-31 15:17:53 | INFO | Création table : silver.silver_nyc_taxi
+2026-08-31 15:17:53 | INFO | Table exists silver.silver_nyc_taxi = False
+2026-08-31 15:17:53 | INFO | Creating table : silver.silver_nyc_taxi
+2026-08-31 15:17:53 | INFO | 
+        CREATE TABLE IF NOT EXISTS silver.silver_nyc_taxi
+        (
+            VendorID INT,
+tpep_pickup_datetime TIMESTAMP,
+tpep_dropoff_datetime TIMESTAMP,
+passenger_count INT,
+trip_distance DECIMAL(19,5),
+RatecodeID BIGINT,
+store_and_fwd_flag STRING,
+PULocationID INT,
+DOLocationID INT,
+payment_type TINYINT,
+fare_amount DECIMAL(19,5),
+extra DECIMAL(19,5),
+mta_tax DECIMAL(19,5),
+tip_amount DECIMAL(19,5),
+tolls_amount DECIMAL(19,5),
+improvement_surcharge DECIMAL(19,5),
+total_amount DECIMAL(19,5),
+congestion_surcharge DECIMAL(19,5),
+Airport_fee DECIMAL(19,5),
+cbd_congestion_fee DECIMAL(19,5),
+periode INT NOT NULL,
+trip_duration_minute DECIMAL(19,5),
+trip_date INT,
+tip_percent DECIMAL(10,2),
+average_speed DECIMAL(10,2),
+pickup_hour INT,
+pickup_day_of_week INT,
+pickup_month INT,
+pickup_year INT
+        )
+        USING DELTA
+        PARTITIONED BY (periode)
+        
+2026-08-31 15:17:54 | INFO | Table created : silver.silver_nyc_taxi
+2026-08-31 15:17:54 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_fact_trips.json
+2026-08-31 15:17:54 | INFO | Création table : gold.gold_fact_trips
+2026-08-31 15:17:54 | INFO | Table exists gold.gold_fact_trips = False
+2026-08-31 15:17:54 | INFO | Creating table : gold.gold_fact_trips
+2026-08-31 15:17:54 | INFO | 
+        CREATE TABLE IF NOT EXISTS gold.gold_fact_trips
+        (
+            periode INT NOT NULL,
+trip_date INT NOT NULL,
+date DATE NOT NULL,
+PULocationID INT,
+DOLocationID INT,
+trip_duration_minute DECIMAL(19,5),
+trip_distance DECIMAL(19,5),
+passenger_count INT,
+fare_amount DECIMAL(19,5),
+tip_amount DECIMAL(19,5),
+total_amount DECIMAL(19,5),
+payment_type TINYINT
+        )
+        USING DELTA
+        PARTITIONED BY (periode)
+        
+2026-08-31 15:17:55 | INFO | Table created : gold.gold_fact_trips
+2026-08-31 15:17:55 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_kpi_daily.json
+2026-08-31 15:17:55 | INFO | Création table : gold.gold_kpi_daily
+2026-08-31 15:17:55 | INFO | Table exists gold.gold_kpi_daily = False
+2026-08-31 15:17:55 | INFO | Creating table : gold.gold_kpi_daily
+2026-08-31 15:17:55 | INFO | 
+        CREATE TABLE IF NOT EXISTS gold.gold_kpi_daily
+        (
+            periode INT NOT NULL,
+trip_date INT NOT NULL,
+nb_trips BIGINT NOT NULL,
+revenue DECIMAL(19,2),
+avg_distance DECIMAL(19,2),
+avg_tip DECIMAL(19,2),
+avg_revenue_per_trip DECIMAL(19,2),
+total_tips DECIMAL(19,2),
+total_distance DECIMAL(19,2),
+revenue_per_distance DECIMAL(19,2),
+avg_passengers_per_trip DECIMAL(19,2),
+avg_trip_duration DECIMAL(19,2),
+avg_tip_percent DECIMAL(19,2),
+avg_speed DECIMAL(19,2)
+        )
+        USING DELTA
+        PARTITIONED BY (periode)
+        
+2026-08-31 15:17:56 | INFO | Table created : gold.gold_kpi_daily
+2026-08-31 15:17:56 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_date.json
+2026-08-31 15:17:56 | INFO | Création table : gold.gold_dim_date
+2026-08-31 15:17:56 | INFO | Table exists gold.gold_dim_date = False
+2026-08-31 15:17:56 | INFO | Creating table : gold.gold_dim_date
+2026-08-31 15:17:56 | INFO | 
+        CREATE TABLE IF NOT EXISTS gold.gold_dim_date
+        (
+            periode INT NOT NULL,
+date DATE NOT NULL,
+year SMALLINT NOT NULL,
+quarter TINYINT NOT NULL,
+month TINYINT NOT NULL,
+day TINYINT NOT NULL,
+day_of_week TINYINT NOT NULL,
+day_name STRING NOT NULL,
+month_name STRING NOT NULL,
+trip_date INT NOT NULL
+        )
+        USING DELTA
+        
+        
+2026-08-31 15:17:57 | INFO | Table created : gold.gold_dim_date
+2026-08-31 15:17:57 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_location.json
+2026-08-31 15:17:57 | INFO | Création table : ref.gold_dim_location
+2026-08-31 15:17:57 | INFO | Table exists ref.gold_dim_location = False
+2026-08-31 15:17:57 | INFO | Creating table : ref.gold_dim_location
+2026-08-31 15:17:57 | INFO | 
+        CREATE TABLE IF NOT EXISTS ref.gold_dim_location
+        (
+            location_id INT NOT NULL,
+Borough STRING,
+Zone STRING,
+service_zone STRING
+        )
+        USING DELTA
+        
+        
+2026-08-31 15:17:58 | INFO | Table created : ref.gold_dim_location
+2026-08-31 15:17:58 | INFO | Réparation metastore local
+2026-08-31 15:17:58 | INFO | file:/D:/data-ai-engineer-roadmap/nyc_taxi/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 15:17:58 | INFO | Scanning warehouse : file:\D:\data-ai-engineer-roadmap\nyc_taxi\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 15:17:58 | INFO | ================================================================================
+2026-08-31 15:17:58 | INFO | Initialisation terminée
+2026-08-31 15:17:58 | INFO | ================================================================================
+2026-08-31 15:17:58 | INFO | context.env = local
+2026-08-31 15:17:58 | INFO | CATALOG : nyc_taxi
+2026-08-31 15:17:58 | INFO | liste steps : [<nyc_taxi.src.bronze.uber_bronze.UberBronze object at 0x0000024410507610>, <nyc_taxi.src.silver.uber_silver.UberSilver object at 0x00000244105079D0>, <nyc_taxi.src.gold.uber_gold.UberGold object at 0x000002441109DC50>, <nyc_taxi.src.loader.data_loader.DataLoader object at 0x0000024410778650>]
+2026-08-31 15:17:58 | INFO | ========================================================================================================================
+2026-08-31 15:17:58 | INFO | context.row_count = {}
+2026-08-31 15:17:58 | INFO | ========================================================================================================================
+2026-08-31 15:17:58 | INFO | ************************* periode : 202502
+2026-08-31 15:17:58 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 15:17:58 | INFO | ******************** periode : 202502 ******************** 
+2026-08-31 15:17:58 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 15:17:58 | INFO | ========================================================================================================================
+2026-08-31 15:17:58 | INFO | audit_table : audit.audit_load
+2026-08-31 15:17:59 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 15:18:14 | INFO | ********************************************* Starting UberBronze *********************************************
+2026-08-31 15:18:14 | INFO | File name: yellow_tripdata_2025-02.parquet
+2026-08-31 15:18:14 | INFO | get_file_name completed in 0.0s
+2026-08-31 15:18:14 | INFO | File name: yellow_tripdata_2025-02.parquet
+2026-08-31 15:18:14 | INFO | get_file_name completed in 0.0s
+2026-08-31 15:18:14 | INFO | get_path_file completed in 0.0s
+2026-08-31 15:18:14 | INFO | ========================= dataset_url https://d37ci6vzurychx.cloudfront.net/trip-data ========================= 
+2026-08-31 15:18:14 | INFO | Bronze path : D:\data-ai-engineer-roadmap\data\bronze\raw_files
+2026-08-31 15:18:14 | INFO | Extracting yellow_tripdata_2025-02.parquet from D:\data-ai-engineer-roadmap\data\bronze\raw_files\yellow\2025\yellow_tripdata_2025-02.parquet
+2026-08-31 15:18:31 | INFO | ======================================================= Bronze rows : 3577543 ======================================================= 
+2026-08-31 15:18:31 | INFO | run completed in 17.01s
+2026-08-31 15:18:31 | INFO | ********************************************* Finished UberBronze *********************************************
+2026-08-31 15:18:31 | INFO | ========================================================================================================================
+2026-08-31 15:18:31 | INFO | ********************************************* Starting UberSilver *********************************************
+2026-08-31 15:18:32 | INFO | add_trip_duration completed in 0.03s
+2026-08-31 15:18:32 | INFO | add_date_key completed in 0.2s
+2026-08-31 15:18:32 | INFO | add_tip_percent completed in 0.07s
+2026-08-31 15:18:32 | INFO | add_average_speed completed in 0.04s
+2026-08-31 15:18:32 | INFO | add_date_features completed in 0.07s
+2026-08-31 15:18:32 | INFO | cast_columns completed in 0.11s
+2026-08-31 15:18:32 | INFO | apply_quality_rules completed in 0.1s
+2026-08-31 15:18:37 | INFO | Silver rows : 3577543 -> 3421081
+2026-08-31 15:18:37 | INFO | Environment : local
+2026-08-31 15:18:37 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 15:18:37 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 15:18:37 | INFO | path_manager : <nyc_taxi.src.common.path_manager.PathManager object at 0x000002440DCD56D0>
+2026-08-31 15:18:41 | INFO | run completed in 9.12s
+2026-08-31 15:18:41 | INFO | ********************************************* Finished UberSilver *********************************************
+2026-08-31 15:18:41 | INFO | ========================================================================================================================
+2026-08-31 15:18:41 | INFO | ********************************************* Starting UberGold *********************************************
+2026-08-31 15:18:41 | INFO | ============ Construction des DataFrames Gold ============
+2026-08-31 15:18:41 | INFO | get_fact_trips completed in 0.09s
+2026-08-31 15:18:41 | INFO | get_dim_date completed in 0.2s
+2026-08-31 15:18:41 | INFO | get_kpi_daily completed in 0.35s
+2026-08-31 15:18:42 | INFO | ============ Fin Construction Gold ============
+2026-08-31 15:18:42 | INFO | run completed in 0.92s
+2026-08-31 15:18:42 | INFO | ********************************************* Finished UberGold *********************************************
+2026-08-31 15:18:42 | INFO | ========================================================================================================================
+2026-08-31 15:18:42 | INFO | ********************************************* Starting DataLoader *********************************************
+2026-08-31 15:18:42 | INFO | Environment : local
+2026-08-31 15:18:42 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 15:18:42 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 15:18:42 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\silver_nyc_taxi.json
+2026-08-31 15:18:42 | INFO | Missing columns: set()
+2026-08-31 15:18:42 | INFO | Schema valide pour silver_nyc_taxi
+2026-08-31 15:18:42 | INFO | None
+2026-08-31 15:19:22 | INFO | silver_nyc_taxi : 3421081 rows
+2026-08-31 15:19:22 | INFO | Partitions : 2
+2026-08-31 15:19:22 | INFO | START WRITE silver_nyc_taxi
+2026-08-31 15:19:22 | INFO | Table TO SAVE : silver.silver_nyc_taxi
+2026-08-31 15:20:04 | INFO | Table silver.silver_nyc_taxi saved
+2026-08-31 15:20:04 | INFO | END WRITE silver_nyc_taxi
+2026-08-31 15:20:04 | INFO | Environment : local
+2026-08-31 15:20:04 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 15:20:04 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 15:20:04 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_fact_trips.json
+2026-08-31 15:20:04 | INFO | Missing columns: set()
+2026-08-31 15:20:04 | INFO | Schema valide pour gold_fact_trips
+2026-08-31 15:20:04 | INFO | None
+2026-08-31 15:20:58 | INFO | gold_fact_trips : 3421081 rows
+2026-08-31 15:20:58 | INFO | Partitions : 2
+2026-08-31 15:20:58 | INFO | START WRITE gold_fact_trips
+2026-08-31 15:20:58 | INFO | Table TO SAVE : gold.gold_fact_trips
+2026-08-31 15:21:15 | INFO | Table gold.gold_fact_trips saved
+2026-08-31 15:21:15 | INFO | END WRITE gold_fact_trips
+2026-08-31 15:21:15 | INFO | Environment : local
+2026-08-31 15:21:15 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 15:21:15 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 15:21:15 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_date.json
+2026-08-31 15:21:16 | INFO | Missing columns: set()
+2026-08-31 15:21:16 | INFO | Schema valide pour gold_dim_date
+2026-08-31 15:21:17 | INFO | None
+2026-08-31 15:21:27 | INFO | gold_dim_date : 30 rows
+2026-08-31 15:21:27 | INFO | Partitions : 200
+2026-08-31 15:21:27 | INFO | START WRITE gold_dim_date
+2026-08-31 15:21:27 | INFO | Table TO SAVE : gold.gold_dim_date
+2026-08-31 15:21:30 | INFO | Table gold.gold_dim_date saved
+2026-08-31 15:21:30 | INFO | END WRITE gold_dim_date
+2026-08-31 15:21:30 | INFO | Environment : local
+2026-08-31 15:21:30 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 15:21:30 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 15:21:30 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_kpi_daily.json
+2026-08-31 15:21:30 | INFO | Missing columns: set()
+2026-08-31 15:21:30 | INFO | Schema valide pour gold_kpi_daily
+2026-08-31 15:21:30 | INFO | None
+2026-08-31 15:21:55 | INFO | gold_kpi_daily : 30 rows
+2026-08-31 15:21:55 | INFO | Partitions : 200
+2026-08-31 15:21:55 | INFO | START WRITE gold_kpi_daily
+2026-08-31 15:21:55 | INFO | Table TO SAVE : gold.gold_kpi_daily
+2026-08-31 15:21:57 | INFO | Table gold.gold_kpi_daily saved
+2026-08-31 15:21:57 | INFO | END WRITE gold_kpi_daily
+2026-08-31 15:21:57 | INFO | run completed in 195.1s
+2026-08-31 15:21:57 | INFO | ********************************************* Finished DataLoader *********************************************
+2026-08-31 15:21:57 | INFO | ========================================================================================================================
+2026-08-31 15:21:57 | INFO | MaintenanceJob started
+2026-08-31 15:21:57 | INFO | Processing silver.silver_nyc_taxi
+2026-08-31 15:22:51 | INFO | VACUUM DRY RUN on silver.silver_nyc_taxi
+2026-08-31 15:25:06 | INFO | 0 files can be removed
+2026-08-31 15:26:20 | INFO | VACUUM completed on silver.silver_nyc_taxi
+2026-08-31 15:26:20 | INFO | Maintenance completed for silver_nyc_taxi
+2026-08-31 15:26:20 | INFO | Processing gold.gold_fact_trips
+2026-08-31 15:26:40 | INFO | VACUUM DRY RUN on gold.gold_fact_trips
+2026-08-31 15:28:47 | INFO | 0 files can be removed
+2026-08-31 15:30:08 | INFO | VACUUM completed on gold.gold_fact_trips
+2026-08-31 15:30:08 | INFO | Maintenance completed for gold_fact_trips
+2026-08-31 15:30:08 | INFO | Processing gold.gold_dim_date
+2026-08-31 15:30:13 | INFO | VACUUM DRY RUN on gold.gold_dim_date
+2026-08-31 15:32:22 | INFO | 0 files can be removed
+2026-08-31 17:18:32 | INFO | VACUUM completed on gold.gold_dim_date
+2026-08-31 17:18:32 | INFO | Maintenance completed for gold_dim_date
+2026-08-31 17:18:32 | INFO | Processing gold.gold_kpi_daily
+2026-08-31 17:18:38 | INFO | VACUUM DRY RUN on gold.gold_kpi_daily
+2026-08-31 17:23:26 | INFO | 0 files can be removed
+2026-08-31 17:25:16 | INFO | VACUUM completed on gold.gold_kpi_daily
+2026-08-31 17:25:16 | INFO | Maintenance completed for gold_kpi_daily
+2026-08-31 17:25:16 | INFO | MaintenanceJob finished
+2026-08-31 17:25:29 | INFO | audit_table = audit.audit_load
+2026-08-31 17:25:48 | INFO | Inserting row count for bronze with 3577543 rows
+2026-08-31 17:25:48 | INFO | Inserting row count for silver with 3421081 rows
+2026-08-31 17:25:48 | INFO | Inserting row count for silver_nyc_taxi with 3421081 rows
+2026-08-31 17:25:48 | INFO | Inserting row count for gold_fact_trips with 3421081 rows
+2026-08-31 17:25:48 | INFO | Inserting row count for gold_dim_date with 30 rows
+2026-08-31 17:25:48 | INFO | Inserting row count for gold_kpi_daily with 30 rows
+2026-08-31 17:34:00 | INFO | file:/D:/data-ai-engineer-roadmap/nyc_taxi/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 17:34:00 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 17:34:51 | INFO | Registered : audit.audit_load
+2026-08-31 17:34:53 | INFO | Registered : audit.audit_row_count
+2026-08-31 17:34:55 | INFO | Registered : gold.gold_dim_date
+2026-08-31 17:34:57 | INFO | Registered : gold.gold_dim_location
+2026-08-31 17:34:58 | INFO | Registered : gold.gold_fact_trips
+2026-08-31 17:34:59 | INFO | Registered : gold.gold_kpi_daily
+2026-08-31 17:35:00 | INFO | Registered : ref.gold_dim_location
+2026-08-31 17:35:04 | INFO | Registered : silver.silver_nyc_taxi
+2026-08-31 17:35:04 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202502', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 17:35:04 | INFO | env       : local
+2026-08-31 17:35:04 | INFO | args      : Namespace(env='local', periode=202502, taxi_type='yellow')
+2026-08-31 17:35:04 | INFO | periode   : 202502
+2026-08-31 17:35:04 | INFO | taxi_type : yellow
+2026-08-31 17:35:04 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 17:35:04 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 17:35:04 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 17:35:04 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 17:35:04 | INFO | CATALOG : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 17:35:04 | INFO | full_table_name : audit.audit_load
+2026-08-31 17:35:04 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 17:35:04 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 17:35:04 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 17:35:04 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 17:35:04 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 17:35:04 | INFO | context.env = local
+2026-08-31 17:35:04 | INFO | CATALOG : nyc_taxi
+2026-08-31 17:35:04 | INFO | liste steps : [<nyc_taxi.src.bronze.uber_bronze.UberBronze object at 0x000002BF1A64B350>, <nyc_taxi.src.silver.uber_silver.UberSilver object at 0x000002BF1C2E8690>, <nyc_taxi.src.gold.uber_gold.UberGold object at 0x000002BF1C3B5C50>, <nyc_taxi.src.loader.data_loader.DataLoader object at 0x000002BF1D0BCF50>]
+2026-08-31 17:35:04 | INFO | ========================================================================================================================
+2026-08-31 17:35:04 | INFO | context.row_count = {}
+2026-08-31 17:35:04 | INFO | ========================================================================================================================
+2026-08-31 17:35:04 | INFO | ************************* periode : 202502
+2026-08-31 17:35:04 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 17:35:04 | INFO | ******************** periode : 202502 ******************** 
+2026-08-31 17:35:04 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 17:35:04 | INFO | ========================================================================================================================
+2026-08-31 17:35:04 | INFO | audit_table : audit.audit_load
+2026-08-31 17:35:06 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 17:35:31 | INFO | Period 202502 already loaded =====================================================================================
+2026-08-31 17:35:31 | INFO | ========================================================================================================================
+2026-08-31 17:36:40 | INFO | file:/D:/data-ai-engineer-roadmap/nyc_taxi/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 17:36:40 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 17:36:50 | INFO | Already registered : audit.audit_load
+2026-08-31 17:36:50 | INFO | Already registered : audit.audit_row_count
+2026-08-31 17:36:50 | INFO | Already registered : gold.gold_dim_date
+2026-08-31 17:36:51 | INFO | Already registered : gold.gold_dim_location
+2026-08-31 17:36:51 | INFO | Already registered : gold.gold_fact_trips
+2026-08-31 17:36:51 | INFO | Already registered : gold.gold_kpi_daily
+2026-08-31 17:36:51 | INFO | Already registered : ref.gold_dim_location
+2026-08-31 17:36:51 | INFO | Already registered : silver.silver_nyc_taxi
+2026-08-31 17:36:51 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 17:36:51 | INFO | env       : local
+2026-08-31 17:36:51 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 17:36:51 | INFO | periode   : 202503
+2026-08-31 17:36:51 | INFO | taxi_type : yellow
+2026-08-31 17:36:51 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 17:36:51 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 17:36:51 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 17:36:51 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 17:36:51 | INFO | CATALOG : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 17:36:51 | INFO | full_table_name : audit.audit_load
+2026-08-31 17:36:51 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 17:36:51 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 17:36:51 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 17:36:51 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 17:36:51 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 17:36:51 | INFO | context.env = local
+2026-08-31 17:36:51 | INFO | CATALOG : nyc_taxi
+2026-08-31 17:36:51 | INFO | liste steps : [<nyc_taxi.src.bronze.uber_bronze.UberBronze object at 0x0000024BBB18CC10>, <nyc_taxi.src.silver.uber_silver.UberSilver object at 0x0000024BB898B250>, <nyc_taxi.src.gold.uber_gold.UberGold object at 0x0000024BBA756A10>, <nyc_taxi.src.loader.data_loader.DataLoader object at 0x0000024BBA76F150>]
+2026-08-31 17:36:51 | INFO | ========================================================================================================================
+2026-08-31 17:36:51 | INFO | context.row_count = {}
+2026-08-31 17:36:51 | INFO | ========================================================================================================================
+2026-08-31 17:36:51 | INFO | ************************* periode : 202503
+2026-08-31 17:36:51 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 17:36:51 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 17:36:51 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 17:36:51 | INFO | ========================================================================================================================
+2026-08-31 17:36:51 | INFO | audit_table : audit.audit_load
+2026-08-31 17:36:55 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 17:37:20 | INFO | ********************************************* Starting UberBronze *********************************************
+2026-08-31 17:37:20 | INFO | File name: yellow_tripdata_2025-03.parquet
+2026-08-31 17:37:20 | INFO | get_file_name completed in 0.0s
+2026-08-31 17:37:20 | INFO | File name: yellow_tripdata_2025-03.parquet
+2026-08-31 17:37:20 | INFO | get_file_name completed in 0.0s
+2026-08-31 17:37:20 | INFO | get_path_file completed in 0.0s
+2026-08-31 17:37:20 | INFO | ========================= dataset_url https://d37ci6vzurychx.cloudfront.net/trip-data ========================= 
+2026-08-31 17:37:20 | INFO | Bronze path : D:\data-ai-engineer-roadmap\data\bronze\raw_files
+2026-08-31 17:37:20 | INFO | Extracting yellow_tripdata_2025-03.parquet from D:\data-ai-engineer-roadmap\data\bronze\raw_files\yellow\2025\yellow_tripdata_2025-03.parquet
+2026-08-31 17:37:45 | INFO | ======================================================= Bronze rows : 4145257 ======================================================= 
+2026-08-31 17:37:45 | INFO | run completed in 25.33s
+2026-08-31 17:37:45 | INFO | ********************************************* Finished UberBronze *********************************************
+2026-08-31 17:37:45 | INFO | ========================================================================================================================
+2026-08-31 17:37:45 | INFO | ********************************************* Starting UberSilver *********************************************
+2026-08-31 17:37:46 | INFO | add_trip_duration completed in 0.05s
+2026-08-31 17:37:46 | INFO | add_date_key completed in 0.08s
+2026-08-31 17:37:46 | INFO | add_tip_percent completed in 0.05s
+2026-08-31 17:37:46 | INFO | add_average_speed completed in 0.05s
+2026-08-31 17:37:46 | INFO | add_date_features completed in 0.13s
+2026-08-31 17:37:46 | INFO | cast_columns completed in 0.18s
+2026-08-31 17:37:46 | INFO | apply_quality_rules completed in 0.13s
+2026-08-31 17:37:53 | INFO | Silver rows : 4145257 -> 3955117
+2026-08-31 17:37:53 | INFO | Environment : local
+2026-08-31 17:37:53 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 17:37:53 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 17:37:53 | INFO | path_manager : <nyc_taxi.src.common.path_manager.PathManager object at 0x0000024BBBC26F50>
+2026-08-31 17:38:00 | INFO | run completed in 14.88s
+2026-08-31 17:38:00 | INFO | ********************************************* Finished UberSilver *********************************************
+2026-08-31 17:38:00 | INFO | ========================================================================================================================
+2026-08-31 17:38:00 | INFO | ********************************************* Starting UberGold *********************************************
+2026-08-31 17:38:00 | INFO | ============ Construction des DataFrames Gold ============
+2026-08-31 17:38:00 | INFO | get_fact_trips completed in 0.11s
+2026-08-31 17:38:01 | INFO | get_dim_date completed in 0.36s
+2026-08-31 17:38:01 | INFO | get_kpi_daily completed in 0.65s
+2026-08-31 17:38:02 | INFO | ============ Fin Construction Gold ============
+2026-08-31 17:38:02 | INFO | run completed in 1.83s
+2026-08-31 17:38:02 | INFO | ********************************************* Finished UberGold *********************************************
+2026-08-31 17:38:02 | INFO | ========================================================================================================================
+2026-08-31 17:38:02 | INFO | ********************************************* Starting DataLoader *********************************************
+2026-08-31 17:38:02 | INFO | Environment : local
+2026-08-31 17:38:02 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 17:38:02 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 17:38:02 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\silver_nyc_taxi.json
+2026-08-31 17:38:02 | INFO | Missing columns: set()
+2026-08-31 17:38:02 | INFO | Schema valide pour silver_nyc_taxi
+2026-08-31 17:38:02 | INFO | None
+2026-08-31 17:39:18 | INFO | silver_nyc_taxi : 3955117 rows
+2026-08-31 17:39:18 | INFO | Partitions : 2
+2026-08-31 17:39:18 | INFO | START WRITE silver_nyc_taxi
+2026-08-31 17:39:18 | INFO | Table TO SAVE : silver.silver_nyc_taxi
+2026-08-31 17:40:30 | INFO | Table silver.silver_nyc_taxi saved
+2026-08-31 17:40:30 | INFO | END WRITE silver_nyc_taxi
+2026-08-31 17:40:30 | INFO | Environment : local
+2026-08-31 17:40:30 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 17:40:30 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 17:40:30 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_fact_trips.json
+2026-08-31 17:40:30 | INFO | Missing columns: set()
+2026-08-31 17:40:30 | INFO | Schema valide pour gold_fact_trips
+2026-08-31 17:40:31 | INFO | None
+2026-08-31 17:41:07 | INFO | gold_fact_trips : 3955117 rows
+2026-08-31 17:41:07 | INFO | Partitions : 2
+2026-08-31 17:41:07 | INFO | START WRITE gold_fact_trips
+2026-08-31 17:41:07 | INFO | Table TO SAVE : gold.gold_fact_trips
+2026-08-31 17:41:34 | INFO | Table gold.gold_fact_trips saved
+2026-08-31 17:41:34 | INFO | END WRITE gold_fact_trips
+2026-08-31 17:41:34 | INFO | Environment : local
+2026-08-31 17:41:34 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 17:41:34 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 17:41:34 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_date.json
+2026-08-31 17:41:34 | INFO | Missing columns: set()
+2026-08-31 17:41:34 | INFO | Schema valide pour gold_dim_date
+2026-08-31 17:41:34 | INFO | None
+2026-08-31 17:41:54 | INFO | gold_dim_date : 35 rows
+2026-08-31 17:41:54 | INFO | Partitions : 200
+2026-08-31 17:41:54 | INFO | START WRITE gold_dim_date
+2026-08-31 17:41:54 | INFO | Table TO SAVE : gold.gold_dim_date
+2026-08-31 17:41:59 | INFO | Table gold.gold_dim_date saved
+2026-08-31 17:41:59 | INFO | END WRITE gold_dim_date
+2026-08-31 17:41:59 | INFO | Environment : local
+2026-08-31 17:41:59 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 17:41:59 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 17:41:59 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_kpi_daily.json
+2026-08-31 17:41:59 | INFO | Missing columns: set()
+2026-08-31 17:41:59 | INFO | Schema valide pour gold_kpi_daily
+2026-08-31 17:41:59 | INFO | None
+2026-08-31 17:42:36 | INFO | gold_kpi_daily : 35 rows
+2026-08-31 17:42:36 | INFO | Partitions : 200
+2026-08-31 17:42:36 | INFO | START WRITE gold_kpi_daily
+2026-08-31 17:42:36 | INFO | Table TO SAVE : gold.gold_kpi_daily
+2026-08-31 17:42:39 | INFO | Table gold.gold_kpi_daily saved
+2026-08-31 17:42:39 | INFO | END WRITE gold_kpi_daily
+2026-08-31 17:42:39 | INFO | run completed in 277.21s
+2026-08-31 17:42:39 | INFO | ********************************************* Finished DataLoader *********************************************
+2026-08-31 17:42:39 | INFO | ========================================================================================================================
+2026-08-31 17:42:39 | INFO | MaintenanceJob started
+2026-08-31 17:42:39 | INFO | Processing silver.silver_nyc_taxi
+2026-08-31 17:44:39 | INFO | VACUUM DRY RUN on silver.silver_nyc_taxi
+2026-08-31 17:48:04 | INFO | 0 files can be removed
+2026-08-31 17:49:38 | INFO | VACUUM completed on silver.silver_nyc_taxi
+2026-08-31 17:49:38 | INFO | Maintenance completed for silver_nyc_taxi
+2026-08-31 17:49:38 | INFO | Processing gold.gold_fact_trips
+2026-08-31 17:50:28 | INFO | VACUUM DRY RUN on gold.gold_fact_trips
+2026-08-31 17:53:12 | INFO | 0 files can be removed
+2026-08-31 17:54:57 | INFO | VACUUM completed on gold.gold_fact_trips
+2026-08-31 17:54:57 | INFO | Maintenance completed for gold_fact_trips
+2026-08-31 17:54:57 | INFO | Processing gold.gold_dim_date
+2026-08-31 17:55:13 | INFO | VACUUM DRY RUN on gold.gold_dim_date
+2026-08-31 17:58:32 | INFO | 0 files can be removed
+2026-08-31 18:00:31 | INFO | VACUUM completed on gold.gold_dim_date
+2026-08-31 18:00:31 | INFO | Maintenance completed for gold_dim_date
+2026-08-31 18:00:31 | INFO | Processing gold.gold_kpi_daily
+2026-08-31 18:00:47 | INFO | VACUUM DRY RUN on gold.gold_kpi_daily
+2026-08-31 18:04:32 | INFO | 0 files can be removed
+2026-08-31 18:06:35 | INFO | VACUUM completed on gold.gold_kpi_daily
+2026-08-31 18:06:35 | INFO | Maintenance completed for gold_kpi_daily
+2026-08-31 18:06:35 | INFO | MaintenanceJob finished
+2026-08-31 18:06:49 | INFO | audit_table = audit.audit_load
+2026-08-31 18:07:03 | INFO | Inserting row count for bronze with 4145257 rows
+2026-08-31 18:07:03 | INFO | Inserting row count for silver with 3955117 rows
+2026-08-31 18:07:03 | INFO | Inserting row count for silver_nyc_taxi with 3955117 rows
+2026-08-31 18:07:03 | INFO | Inserting row count for gold_fact_trips with 3955117 rows
+2026-08-31 18:07:03 | INFO | Inserting row count for gold_dim_date with 35 rows
+2026-08-31 18:07:03 | INFO | Inserting row count for gold_kpi_daily with 35 rows
+2026-08-31 18:20:30 | INFO | file:/D:/data-ai-engineer-roadmap/nyc_taxi/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 18:20:30 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 18:20:40 | INFO | Already registered : audit.audit_load
+2026-08-31 18:20:40 | INFO | Already registered : audit.audit_row_count
+2026-08-31 18:20:40 | INFO | Already registered : gold.gold_dim_date
+2026-08-31 18:20:40 | INFO | Already registered : gold.gold_dim_location
+2026-08-31 18:20:40 | INFO | Already registered : gold.gold_fact_trips
+2026-08-31 18:20:40 | INFO | Already registered : gold.gold_kpi_daily
+2026-08-31 18:20:40 | INFO | Already registered : ref.gold_dim_location
+2026-08-31 18:20:40 | INFO | Already registered : silver.silver_nyc_taxi
+2026-08-31 18:20:40 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 18:20:40 | INFO | env       : local
+2026-08-31 18:20:40 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 18:20:40 | INFO | periode   : 202503
+2026-08-31 18:20:40 | INFO | taxi_type : yellow
+2026-08-31 18:20:40 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 18:20:40 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:20:40 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 18:20:40 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:20:40 | INFO | CATALOG : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 18:20:40 | INFO | full_table_name : audit.audit_load
+2026-08-31 18:20:40 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 18:20:40 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 18:20:40 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 18:20:40 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 18:20:40 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 18:20:40 | INFO | context.env = local
+2026-08-31 18:20:40 | INFO | CATALOG : nyc_taxi
+2026-08-31 18:20:40 | INFO | liste steps : [<nyc_taxi.src.bronze.uber_bronze.UberBronze object at 0x000001E88D1C5CD0>, <nyc_taxi.src.silver.uber_silver.UberSilver object at 0x000001E88C017C50>, <nyc_taxi.src.gold.uber_gold.UberGold object at 0x000001E88D04ED10>, <nyc_taxi.src.loader.data_loader.DataLoader object at 0x000001E88D1DE650>]
+2026-08-31 18:20:40 | INFO | ========================================================================================================================
+2026-08-31 18:20:40 | INFO | context.row_count = {}
+2026-08-31 18:20:40 | INFO | ========================================================================================================================
+2026-08-31 18:20:40 | INFO | ************************* periode : 202503
+2026-08-31 18:20:40 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 18:20:40 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 18:20:40 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 18:20:40 | INFO | ========================================================================================================================
+2026-08-31 18:20:40 | INFO | audit_table : audit.audit_load
+2026-08-31 18:20:45 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 18:21:09 | INFO | Period 202503 already loaded =====================================================================================
+2026-08-31 18:21:09 | INFO | ========================================================================================================================
+2026-08-31 18:27:25 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 18:27:33 | INFO | Already registered : audit.audit_load
+2026-08-31 18:27:33 | INFO | Already registered : audit.audit_row_count
+2026-08-31 18:27:33 | INFO | Already registered : gold.gold_dim_date
+2026-08-31 18:27:33 | INFO | Already registered : gold.gold_dim_location
+2026-08-31 18:27:33 | INFO | Already registered : gold.gold_fact_trips
+2026-08-31 18:27:33 | INFO | Already registered : gold.gold_kpi_daily
+2026-08-31 18:27:33 | INFO | Already registered : ref.gold_dim_location
+2026-08-31 18:27:33 | INFO | Already registered : silver.silver_nyc_taxi
+2026-08-31 18:27:33 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 18:27:33 | INFO | env       : local
+2026-08-31 18:27:33 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 18:27:33 | INFO | periode   : 202503
+2026-08-31 18:27:33 | INFO | taxi_type : yellow
+2026-08-31 18:27:33 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 18:27:33 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:27:33 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 18:27:33 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:27:33 | INFO | CATALOG : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 18:27:33 | INFO | full_table_name : audit.audit_load
+2026-08-31 18:27:33 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 18:27:33 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 18:27:33 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 18:27:33 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 18:27:33 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 18:27:33 | INFO | context.env = local
+2026-08-31 18:27:33 | INFO | CATALOG : nyc_taxi
+2026-08-31 18:27:33 | INFO | liste steps : [<nyc_taxi.src.bronze.uber_bronze.UberBronze object at 0x00000247581C2510>, <nyc_taxi.src.silver.uber_silver.UberSilver object at 0x00000247565AF150>, <nyc_taxi.src.gold.uber_gold.UberGold object at 0x00000247565CB550>, <nyc_taxi.src.loader.data_loader.DataLoader object at 0x0000024758198690>]
+2026-08-31 18:27:33 | INFO | ========================================================================================================================
+2026-08-31 18:27:33 | INFO | context.row_count = {}
+2026-08-31 18:27:33 | INFO | ========================================================================================================================
+2026-08-31 18:27:33 | INFO | ************************* periode : 202503
+2026-08-31 18:27:33 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 18:27:33 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 18:27:33 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 18:27:33 | INFO | ========================================================================================================================
+2026-08-31 18:27:33 | INFO | audit_table : audit.audit_load
+2026-08-31 18:27:40 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 18:28:20 | INFO | Period 202503 already loaded =====================================================================================
+2026-08-31 18:28:20 | INFO | ========================================================================================================================
+2026-08-31 18:29:45 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 18:30:31 | INFO | Registered : audit.audit_load
+2026-08-31 18:30:33 | INFO | Registered : audit.audit_row_count
+2026-08-31 18:30:39 | INFO | Registered : gold.gold_dim_date
+2026-08-31 18:30:40 | INFO | Registered : gold.gold_dim_location
+2026-08-31 18:30:41 | INFO | Registered : gold.gold_fact_trips
+2026-08-31 18:30:42 | INFO | Registered : gold.gold_kpi_daily
+2026-08-31 18:30:43 | INFO | Registered : ref.gold_dim_location
+2026-08-31 18:30:44 | INFO | Registered : silver.silver_nyc_taxi
+2026-08-31 18:30:44 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 18:30:44 | INFO | env       : local
+2026-08-31 18:30:44 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 18:30:44 | INFO | periode   : 202503
+2026-08-31 18:30:44 | INFO | taxi_type : yellow
+2026-08-31 18:30:44 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 18:30:44 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:30:44 | INFO | project_root D:\data-ai-engineer-roadmap
+2026-08-31 18:30:44 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:30:44 | INFO | CATALOG : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 18:30:44 | INFO | full_table_name : audit.audit_load
+2026-08-31 18:30:44 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 18:30:44 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 18:30:44 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 18:30:44 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 18:30:44 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 18:30:44 | INFO | context.env = local
+2026-08-31 18:30:44 | INFO | CATALOG : nyc_taxi
+2026-08-31 18:30:44 | INFO | liste steps : [<nyc_taxi.src.bronze.uber_bronze.UberBronze object at 0x0000020EF0BB6250>, <nyc_taxi.src.silver.uber_silver.UberSilver object at 0x0000020EF0A3F810>, <nyc_taxi.src.gold.uber_gold.UberGold object at 0x0000020EEF9C6F90>, <nyc_taxi.src.loader.data_loader.DataLoader object at 0x0000020EF0BB5E90>]
+2026-08-31 18:30:44 | INFO | ========================================================================================================================
+2026-08-31 18:30:44 | INFO | context.row_count = {}
+2026-08-31 18:30:44 | INFO | ========================================================================================================================
+2026-08-31 18:30:44 | INFO | ************************* periode : 202503
+2026-08-31 18:30:44 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 18:30:44 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 18:30:44 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 18:30:44 | INFO | ========================================================================================================================
+2026-08-31 18:30:44 | INFO | audit_table : audit.audit_load
+2026-08-31 18:30:45 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 18:31:02 | INFO | Period 202503 already loaded =====================================================================================
+2026-08-31 18:31:02 | INFO | ========================================================================================================================
+2026-08-31 18:45:32 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 18:45:44 | INFO | Already registered : audit.audit_load
+2026-08-31 18:45:45 | INFO | Already registered : audit.audit_row_count
+2026-08-31 18:45:45 | INFO | Already registered : gold.gold_dim_date
+2026-08-31 18:45:45 | INFO | Already registered : gold.gold_dim_location
+2026-08-31 18:45:45 | INFO | Already registered : gold.gold_fact_trips
+2026-08-31 18:45:45 | INFO | Already registered : gold.gold_kpi_daily
+2026-08-31 18:45:45 | INFO | Already registered : ref.gold_dim_location
+2026-08-31 18:45:45 | INFO | Already registered : silver.silver_nyc_taxi
+2026-08-31 18:45:45 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 18:45:45 | INFO | env       : local
+2026-08-31 18:45:45 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 18:45:45 | INFO | periode   : 202503
+2026-08-31 18:45:45 | INFO | taxi_type : yellow
+2026-08-31 18:45:45 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 18:45:45 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:45:45 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 18:45:45 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 18:45:45 | INFO | path_sql_schema : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 18:45:45 | INFO | full_table_name : audit.audit_load
+2026-08-31 18:45:45 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 18:45:45 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 18:45:45 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 18:45:45 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 18:45:45 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 18:45:45 | INFO | Environnement = local
+2026-08-31 18:45:45 | INFO | catalog_name : nyc_taxi
+2026-08-31 18:45:45 | INFO | 
+ ========================================================================================================================
+2026-08-31 18:45:45 | INFO | context.row_count = {}
+2026-08-31 18:45:45 | INFO | 
+ ========================================================================================================================
+2026-08-31 18:45:45 | INFO | ************************* periode : 202503
+2026-08-31 18:45:45 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 18:45:45 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 18:45:45 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 18:45:45 | INFO | ========================================================================================================================
+2026-08-31 18:45:45 | INFO | audit_table : audit.audit_load
+2026-08-31 18:45:50 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 18:46:24 | INFO | Period 202503 already loaded =====================================================================================
+2026-08-31 18:46:24 | INFO | ========================================================================================================================
+2026-08-31 19:00:15 | INFO | ========================================================================================================================
+2026-08-31 19:00:15 | INFO | cwd = D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 19:00:16 | INFO | warehouse = file:/D:/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 19:00:16 | INFO | ========================================================================================================================
+2026-08-31 19:00:16 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 19:00:50 | INFO | Registered : audit.audit_load
+2026-08-31 19:00:51 | INFO | Registered : audit.audit_row_count
+2026-08-31 19:00:53 | INFO | Registered : gold.gold_dim_date
+2026-08-31 19:00:54 | INFO | Registered : gold.gold_dim_location
+2026-08-31 19:00:55 | INFO | Registered : gold.gold_fact_trips
+2026-08-31 19:00:56 | INFO | Registered : gold.gold_kpi_daily
+2026-08-31 19:00:56 | INFO | Registered : ref.gold_dim_location
+2026-08-31 19:00:57 | INFO | Registered : silver.silver_nyc_taxi
+2026-08-31 19:00:57 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 19:00:57 | INFO | env       : local
+2026-08-31 19:00:57 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 19:00:57 | INFO | periode   : 202503
+2026-08-31 19:00:57 | INFO | taxi_type : yellow
+2026-08-31 19:00:57 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 19:00:57 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 19:00:57 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 19:00:57 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 19:00:57 | INFO | path_sql_schema : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 19:00:57 | INFO | full_table_name : audit.audit_load
+2026-08-31 19:00:57 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 19:00:57 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 19:00:57 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 19:00:57 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 19:00:57 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 19:00:57 | INFO | Environnement = local
+2026-08-31 19:00:57 | INFO | catalog_name : nyc_taxi
+2026-08-31 19:00:57 | INFO | 
+ ========================================================================================================================
+2026-08-31 19:00:57 | INFO | context.row_count = {}
+2026-08-31 19:00:57 | INFO | 
+ ========================================================================================================================
+2026-08-31 19:00:57 | INFO | ************************* periode : 202503
+2026-08-31 19:00:57 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 19:00:57 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 19:00:57 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 19:00:57 | INFO | ========================================================================================================================
+2026-08-31 19:00:57 | INFO | audit_table : audit.audit_load
+2026-08-31 19:00:58 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 19:01:14 | INFO | Period 202503 already loaded =====================================================================================
+2026-08-31 19:01:14 | INFO | ========================================================================================================================
+2026-08-31 19:03:34 | INFO | ========================================================================================================================
+2026-08-31 19:03:34 | INFO | cwd = D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 19:03:35 | INFO | warehouse = file:/D:/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 19:03:35 | INFO | ========================================================================================================================
+2026-08-31 19:03:35 | INFO | Scanning warehouse : D:\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 19:03:42 | INFO | Already registered : audit.audit_load
+2026-08-31 19:03:42 | INFO | Already registered : audit.audit_row_count
+2026-08-31 19:03:42 | INFO | Already registered : gold.gold_dim_date
+2026-08-31 19:03:42 | INFO | Already registered : gold.gold_dim_location
+2026-08-31 19:03:42 | INFO | Already registered : gold.gold_fact_trips
+2026-08-31 19:03:42 | INFO | Already registered : gold.gold_kpi_daily
+2026-08-31 19:03:42 | INFO | Already registered : ref.gold_dim_location
+2026-08-31 19:03:42 | INFO | Already registered : silver.silver_nyc_taxi
+2026-08-31 19:03:42 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202503', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 19:03:42 | INFO | env       : local
+2026-08-31 19:03:42 | INFO | args      : Namespace(env='local', periode=202503, taxi_type='yellow')
+2026-08-31 19:03:42 | INFO | periode   : 202503
+2026-08-31 19:03:42 | INFO | taxi_type : yellow
+2026-08-31 19:03:42 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 19:03:42 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 19:03:42 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 19:03:42 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 19:03:42 | INFO | path_sql_schema : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 19:03:42 | INFO | full_table_name : audit.audit_load
+2026-08-31 19:03:42 | INFO | full_table_name : audit.audit_row_count
+2026-08-31 19:03:42 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-08-31 19:03:42 | INFO | full_table_name : gold.gold_fact_trips
+2026-08-31 19:03:42 | INFO | full_table_name : gold.gold_dim_date
+2026-08-31 19:03:42 | INFO | full_table_name : gold.gold_kpi_daily
+2026-08-31 19:03:42 | INFO | Environnement = local
+2026-08-31 19:03:42 | INFO | catalog_name : nyc_taxi
+2026-08-31 19:03:42 | INFO | 
+ ========================================================================================================================
+2026-08-31 19:03:42 | INFO | context.row_count = {}
+2026-08-31 19:03:42 | INFO | 
+ ========================================================================================================================
+2026-08-31 19:03:42 | INFO | ************************* periode : 202503
+2026-08-31 19:03:42 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 19:03:42 | INFO | ******************** periode : 202503 ******************** 
+2026-08-31 19:03:42 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 19:03:42 | INFO | ========================================================================================================================
+2026-08-31 19:03:42 | INFO | audit_table : audit.audit_load
+2026-08-31 19:03:46 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 19:04:08 | INFO | Period 202503 already loaded =====================================================================================
+2026-08-31 19:04:08 | INFO | ========================================================================================================================
+2026-08-31 23:05:48 | INFO | ========================================================================================================================
+2026-08-31 23:05:48 | INFO | cwd = D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 23:05:49 | INFO | warehouse = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-08-31 23:05:49 | INFO | ========================================================================================================================
+2026-08-31 23:05:49 | INFO | Scanning warehouse : \mnt\d\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 23:05:49 | WARNING | Warehouse does not exist : \mnt\d\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 23:05:49 | INFO | sys.argv  : ['D:\\data-ai-engineer-roadmap\\nyc_taxi\\src\\jobs\\pipeline_runner_jobs_bundles.py', '--periode', '202504', '--taxi_type', 'yellow', '--env', 'local']
+2026-08-31 23:05:49 | INFO | env       : local
+2026-08-31 23:05:49 | INFO | args      : Namespace(env='local', periode=202504, taxi_type='yellow')
+2026-08-31 23:05:49 | INFO | periode   : 202504
+2026-08-31 23:05:49 | INFO | taxi_type : yellow
+2026-08-31 23:05:49 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 23:05:49 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 23:05:49 | INFO | project_root : D:\data-ai-engineer-roadmap
+2026-08-31 23:05:49 | INFO | Loading config from D:\data-ai-engineer-roadmap\config\variable_environnement.yaml
+2026-08-31 23:05:49 | INFO | path_sql_schema : D:/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-08-31 23:05:49 | INFO | full_table_name : audit.audit_load
+2026-08-31 23:06:14 | INFO | ================================================================================
+2026-08-31 23:06:14 | INFO | Initialisation environnement
+2026-08-31 23:06:14 | INFO | ================================================================================
+2026-08-31 23:06:14 | INFO | Création des schémas
+2026-08-31 23:06:18 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\audit_load.json
+2026-08-31 23:06:18 | INFO | Création table : audit.audit_load
+2026-08-31 23:06:18 | INFO | Table exists audit.audit_load = False
+2026-08-31 23:06:18 | INFO | Creating table : audit.audit_load
+2026-08-31 23:06:18 | INFO | 
+        CREATE TABLE IF NOT EXISTS audit.audit_load
+        (
+            run_id BIGINT NOT NULL,
+periode INT NOT NULL,
+table_name STRING NOT NULL,
+taxi_type STRING NOT NULL,
+status STRING NOT NULL,
+start_time TIMESTAMP NOT NULL,
+end_time TIMESTAMP NOT NULL,
+duration_seconds DECIMAL(18,2),
+error_step STRING,
+message STRING
+        )
+        USING DELTA
+        
+        
+2026-08-31 23:06:27 | INFO | Table created : audit.audit_load
+2026-08-31 23:06:27 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\audit_row_count.json
+2026-08-31 23:06:27 | INFO | Création table : audit.audit_row_count
+2026-08-31 23:06:27 | INFO | Table exists audit.audit_row_count = False
+2026-08-31 23:06:27 | INFO | Creating table : audit.audit_row_count
+2026-08-31 23:06:27 | INFO | 
+        CREATE TABLE IF NOT EXISTS audit.audit_row_count
+        (
+            run_id BIGINT NOT NULL,
+periode INT NOT NULL,
+table_name STRING NOT NULL,
+row_count BIGINT NOT NULL,
+created_at TIMESTAMP NOT NULL
+        )
+        USING DELTA
+        
+        
+2026-08-31 23:06:28 | INFO | Table created : audit.audit_row_count
+2026-08-31 23:06:28 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\silver_nyc_taxi.json
+2026-08-31 23:06:28 | INFO | Création table : silver.silver_nyc_taxi
+2026-08-31 23:06:28 | INFO | Table exists silver.silver_nyc_taxi = False
+2026-08-31 23:06:28 | INFO | Creating table : silver.silver_nyc_taxi
+2026-08-31 23:06:28 | INFO | 
+        CREATE TABLE IF NOT EXISTS silver.silver_nyc_taxi
+        (
+            VendorID INT,
+tpep_pickup_datetime TIMESTAMP,
+tpep_dropoff_datetime TIMESTAMP,
+passenger_count INT,
+trip_distance DECIMAL(19,5),
+RatecodeID BIGINT,
+store_and_fwd_flag STRING,
+PULocationID INT,
+DOLocationID INT,
+payment_type TINYINT,
+fare_amount DECIMAL(19,5),
+extra DECIMAL(19,5),
+mta_tax DECIMAL(19,5),
+tip_amount DECIMAL(19,5),
+tolls_amount DECIMAL(19,5),
+improvement_surcharge DECIMAL(19,5),
+total_amount DECIMAL(19,5),
+congestion_surcharge DECIMAL(19,5),
+Airport_fee DECIMAL(19,5),
+cbd_congestion_fee DECIMAL(19,5),
+periode INT NOT NULL,
+trip_duration_minute DECIMAL(19,5),
+trip_date INT,
+tip_percent DECIMAL(10,2),
+average_speed DECIMAL(10,2),
+pickup_hour INT,
+pickup_day_of_week INT,
+pickup_month INT,
+pickup_year INT
+        )
+        USING DELTA
+        PARTITIONED BY (periode)
+        
+2026-08-31 23:06:29 | INFO | Table created : silver.silver_nyc_taxi
+2026-08-31 23:06:29 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_fact_trips.json
+2026-08-31 23:06:29 | INFO | Création table : gold.gold_fact_trips
+2026-08-31 23:06:29 | INFO | Table exists gold.gold_fact_trips = False
+2026-08-31 23:06:29 | INFO | Creating table : gold.gold_fact_trips
+2026-08-31 23:06:29 | INFO | 
+        CREATE TABLE IF NOT EXISTS gold.gold_fact_trips
+        (
+            periode INT NOT NULL,
+trip_date INT NOT NULL,
+date DATE NOT NULL,
+PULocationID INT,
+DOLocationID INT,
+trip_duration_minute DECIMAL(19,5),
+trip_distance DECIMAL(19,5),
+passenger_count INT,
+fare_amount DECIMAL(19,5),
+tip_amount DECIMAL(19,5),
+total_amount DECIMAL(19,5),
+payment_type TINYINT
+        )
+        USING DELTA
+        PARTITIONED BY (periode)
+        
+2026-08-31 23:06:31 | INFO | Table created : gold.gold_fact_trips
+2026-08-31 23:06:31 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_kpi_daily.json
+2026-08-31 23:06:31 | INFO | Création table : gold.gold_kpi_daily
+2026-08-31 23:06:31 | INFO | Table exists gold.gold_kpi_daily = False
+2026-08-31 23:06:31 | INFO | Creating table : gold.gold_kpi_daily
+2026-08-31 23:06:31 | INFO | 
+        CREATE TABLE IF NOT EXISTS gold.gold_kpi_daily
+        (
+            periode INT NOT NULL,
+trip_date INT NOT NULL,
+nb_trips BIGINT NOT NULL,
+revenue DECIMAL(19,2),
+avg_distance DECIMAL(19,2),
+avg_tip DECIMAL(19,2),
+avg_revenue_per_trip DECIMAL(19,2),
+total_tips DECIMAL(19,2),
+total_distance DECIMAL(19,2),
+revenue_per_distance DECIMAL(19,2),
+avg_passengers_per_trip DECIMAL(19,2),
+avg_trip_duration DECIMAL(19,2),
+avg_tip_percent DECIMAL(19,2),
+avg_speed DECIMAL(19,2)
+        )
+        USING DELTA
+        PARTITIONED BY (periode)
+        
+2026-08-31 23:06:32 | INFO | Table created : gold.gold_kpi_daily
+2026-08-31 23:06:32 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_date.json
+2026-08-31 23:06:32 | INFO | Création table : gold.gold_dim_date
+2026-08-31 23:06:32 | INFO | Table exists gold.gold_dim_date = False
+2026-08-31 23:06:32 | INFO | Creating table : gold.gold_dim_date
+2026-08-31 23:06:32 | INFO | 
+        CREATE TABLE IF NOT EXISTS gold.gold_dim_date
+        (
+            periode INT NOT NULL,
+date DATE NOT NULL,
+year SMALLINT NOT NULL,
+quarter TINYINT NOT NULL,
+month TINYINT NOT NULL,
+day TINYINT NOT NULL,
+day_of_week TINYINT NOT NULL,
+day_name STRING NOT NULL,
+month_name STRING NOT NULL,
+trip_date INT NOT NULL
+        )
+        USING DELTA
+        
+        
+2026-08-31 23:06:33 | INFO | Table created : gold.gold_dim_date
+2026-08-31 23:06:33 | INFO | Schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_location.json
+2026-08-31 23:06:33 | INFO | Création table : ref.gold_dim_location
+2026-08-31 23:06:33 | INFO | Table exists ref.gold_dim_location = False
+2026-08-31 23:06:33 | INFO | Creating table : ref.gold_dim_location
+2026-08-31 23:06:33 | INFO | 
+        CREATE TABLE IF NOT EXISTS ref.gold_dim_location
+        (
+            location_id INT NOT NULL,
+Borough STRING,
+Zone STRING,
+service_zone STRING
+        )
+        USING DELTA
+        
+        
+2026-08-31 23:06:34 | INFO | Table created : ref.gold_dim_location
+2026-08-31 23:06:34 | INFO | Réparation metastore local
+2026-08-31 23:06:34 | INFO | Scanning warehouse : \mnt\d\data-ai-engineer-roadmap\spark-warehouse
+2026-08-31 23:06:34 | INFO | Checking table : audit.audit_load
+2026-08-31 23:06:34 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/audit.db/audit_load
+2026-08-31 23:06:34 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/audit.db/audit_load
+2026-08-31 23:06:34 | INFO | Already registered correctly : audit.audit_load
+2026-08-31 23:06:34 | INFO | Checking table : audit.audit_row_count
+2026-08-31 23:06:35 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/audit.db/audit_row_count
+2026-08-31 23:06:35 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/audit.db/audit_row_count
+2026-08-31 23:06:35 | INFO | Already registered correctly : audit.audit_row_count
+2026-08-31 23:06:35 | INFO | Checking table : gold.gold_dim_date
+2026-08-31 23:06:35 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_dim_date
+2026-08-31 23:06:35 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_dim_date
+2026-08-31 23:06:35 | INFO | Already registered correctly : gold.gold_dim_date
+2026-08-31 23:06:35 | INFO | Checking table : gold.gold_fact_trips
+2026-08-31 23:06:35 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_fact_trips
+2026-08-31 23:06:35 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_fact_trips
+2026-08-31 23:06:35 | INFO | Already registered correctly : gold.gold_fact_trips
+2026-08-31 23:06:35 | INFO | Checking table : gold.gold_kpi_daily
+2026-08-31 23:06:35 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_kpi_daily
+2026-08-31 23:06:35 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/gold.db/gold_kpi_daily
+2026-08-31 23:06:35 | INFO | Already registered correctly : gold.gold_kpi_daily
+2026-08-31 23:06:35 | INFO | Checking table : ref.gold_dim_location
+2026-08-31 23:06:35 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/ref.db/gold_dim_location
+2026-08-31 23:06:35 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/ref.db/gold_dim_location
+2026-08-31 23:06:35 | INFO | Already registered correctly : ref.gold_dim_location
+2026-08-31 23:06:35 | INFO | Checking table : silver.silver_nyc_taxi
+2026-08-31 23:06:36 | INFO | Current location   : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/silver.db/silver_nyc_taxi
+2026-08-31 23:06:36 | INFO | Expected location  : D:/mnt/d/data-ai-engineer-roadmap/spark-warehouse/silver.db/silver_nyc_taxi
+2026-08-31 23:06:36 | INFO | Already registered correctly : silver.silver_nyc_taxi
+2026-08-31 23:06:36 | INFO | ================================================================================
+2026-08-31 23:06:36 | INFO | Initialisation terminée
+2026-08-31 23:06:36 | INFO | ================================================================================
+2026-08-31 23:06:36 | INFO | Environnement = local
+2026-08-31 23:06:36 | INFO | catalog_name : nyc_taxi
+2026-08-31 23:06:36 | INFO | 
+ ========================================================================================================================
+2026-08-31 23:06:36 | INFO | context.row_count = {}
+2026-08-31 23:06:36 | INFO | 
+ ========================================================================================================================
+2026-08-31 23:06:36 | INFO | ************************* periode : 202504
+2026-08-31 23:06:36 | INFO | ******************** taxi_type : yellow ******************** 
+2026-08-31 23:06:36 | INFO | ******************** periode : 202504 ******************** 
+2026-08-31 23:06:36 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-08-31 23:06:36 | INFO | ========================================================================================================================
+2026-08-31 23:06:36 | INFO | audit_table : audit.audit_load
+2026-08-31 23:06:36 | INFO | Tables disponibles dans le catalogue : []
+2026-08-31 23:06:47 | INFO | ********************************************* Starting UberBronze *********************************************
+2026-08-31 23:06:47 | INFO | File name: yellow_tripdata_2025-04.parquet
+2026-08-31 23:06:47 | INFO | get_file_name completed in 0.0s
+2026-08-31 23:06:47 | INFO | File name: yellow_tripdata_2025-04.parquet
+2026-08-31 23:06:47 | INFO | get_file_name completed in 0.0s
+2026-08-31 23:06:47 | INFO | get_path_file completed in 0.0s
+2026-08-31 23:06:47 | INFO | ========================= dataset_url https://d37ci6vzurychx.cloudfront.net/trip-data ========================= 
+2026-08-31 23:06:47 | INFO | Bronze path : D:\data-ai-engineer-roadmap\data\bronze\raw_files
+2026-08-31 23:06:47 | INFO | Extracting yellow_tripdata_2025-04.parquet from D:\data-ai-engineer-roadmap\data\bronze\raw_files\yellow\2025\yellow_tripdata_2025-04.parquet
+2026-08-31 23:06:47 | INFO | ========================= Downloading yellow_tripdata_2025-04.parquet ========================= 
+2026-08-31 23:07:05 | INFO | ======================================================= Bronze rows : 3970553 ======================================================= 
+2026-08-31 23:07:05 | INFO | run completed in 18.05s
+2026-08-31 23:07:05 | INFO | ********************************************* Finished UberBronze *********************************************
+2026-08-31 23:07:05 | INFO | ========================================================================================================================
+2026-08-31 23:07:05 | INFO | ********************************************* Starting UberSilver *********************************************
+2026-08-31 23:07:05 | INFO | add_trip_duration completed in 0.03s
+2026-08-31 23:07:05 | INFO | add_date_key completed in 0.04s
+2026-08-31 23:07:05 | INFO | add_tip_percent completed in 0.02s
+2026-08-31 23:07:05 | INFO | add_average_speed completed in 0.03s
+2026-08-31 23:07:05 | INFO | add_date_features completed in 0.08s
+2026-08-31 23:07:05 | INFO | cast_columns completed in 0.11s
+2026-08-31 23:07:05 | INFO | apply_quality_rules completed in 0.05s
+2026-08-31 23:07:10 | INFO | Silver rows : 3970553 -> 3776318
+2026-08-31 23:07:10 | INFO | Environment : local
+2026-08-31 23:07:10 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 23:07:10 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 23:07:10 | INFO | path_manager : <nyc_taxi.src.common.path_manager.PathManager object at 0x000001FD38433710>
+2026-08-31 23:07:15 | INFO | run completed in 10.27s
+2026-08-31 23:07:15 | INFO | ********************************************* Finished UberSilver *********************************************
+2026-08-31 23:07:15 | INFO | ========================================================================================================================
+2026-08-31 23:07:15 | INFO | ********************************************* Starting UberGold *********************************************
+2026-08-31 23:07:15 | INFO | ============ Construction des DataFrames Gold ============
+2026-08-31 23:07:15 | INFO | get_fact_trips completed in 0.06s
+2026-08-31 23:07:15 | INFO | get_dim_date completed in 0.19s
+2026-08-31 23:07:16 | INFO | get_kpi_daily completed in 0.56s
+2026-08-31 23:07:16 | INFO | ============ Fin Construction Gold ============
+2026-08-31 23:07:16 | INFO | run completed in 1.32s
+2026-08-31 23:07:16 | INFO | ********************************************* Finished UberGold *********************************************
+2026-08-31 23:07:16 | INFO | ========================================================================================================================
+2026-08-31 23:07:16 | INFO | ********************************************* Starting DataLoader *********************************************
+2026-08-31 23:07:16 | INFO | Environment : local
+2026-08-31 23:07:16 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 23:07:16 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 23:07:16 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\silver_nyc_taxi.json
+2026-08-31 23:07:16 | INFO | Missing columns: set()
+2026-08-31 23:07:16 | INFO | Schema valide pour silver_nyc_taxi
+2026-08-31 23:07:17 | INFO | None
+2026-08-31 23:08:00 | INFO | silver_nyc_taxi : 3776318 rows
+2026-08-31 23:08:00 | INFO | Partitions : 2
+2026-08-31 23:08:00 | INFO | START WRITE silver_nyc_taxi
+2026-08-31 23:08:00 | INFO | Table TO SAVE : silver.silver_nyc_taxi
+2026-08-31 23:08:42 | INFO | Table silver.silver_nyc_taxi saved
+2026-08-31 23:08:42 | INFO | END WRITE silver_nyc_taxi
+2026-08-31 23:08:43 | INFO | Environment : local
+2026-08-31 23:08:43 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 23:08:43 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 23:08:43 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_fact_trips.json
+2026-08-31 23:08:43 | INFO | Missing columns: set()
+2026-08-31 23:08:43 | INFO | Schema valide pour gold_fact_trips
+2026-08-31 23:08:43 | INFO | None
+2026-08-31 23:09:02 | INFO | gold_fact_trips : 3776318 rows
+2026-08-31 23:09:02 | INFO | Partitions : 2
+2026-08-31 23:09:02 | INFO | START WRITE gold_fact_trips
+2026-08-31 23:09:02 | INFO | Table TO SAVE : gold.gold_fact_trips
+2026-08-31 23:09:15 | INFO | Table gold.gold_fact_trips saved
+2026-08-31 23:09:15 | INFO | END WRITE gold_fact_trips
+2026-08-31 23:09:15 | INFO | Environment : local
+2026-08-31 23:09:15 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 23:09:15 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 23:09:15 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_dim_date.json
+2026-08-31 23:09:15 | INFO | Missing columns: set()
+2026-08-31 23:09:15 | INFO | Schema valide pour gold_dim_date
+2026-08-31 23:09:15 | INFO | None
+2026-08-31 23:09:28 | INFO | gold_dim_date : 32 rows
+2026-08-31 23:09:28 | INFO | Partitions : 200
+2026-08-31 23:09:28 | INFO | START WRITE gold_dim_date
+2026-08-31 23:09:28 | INFO | Table TO SAVE : gold.gold_dim_date
+2026-08-31 23:09:31 | INFO | Table gold.gold_dim_date saved
+2026-08-31 23:09:31 | INFO | END WRITE gold_dim_date
+2026-08-31 23:09:31 | INFO | Environment : local
+2026-08-31 23:09:31 | INFO | Path.cwd(): D:\data-ai-engineer-roadmap\nyc_taxi
+2026-08-31 23:09:31 | INFO | Path manager initialized at D:\data-ai-engineer-roadmap\nyc_taxi\schema
+2026-08-31 23:09:31 | INFO | Validation schema : D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow\gold_kpi_daily.json
+2026-08-31 23:09:31 | INFO | Missing columns: set()
+2026-08-31 23:09:31 | INFO | Schema valide pour gold_kpi_daily
+2026-08-31 23:09:31 | INFO | None
+2026-08-31 23:09:55 | INFO | gold_kpi_daily : 32 rows
+2026-08-31 23:09:55 | INFO | Partitions : 200
+2026-08-31 23:09:55 | INFO | START WRITE gold_kpi_daily
+2026-08-31 23:09:55 | INFO | Table TO SAVE : gold.gold_kpi_daily
+2026-08-31 23:09:57 | INFO | Table gold.gold_kpi_daily saved
+2026-08-31 23:09:57 | INFO | END WRITE gold_kpi_daily
+2026-08-31 23:09:57 | INFO | run completed in 160.49s
+2026-08-31 23:09:57 | INFO | ********************************************* Finished DataLoader *********************************************
+2026-08-31 23:09:57 | INFO | ========================================================================================================================
+2026-08-31 23:09:57 | INFO | MaintenanceJob started
+2026-08-31 23:09:57 | INFO | Processing silver.silver_nyc_taxi
+2026-08-31 23:10:56 | INFO | VACUUM DRY RUN on silver.silver_nyc_taxi
+2026-08-31 23:13:16 | INFO | 0 files can be removed
+2026-08-31 23:14:38 | INFO | VACUUM completed on silver.silver_nyc_taxi
+2026-08-31 23:14:38 | INFO | Maintenance completed for silver_nyc_taxi
+2026-08-31 23:14:38 | INFO | Processing gold.gold_fact_trips
+2026-08-31 23:15:04 | INFO | VACUUM DRY RUN on gold.gold_fact_trips
+2026-08-31 23:17:10 | INFO | 0 files can be removed
+2026-08-31 23:18:32 | INFO | VACUUM completed on gold.gold_fact_trips
+2026-08-31 23:18:32 | INFO | Maintenance completed for gold_fact_trips
+2026-08-31 23:18:32 | INFO | Processing gold.gold_dim_date
+2026-08-31 23:18:38 | INFO | VACUUM DRY RUN on gold.gold_dim_date
+2026-08-31 23:20:43 | INFO | 0 files can be removed
+2026-08-31 23:21:56 | INFO | VACUUM completed on gold.gold_dim_date
+2026-08-31 23:21:56 | INFO | Maintenance completed for gold_dim_date
+2026-08-31 23:21:56 | INFO | Processing gold.gold_kpi_daily
+2026-08-31 23:22:02 | INFO | VACUUM DRY RUN on gold.gold_kpi_daily
+2026-08-31 23:25:39 | INFO | 0 files can be removed
+2026-08-31 23:26:53 | INFO | VACUUM completed on gold.gold_kpi_daily
+2026-08-31 23:26:53 | INFO | Maintenance completed for gold_kpi_daily
+2026-08-31 23:26:53 | INFO | MaintenanceJob finished
+2026-08-31 23:27:11 | INFO | audit_table = audit.audit_load
+2026-08-31 23:27:21 | INFO | Inserting row count for bronze with 3970553 rows
+2026-08-31 23:27:21 | INFO | Inserting row count for silver with 3776318 rows
+2026-08-31 23:27:21 | INFO | Inserting row count for silver_nyc_taxi with 3776318 rows
+2026-08-31 23:27:21 | INFO | Inserting row count for gold_fact_trips with 3776318 rows
+2026-08-31 23:27:21 | INFO | Inserting row count for gold_dim_date with 32 rows
+2026-08-31 23:27:21 | INFO | Inserting row count for gold_kpi_daily with 32 rows
+2026-09-01 11:05:38 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:05:38 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 11:05:47 | INFO | ========================================================================================================================
+2026-09-01 11:05:47 | INFO | cwd = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:05:47 | INFO | python    = /home/alpha/nyc_taxi_env/bin/python
+2026-09-01 11:05:48 | INFO | warehouse = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 11:05:48 | INFO | warehouse_dir = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 11:05:48 | INFO | metastore_dir = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 11:05:48 | INFO | bronze_path = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 11:05:48 | INFO | ========================================================================================================================
+2026-09-01 11:05:48 | INFO | Scanning warehouse : /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 11:05:56 | INFO | Already registered : audit.audit_load
+2026-09-01 11:05:56 | INFO | Already registered : audit.audit_row_count
+2026-09-01 11:05:56 | INFO | Already registered : gold.gold_dim_date
+2026-09-01 11:06:02 | ERROR | Error repairing gold.gold_dim_location : `gold.gold_dim_location` is not a valid name for tables/databases. Valid names only contain alphabet characters, numbers and _.
+2026-09-01 11:06:02 | INFO | Already registered : gold.gold_fact_trips
+2026-09-01 11:06:02 | INFO | Already registered : gold.gold_kpi_daily
+2026-09-01 11:06:02 | INFO | Already registered : ref.gold_dim_location
+2026-09-01 11:06:03 | INFO | Already registered : silver.silver_nyc_taxi
+2026-09-01 11:06:03 | INFO | sys.argv  : ['/mnt/d/data-ai-engineer-roadmap/nyc_taxi/src/jobs/pipeline_runner_jobs_bundles.py', '--periode', '202504', '--taxi_type', 'yellow']
+2026-09-01 11:06:03 | INFO | env       : local
+2026-09-01 11:06:03 | INFO | args      : Namespace(env='local', periode=202504, taxi_type='yellow')
+2026-09-01 11:06:03 | INFO | periode   : 202504
+2026-09-01 11:06:03 | INFO | taxi_type : yellow
+2026-09-01 11:06:03 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:06:03 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 11:06:03 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:06:03 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 11:06:03 | INFO | path_sql_schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 11:06:03 | INFO | full_table_name : audit.audit_load
+2026-09-01 11:06:03 | INFO | full_table_name : audit.audit_row_count
+2026-09-01 11:06:03 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-09-01 11:06:03 | INFO | full_table_name : gold.gold_fact_trips
+2026-09-01 11:06:03 | INFO | full_table_name : gold.gold_dim_date
+2026-09-01 11:06:03 | INFO | full_table_name : gold.gold_kpi_daily
+2026-09-01 11:06:03 | INFO | Environnement = local
+2026-09-01 11:06:03 | INFO | catalog_name : nyc_taxi
+2026-09-01 11:06:03 | INFO | 
+ ========================================================================================================================
+2026-09-01 11:06:03 | INFO | context.row_count = {}
+2026-09-01 11:06:03 | INFO | 
+ ========================================================================================================================
+2026-09-01 11:06:03 | INFO | ************************* periode : 202504
+2026-09-01 11:06:03 | INFO | ******************** taxi_type : yellow ******************** 
+2026-09-01 11:06:03 | INFO | ******************** periode : 202504 ******************** 
+2026-09-01 11:06:03 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-09-01 11:06:03 | INFO | ========================================================================================================================
+2026-09-01 11:06:03 | INFO | audit_table : audit.audit_load
+2026-09-01 11:06:03 | INFO | Tables disponibles dans le catalogue : []
+2026-09-01 11:06:12 | INFO | ********************************************* Starting UberBronze *********************************************
+2026-09-01 11:06:12 | INFO | File name: yellow_tripdata_2025-04.parquet
+2026-09-01 11:06:12 | INFO | get_file_name completed in 0.0s
+2026-09-01 11:06:12 | INFO | File name: yellow_tripdata_2025-04.parquet
+2026-09-01 11:06:12 | INFO | get_file_name completed in 0.0s
+2026-09-01 11:06:12 | INFO | get_path_file completed in 0.0s
+2026-09-01 11:06:12 | INFO | ========================= dataset_url https://d37ci6vzurychx.cloudfront.net/trip-data ========================= 
+2026-09-01 11:06:12 | INFO | Bronze path : /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 11:06:12 | INFO | Extracting yellow_tripdata_2025-04.parquet from /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files/yellow/2025/yellow_tripdata_2025-04.parquet
+2026-09-01 11:06:13 | INFO | path_file = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files/yellow/2025/yellow_tripdata_2025-04.parquet
+2026-09-01 11:06:26 | INFO | ======================================================= Bronze rows : 3970553 ======================================================= 
+2026-09-01 11:06:26 | INFO | run completed in 13.99s
+2026-09-01 11:06:26 | INFO | ********************************************* Finished UberBronze *********************************************
+2026-09-01 11:06:26 | INFO | ========================================================================================================================
+2026-09-01 11:06:26 | INFO | ********************************************* Starting UberSilver *********************************************
+2026-09-01 11:06:26 | INFO | add_trip_duration completed in 0.04s
+2026-09-01 11:06:26 | INFO | add_date_key completed in 0.04s
+2026-09-01 11:06:26 | INFO | add_tip_percent completed in 0.03s
+2026-09-01 11:06:26 | INFO | add_average_speed completed in 0.03s
+2026-09-01 11:06:27 | INFO | add_date_features completed in 0.07s
+2026-09-01 11:06:27 | INFO | cast_columns completed in 0.08s
+2026-09-01 11:06:27 | INFO | apply_quality_rules completed in 0.07s
+2026-09-01 11:06:31 | INFO | Silver rows : 3970553 -> 3776318
+2026-09-01 11:06:31 | INFO | Environment : local
+2026-09-01 11:06:31 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:06:31 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 11:06:31 | INFO | path_manager : <nyc_taxi.src.common.path_manager.PathManager object at 0x7ad6f67e6660>
+2026-09-01 11:06:35 | INFO | run completed in 8.68s
+2026-09-01 11:06:35 | INFO | ********************************************* Finished UberSilver *********************************************
+2026-09-01 11:06:35 | INFO | ========================================================================================================================
+2026-09-01 11:06:35 | INFO | ********************************************* Starting UberGold *********************************************
+2026-09-01 11:06:35 | INFO | ============ Construction des DataFrames Gold ============
+2026-09-01 11:06:35 | INFO | get_fact_trips completed in 0.06s
+2026-09-01 11:06:35 | INFO | get_dim_date completed in 0.19s
+2026-09-01 11:06:36 | INFO | get_kpi_daily completed in 0.34s
+2026-09-01 11:06:36 | INFO | ============ Fin Construction Gold ============
+2026-09-01 11:06:36 | INFO | run completed in 0.88s
+2026-09-01 11:06:36 | INFO | ********************************************* Finished UberGold *********************************************
+2026-09-01 11:06:36 | INFO | ========================================================================================================================
+2026-09-01 11:06:36 | INFO | ********************************************* Starting DataLoader *********************************************
+2026-09-01 11:06:36 | INFO | Environment : local
+2026-09-01 11:06:36 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:06:36 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 11:06:36 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/silver_nyc_taxi.json
+2026-09-01 11:06:36 | INFO | Missing columns: set()
+2026-09-01 11:06:36 | INFO | Schema valide pour silver_nyc_taxi
+2026-09-01 11:06:36 | INFO | None
+2026-09-01 11:07:16 | INFO | silver_nyc_taxi : 3776318 rows
+2026-09-01 11:07:16 | INFO | Partitions : 2
+2026-09-01 11:07:16 | INFO | START WRITE silver_nyc_taxi
+2026-09-01 11:07:16 | INFO | Table TO SAVE : silver.silver_nyc_taxi
+2026-09-01 11:08:14 | INFO | Table silver.silver_nyc_taxi saved
+2026-09-01 11:08:14 | INFO | END WRITE silver_nyc_taxi
+2026-09-01 11:08:14 | INFO | Environment : local
+2026-09-01 11:08:14 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:08:14 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 11:08:14 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_fact_trips.json
+2026-09-01 11:08:14 | INFO | Missing columns: set()
+2026-09-01 11:08:14 | INFO | Schema valide pour gold_fact_trips
+2026-09-01 11:08:14 | INFO | None
+2026-09-01 11:08:30 | INFO | gold_fact_trips : 3776318 rows
+2026-09-01 11:08:30 | INFO | Partitions : 2
+2026-09-01 11:08:30 | INFO | START WRITE gold_fact_trips
+2026-09-01 11:08:30 | INFO | Table TO SAVE : gold.gold_fact_trips
+2026-09-01 11:08:51 | INFO | Table gold.gold_fact_trips saved
+2026-09-01 11:08:51 | INFO | END WRITE gold_fact_trips
+2026-09-01 11:08:51 | INFO | Environment : local
+2026-09-01 11:08:51 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:08:51 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 11:08:51 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_dim_date.json
+2026-09-01 11:08:52 | INFO | Missing columns: set()
+2026-09-01 11:08:52 | INFO | Schema valide pour gold_dim_date
+2026-09-01 11:08:52 | INFO | None
+2026-09-01 11:09:03 | INFO | gold_dim_date : 32 rows
+2026-09-01 11:09:03 | INFO | Partitions : 200
+2026-09-01 11:09:03 | INFO | START WRITE gold_dim_date
+2026-09-01 11:09:03 | INFO | Table TO SAVE : gold.gold_dim_date
+2026-09-01 11:09:08 | INFO | Table gold.gold_dim_date saved
+2026-09-01 11:09:08 | INFO | END WRITE gold_dim_date
+2026-09-01 11:09:08 | INFO | Environment : local
+2026-09-01 11:09:08 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 11:09:08 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 11:09:08 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_kpi_daily.json
+2026-09-01 11:09:08 | INFO | Missing columns: set()
+2026-09-01 11:09:08 | INFO | Schema valide pour gold_kpi_daily
+2026-09-01 11:09:08 | INFO | None
+2026-09-01 11:09:27 | INFO | gold_kpi_daily : 32 rows
+2026-09-01 11:09:27 | INFO | Partitions : 200
+2026-09-01 11:09:27 | INFO | START WRITE gold_kpi_daily
+2026-09-01 11:09:27 | INFO | Table TO SAVE : gold.gold_kpi_daily
+2026-09-01 11:09:30 | INFO | Table gold.gold_kpi_daily saved
+2026-09-01 11:09:30 | INFO | END WRITE gold_kpi_daily
+2026-09-01 11:09:30 | INFO | run completed in 174.75s
+2026-09-01 11:09:30 | INFO | ********************************************* Finished DataLoader *********************************************
+2026-09-01 11:09:30 | INFO | ========================================================================================================================
+2026-09-01 11:09:30 | INFO | MaintenanceJob started
+2026-09-01 11:09:30 | INFO | Processing silver.silver_nyc_taxi
+2026-09-01 11:11:02 | INFO | VACUUM DRY RUN on silver.silver_nyc_taxi
+2026-09-01 11:13:06 | INFO | 0 files can be removed
+2026-09-01 11:14:29 | INFO | VACUUM completed on silver.silver_nyc_taxi
+2026-09-01 11:14:29 | INFO | Maintenance completed for silver_nyc_taxi
+2026-09-01 11:14:29 | INFO | Processing gold.gold_fact_trips
+2026-09-01 11:15:02 | INFO | VACUUM DRY RUN on gold.gold_fact_trips
+2026-09-01 11:16:19 | INFO | 0 files can be removed
+2026-09-01 11:17:08 | INFO | VACUUM completed on gold.gold_fact_trips
+2026-09-01 11:17:08 | INFO | Maintenance completed for gold_fact_trips
+2026-09-01 11:17:08 | INFO | Processing gold.gold_dim_date
+2026-09-01 11:17:14 | INFO | VACUUM DRY RUN on gold.gold_dim_date
+2026-09-01 11:18:42 | INFO | 0 files can be removed
+2026-09-01 11:20:00 | INFO | VACUUM completed on gold.gold_dim_date
+2026-09-01 11:20:00 | INFO | Maintenance completed for gold_dim_date
+2026-09-01 11:20:00 | INFO | Processing gold.gold_kpi_daily
+2026-09-01 11:20:08 | INFO | VACUUM DRY RUN on gold.gold_kpi_daily
+2026-09-01 11:21:55 | INFO | 0 files can be removed
+2026-09-01 11:23:55 | INFO | VACUUM completed on gold.gold_kpi_daily
+2026-09-01 11:23:55 | INFO | Maintenance completed for gold_kpi_daily
+2026-09-01 11:23:55 | INFO | MaintenanceJob finished
+2026-09-01 11:23:57 | ERROR | Audit insert failed: Could not serialize object: RecursionError: Stack overflow (used 8148 kB) while calling a Python object
+2026-09-01 11:23:57 | INFO | Inserting row count for bronze with 3970553 rows
+2026-09-01 11:23:57 | INFO | Inserting row count for silver with 3776318 rows
+2026-09-01 11:23:57 | INFO | Inserting row count for silver_nyc_taxi with 3776318 rows
+2026-09-01 11:23:57 | INFO | Inserting row count for gold_fact_trips with 3776318 rows
+2026-09-01 11:23:57 | INFO | Inserting row count for gold_dim_date with 32 rows
+2026-09-01 11:23:57 | INFO | Inserting row count for gold_kpi_daily with 32 rows
+2026-09-01 11:23:59 | ERROR | Row count insert failed: Could not serialize object: RecursionError: Stack overflow (used 8148 kB) while calling a Python object
+2026-09-01 12:45:01 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:45:01 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 12:45:08 | INFO | ========================================================================================================================
+2026-09-01 12:45:08 | INFO | cwd = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:45:08 | INFO | python    = /home/alpha/nyc_taxi_env/bin/python
+2026-09-01 12:45:10 | INFO | warehouse = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 12:45:10 | INFO | warehouse_dir = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 12:45:10 | INFO | metastore_dir = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 12:45:10 | INFO | bronze_path = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 12:45:10 | INFO | ========================================================================================================================
+2026-09-01 12:45:10 | INFO | Scanning warehouse : /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 12:45:17 | INFO | Already registered : audit.audit_load
+2026-09-01 12:45:18 | INFO | Already registered : audit.audit_row_count
+2026-09-01 12:45:18 | INFO | Already registered : gold.gold_dim_date
+2026-09-01 12:45:23 | ERROR | Error repairing gold.gold_dim_location : `gold.gold_dim_location` is not a valid name for tables/databases. Valid names only contain alphabet characters, numbers and _.
+2026-09-01 12:45:23 | INFO | Already registered : gold.gold_fact_trips
+2026-09-01 12:45:23 | INFO | Already registered : gold.gold_kpi_daily
+2026-09-01 12:45:23 | INFO | Already registered : ref.gold_dim_location
+2026-09-01 12:45:23 | INFO | Already registered : silver.silver_nyc_taxi
+2026-09-01 12:45:24 | INFO | sys.argv  : ['/mnt/d/data-ai-engineer-roadmap/nyc_taxi/src/jobs/pipeline_runner_jobs_bundles.py', '--periode', '202504', '--taxi_type', 'yellow']
+2026-09-01 12:45:24 | INFO | env       : local
+2026-09-01 12:45:24 | INFO | args      : Namespace(env='local', periode=202504, taxi_type='yellow')
+2026-09-01 12:45:24 | INFO | periode   : 202504
+2026-09-01 12:45:24 | INFO | taxi_type : yellow
+2026-09-01 12:45:24 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:45:24 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 12:45:24 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:45:24 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 12:45:24 | INFO | path_sql_schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 12:45:24 | INFO | full_table_name : audit.audit_load
+2026-09-01 12:45:24 | INFO | full_table_name : audit.audit_row_count
+2026-09-01 12:45:24 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-09-01 12:45:24 | INFO | full_table_name : gold.gold_fact_trips
+2026-09-01 12:45:24 | INFO | full_table_name : gold.gold_dim_date
+2026-09-01 12:45:24 | INFO | full_table_name : gold.gold_kpi_daily
+2026-09-01 12:45:24 | INFO | Environnement = local
+2026-09-01 12:45:24 | INFO | catalog_name : nyc_taxi
+2026-09-01 12:45:24 | INFO | 
+ ========================================================================================================================
+2026-09-01 12:45:24 | INFO | context.row_count = {}
+2026-09-01 12:45:24 | INFO | 
+ ========================================================================================================================
+2026-09-01 12:45:24 | INFO | ************************* periode : 202504
+2026-09-01 12:45:24 | INFO | ******************** taxi_type : yellow ******************** 
+2026-09-01 12:45:24 | INFO | ******************** periode : 202504 ******************** 
+2026-09-01 12:45:24 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-09-01 12:45:24 | INFO | ========================================================================================================================
+2026-09-01 12:45:24 | INFO | audit_table : audit.audit_load
+2026-09-01 12:45:25 | INFO | Tables disponibles dans le catalogue : []
+2026-09-01 12:45:35 | INFO | ********************************************* Starting UberBronze *********************************************
+2026-09-01 12:45:35 | INFO | File name: yellow_tripdata_2025-04.parquet
+2026-09-01 12:45:35 | INFO | get_file_name completed in 0.0s
+2026-09-01 12:45:35 | INFO | File name: yellow_tripdata_2025-04.parquet
+2026-09-01 12:45:35 | INFO | get_file_name completed in 0.0s
+2026-09-01 12:45:35 | INFO | get_path_file completed in 0.0s
+2026-09-01 12:45:35 | INFO | ========================= dataset_url https://d37ci6vzurychx.cloudfront.net/trip-data ========================= 
+2026-09-01 12:45:35 | INFO | Bronze path : /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 12:45:35 | INFO | Extracting yellow_tripdata_2025-04.parquet from /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files/yellow/2025/yellow_tripdata_2025-04.parquet
+2026-09-01 12:45:35 | INFO | path_file = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files/yellow/2025/yellow_tripdata_2025-04.parquet
+2026-09-01 12:45:49 | INFO | ======================================================= Bronze rows : 3970553 ======================================================= 
+2026-09-01 12:45:49 | INFO | run completed in 14.88s
+2026-09-01 12:45:50 | INFO | ********************************************* Finished UberBronze *********************************************
+2026-09-01 12:45:50 | INFO | ========================================================================================================================
+2026-09-01 12:45:50 | INFO | ********************************************* Starting UberSilver *********************************************
+2026-09-01 12:45:50 | INFO | add_trip_duration completed in 0.02s
+2026-09-01 12:45:50 | INFO | add_date_key completed in 0.03s
+2026-09-01 12:45:50 | INFO | add_tip_percent completed in 0.02s
+2026-09-01 12:45:50 | INFO | add_average_speed completed in 0.02s
+2026-09-01 12:45:50 | INFO | add_date_features completed in 0.07s
+2026-09-01 12:45:50 | INFO | cast_columns completed in 0.1s
+2026-09-01 12:45:50 | INFO | apply_quality_rules completed in 0.06s
+2026-09-01 12:45:54 | INFO | Silver rows : 3970553 -> 3776318
+2026-09-01 12:45:54 | INFO | Environment : local
+2026-09-01 12:45:55 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:45:55 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 12:45:55 | INFO | path_manager : <nyc_taxi.src.common.path_manager.PathManager object at 0x779d9f1de900>
+2026-09-01 12:45:59 | INFO | run completed in 9.69s
+2026-09-01 12:45:59 | INFO | ********************************************* Finished UberSilver *********************************************
+2026-09-01 12:45:59 | INFO | ========================================================================================================================
+2026-09-01 12:45:59 | INFO | ********************************************* Starting UberGold *********************************************
+2026-09-01 12:45:59 | INFO | ============ Construction des DataFrames Gold ============
+2026-09-01 12:45:59 | INFO | get_fact_trips completed in 0.06s
+2026-09-01 12:46:00 | INFO | get_dim_date completed in 0.21s
+2026-09-01 12:46:00 | INFO | get_kpi_daily completed in 0.35s
+2026-09-01 12:46:00 | INFO | ============ Fin Construction Gold ============
+2026-09-01 12:46:00 | INFO | run completed in 0.92s
+2026-09-01 12:46:00 | INFO | ********************************************* Finished UberGold *********************************************
+2026-09-01 12:46:00 | INFO | ========================================================================================================================
+2026-09-01 12:46:00 | INFO | ********************************************* Starting DataLoader *********************************************
+2026-09-01 12:46:00 | INFO | Environment : local
+2026-09-01 12:46:00 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:46:00 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 12:46:00 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/silver_nyc_taxi.json
+2026-09-01 12:46:00 | INFO | Missing columns: set()
+2026-09-01 12:46:00 | INFO | Schema valide pour silver_nyc_taxi
+2026-09-01 12:46:00 | INFO | None
+2026-09-01 12:46:38 | INFO | silver_nyc_taxi : 3776318 rows
+2026-09-01 12:46:38 | INFO | Partitions : 2
+2026-09-01 12:46:38 | INFO | START WRITE silver_nyc_taxi
+2026-09-01 12:46:38 | INFO | Table TO SAVE : silver.silver_nyc_taxi
+2026-09-01 12:47:37 | INFO | Table silver.silver_nyc_taxi saved
+2026-09-01 12:47:37 | INFO | END WRITE silver_nyc_taxi
+2026-09-01 12:47:37 | INFO | Environment : local
+2026-09-01 12:47:37 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:47:37 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 12:47:37 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_fact_trips.json
+2026-09-01 12:47:37 | INFO | Missing columns: set()
+2026-09-01 12:47:37 | INFO | Schema valide pour gold_fact_trips
+2026-09-01 12:47:37 | INFO | None
+2026-09-01 12:47:54 | INFO | gold_fact_trips : 3776318 rows
+2026-09-01 12:47:54 | INFO | Partitions : 2
+2026-09-01 12:47:54 | INFO | START WRITE gold_fact_trips
+2026-09-01 12:47:54 | INFO | Table TO SAVE : gold.gold_fact_trips
+2026-09-01 12:48:16 | INFO | Table gold.gold_fact_trips saved
+2026-09-01 12:48:16 | INFO | END WRITE gold_fact_trips
+2026-09-01 12:48:16 | INFO | Environment : local
+2026-09-01 12:48:16 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:48:16 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 12:48:16 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_dim_date.json
+2026-09-01 12:48:16 | INFO | Missing columns: set()
+2026-09-01 12:48:16 | INFO | Schema valide pour gold_dim_date
+2026-09-01 12:48:17 | INFO | None
+2026-09-01 12:48:25 | INFO | gold_dim_date : 32 rows
+2026-09-01 12:48:25 | INFO | Partitions : 200
+2026-09-01 12:48:25 | INFO | START WRITE gold_dim_date
+2026-09-01 12:48:25 | INFO | Table TO SAVE : gold.gold_dim_date
+2026-09-01 12:48:31 | INFO | Table gold.gold_dim_date saved
+2026-09-01 12:48:31 | INFO | END WRITE gold_dim_date
+2026-09-01 12:48:31 | INFO | Environment : local
+2026-09-01 12:48:31 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 12:48:31 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 12:48:31 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_kpi_daily.json
+2026-09-01 12:48:31 | INFO | Missing columns: set()
+2026-09-01 12:48:31 | INFO | Schema valide pour gold_kpi_daily
+2026-09-01 12:48:31 | INFO | None
+2026-09-01 12:48:52 | INFO | gold_kpi_daily : 32 rows
+2026-09-01 12:48:52 | INFO | Partitions : 200
+2026-09-01 12:48:52 | INFO | START WRITE gold_kpi_daily
+2026-09-01 12:48:52 | INFO | Table TO SAVE : gold.gold_kpi_daily
+2026-09-01 12:48:57 | INFO | Table gold.gold_kpi_daily saved
+2026-09-01 12:48:57 | INFO | END WRITE gold_kpi_daily
+2026-09-01 12:48:57 | INFO | run completed in 176.58s
+2026-09-01 12:48:57 | INFO | ********************************************* Finished DataLoader *********************************************
+2026-09-01 12:48:57 | INFO | ========================================================================================================================
+2026-09-01 12:48:57 | INFO | MaintenanceJob started
+2026-09-01 12:48:57 | INFO | Processing silver.silver_nyc_taxi
+2026-09-01 12:53:57 | INFO | VACUUM DRY RUN on silver.silver_nyc_taxi
+2026-09-01 12:55:48 | INFO | 0 files can be removed
+2026-09-01 12:56:37 | INFO | VACUUM completed on silver.silver_nyc_taxi
+2026-09-01 12:56:37 | INFO | Maintenance completed for silver_nyc_taxi
+2026-09-01 12:56:37 | INFO | Processing gold.gold_fact_trips
+2026-09-01 12:57:44 | INFO | VACUUM DRY RUN on gold.gold_fact_trips
+2026-09-01 12:59:02 | INFO | 0 files can be removed
+2026-09-01 12:59:50 | INFO | VACUUM completed on gold.gold_fact_trips
+2026-09-01 12:59:50 | INFO | Maintenance completed for gold_fact_trips
+2026-09-01 12:59:50 | INFO | Processing gold.gold_dim_date
+2026-09-01 12:59:58 | INFO | VACUUM DRY RUN on gold.gold_dim_date
+2026-09-01 13:11:03 | INFO | 0 files can be removed
+2026-09-01 13:11:51 | INFO | VACUUM completed on gold.gold_dim_date
+2026-09-01 13:11:51 | INFO | Maintenance completed for gold_dim_date
+2026-09-01 13:11:51 | INFO | Processing gold.gold_kpi_daily
+2026-09-01 13:11:59 | INFO | VACUUM DRY RUN on gold.gold_kpi_daily
+2026-09-01 13:13:12 | INFO | 0 files can be removed
+2026-09-01 13:14:01 | INFO | VACUUM completed on gold.gold_kpi_daily
+2026-09-01 13:14:01 | INFO | Maintenance completed for gold_kpi_daily
+2026-09-01 13:14:01 | INFO | MaintenanceJob finished
+2026-09-01 13:14:01 | INFO | AUDIT | run_id=1788259524 | periode=202504 | table=silver_nyc_taxi | taxi_type=yellow | status=SUCCESS
+2026-09-01 13:14:04 | ERROR | Audit insert failed: Could not serialize object: RecursionError: Stack overflow (used 8148 kB)
+2026-09-01 13:14:04 | INFO | Inserting row count for bronze with 3970553 rows
+2026-09-01 13:14:04 | INFO | Inserting row count for silver with 3776318 rows
+2026-09-01 13:14:04 | INFO | Inserting row count for silver_nyc_taxi with 3776318 rows
+2026-09-01 13:14:04 | INFO | Inserting row count for gold_fact_trips with 3776318 rows
+2026-09-01 13:14:04 | INFO | Inserting row count for gold_dim_date with 32 rows
+2026-09-01 13:14:04 | INFO | Inserting row count for gold_kpi_daily with 32 rows
+2026-09-01 13:14:05 | ERROR | Row count insert failed: Could not serialize object: RecursionError: Stack overflow (used 8148 kB) while calling a Python object
+2026-09-01 14:09:09 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 14:09:09 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 14:09:17 | INFO | ========================================================================================================================
+2026-09-01 14:09:17 | INFO | cwd = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 14:09:17 | INFO | python    = /home/alpha/nyc_taxi_env/bin/python
+2026-09-01 14:09:18 | INFO | warehouse = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 14:09:18 | INFO | warehouse_dir = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 14:09:18 | INFO | metastore_dir = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 14:09:18 | INFO | bronze_path = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 14:09:18 | INFO | ========================================================================================================================
+2026-09-01 14:09:18 | INFO | Scanning warehouse : /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 14:09:24 | INFO | Already registered : audit.audit_load
+2026-09-01 14:09:25 | INFO | Already registered : audit.audit_row_count
+2026-09-01 14:09:25 | INFO | Already registered : gold.gold_dim_date
+2026-09-01 14:09:31 | ERROR | Error repairing gold.gold_dim_location : `gold.gold_dim_location` is not a valid name for tables/databases. Valid names only contain alphabet characters, numbers and _.
+2026-09-01 14:09:31 | INFO | Already registered : gold.gold_fact_trips
+2026-09-01 14:09:31 | INFO | Already registered : gold.gold_kpi_daily
+2026-09-01 14:09:31 | INFO | Already registered : ref.gold_dim_location
+2026-09-01 14:09:32 | INFO | Already registered : silver.silver_nyc_taxi
+2026-09-01 14:09:32 | INFO | audit_table  : audit.audit_load
+2026-09-01 14:09:45 | INFO | Dernière période : 202503 -> prochaine période : 202504
+2026-09-01 15:14:35 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 15:14:35 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 15:14:42 | INFO | ========================================================================================================================
+2026-09-01 15:14:42 | INFO | cwd = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 15:14:42 | INFO | python    = /home/alpha/nyc_taxi_env/bin/python
+2026-09-01 15:14:43 | INFO | warehouse = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 15:14:43 | INFO | warehouse_dir = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 15:14:43 | INFO | metastore_dir = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 15:14:43 | INFO | bronze_path = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 15:14:43 | INFO | ========================================================================================================================
+2026-09-01 15:14:43 | INFO | Scanning warehouse : /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 15:14:50 | INFO | Already registered : audit.audit_load
+2026-09-01 15:14:51 | INFO | Already registered : audit.audit_row_count
+2026-09-01 15:14:51 | INFO | Already registered : gold.gold_dim_date
+2026-09-01 15:14:56 | ERROR | Error repairing gold.gold_dim_location : `gold.gold_dim_location` is not a valid name for tables/databases. Valid names only contain alphabet characters, numbers and _.
+2026-09-01 15:14:56 | INFO | Already registered : gold.gold_fact_trips
+2026-09-01 15:14:56 | INFO | Already registered : gold.gold_kpi_daily
+2026-09-01 15:14:57 | INFO | Already registered : ref.gold_dim_location
+2026-09-01 15:14:57 | INFO | Already registered : silver.silver_nyc_taxi
+2026-09-01 16:52:44 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 16:52:44 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 16:52:57 | INFO | ========================================================================================================================
+2026-09-01 16:52:57 | INFO | SPARK CONFIGURATION
+2026-09-01 16:52:57 | INFO | ========================================================================================================================
+2026-09-01 16:52:57 | INFO | cwd             = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 16:52:57 | INFO | python          = /home/alpha/spark4_env/bin/python
+2026-09-01 16:52:57 | INFO | spark_version   = 4.2.0
+2026-09-01 16:52:58 | INFO | warehouse       = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 16:52:58 | INFO | warehouse_dir   = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 16:52:58 | INFO | metastore_dir   = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 16:52:58 | INFO | bronze_path     = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 16:52:58 | INFO | ========================================================================================================================
+2026-09-01 16:52:58 | INFO | Checking local metastore...
+2026-09-01 16:52:58 | INFO | audit_table  : audit.audit_load
+2026-09-01 16:53:36 | INFO | Dernière période : 202503 -> prochaine période : 202504
+2026-09-01 16:55:51 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 16:55:51 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 16:56:05 | INFO | ========================================================================================================================
+2026-09-01 16:56:05 | INFO | SPARK CONFIGURATION
+2026-09-01 16:56:05 | INFO | ========================================================================================================================
+2026-09-01 16:56:05 | INFO | cwd             = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 16:56:05 | INFO | python          = /home/alpha/spark4_env/bin/python
+2026-09-01 16:56:05 | INFO | spark_version   = 4.2.0
+2026-09-01 16:56:05 | INFO | warehouse       = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 16:56:05 | INFO | warehouse_dir   = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 16:56:05 | INFO | metastore_dir   = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 16:56:05 | INFO | bronze_path     = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 16:56:05 | INFO | ========================================================================================================================
+2026-09-01 16:56:05 | INFO | Checking local metastore...
+2026-09-01 16:58:03 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 16:58:03 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 16:58:14 | INFO | ========================================================================================================================
+2026-09-01 16:58:14 | INFO | SPARK CONFIGURATION
+2026-09-01 16:58:14 | INFO | ========================================================================================================================
+2026-09-01 16:58:14 | INFO | cwd             = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 16:58:14 | INFO | python          = /home/alpha/spark4_env/bin/python
+2026-09-01 16:58:14 | INFO | spark_version   = 4.2.0
+2026-09-01 16:58:15 | INFO | warehouse       = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 16:58:15 | INFO | warehouse_dir   = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 16:58:15 | INFO | metastore_dir   = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 16:58:15 | INFO | bronze_path     = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 16:58:15 | INFO | ========================================================================================================================
+2026-09-01 16:58:15 | INFO | Checking local metastore...
+2026-09-01 16:58:15 | INFO | audit_table  : audit.audit_load
+2026-09-01 16:58:47 | INFO | Dernière période : 202503 -> prochaine période : 202504
+2026-09-01 17:00:32 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 17:00:32 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 17:00:43 | INFO | ========================================================================================================================
+2026-09-01 17:00:43 | INFO | SPARK CONFIGURATION
+2026-09-01 17:00:43 | INFO | ========================================================================================================================
+2026-09-01 17:00:43 | INFO | cwd             = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 17:00:43 | INFO | python          = /home/alpha/spark4_env/bin/python
+2026-09-01 17:00:43 | INFO | spark_version   = 4.2.0
+2026-09-01 17:00:43 | INFO | warehouse       = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 17:00:43 | INFO | warehouse_dir   = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 17:00:43 | INFO | metastore_dir   = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 17:00:43 | INFO | bronze_path     = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 17:00:43 | INFO | ========================================================================================================================
+2026-09-01 17:00:43 | INFO | Checking local metastore...
+2026-09-01 17:00:43 | INFO | audit_table  : audit.audit_load
+2026-09-01 17:01:16 | INFO | Dernière période : 202503 -> prochaine période : 202504
+2026-09-01 20:24:02 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:24:02 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 20:24:17 | INFO | ========================================================================================================================
+2026-09-01 20:24:17 | INFO | SPARK CONFIGURATION
+2026-09-01 20:24:17 | INFO | ========================================================================================================================
+2026-09-01 20:24:17 | INFO | cwd             = /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:24:17 | INFO | python          = /home/alpha/spark4_env/bin/python
+2026-09-01 20:24:17 | INFO | spark_version   = 4.2.0
+2026-09-01 20:24:17 | INFO | warehouse       = file:/mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 20:24:17 | INFO | warehouse_dir   = /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 20:24:17 | INFO | metastore_dir   = /mnt/d/data-ai-engineer-roadmap/metastore_db
+2026-09-01 20:24:17 | INFO | bronze_path     = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 20:24:17 | INFO | ========================================================================================================================
+2026-09-01 20:24:17 | INFO | Checking local metastore...
+2026-09-01 20:24:17 | INFO | Scanning warehouse : /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+2026-09-01 20:24:33 | INFO | Already registered : audit.audit_load
+2026-09-01 20:24:34 | INFO | Already registered : audit.audit_row_count
+2026-09-01 20:24:36 | INFO | Already registered : gold.gold_dim_date
+2026-09-01 20:24:37 | ERROR | Error repairing gold.gold_dim_location : [INVALID_SCHEMA_OR_RELATION_NAME] `gold`.`gold_dim_location` is not a valid name for tables/schemas. Valid names only contain alphabet characters, numbers and _. SQLSTATE: 42602
+2026-09-01 20:24:38 | INFO | Already registered : gold.gold_fact_trips
+2026-09-01 20:24:39 | INFO | Already registered : gold.gold_kpi_daily
+2026-09-01 20:24:40 | INFO | Already registered : ref.gold_dim_location
+2026-09-01 20:24:41 | INFO | Already registered : silver.silver_nyc_taxi
+2026-09-01 20:24:41 | INFO | sys.argv  : ['/mnt/d/data-ai-engineer-roadmap/nyc_taxi/src/jobs/pipeline_runner_jobs_bundles.py', '--env', 'local', '--periode', '202507', '--taxi_type', 'yellow']
+2026-09-01 20:24:41 | INFO | env       : local
+2026-09-01 20:24:41 | INFO | args      : Namespace(env='local', periode=202507, taxi_type='yellow')
+2026-09-01 20:24:41 | INFO | periode   : 202507
+2026-09-01 20:24:41 | INFO | taxi_type : yellow
+2026-09-01 20:24:41 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:24:41 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 20:24:41 | INFO | project_root : /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:24:41 | INFO | Loading config from /mnt/d/data-ai-engineer-roadmap/config/variable_environnement.yaml
+2026-09-01 20:24:41 | INFO | Période fournie explicitement : 202507
+2026-09-01 20:24:41 | INFO | Période sélectionnée automatiquement : None
+2026-09-01 20:24:41 | INFO | path_sql_schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 20:24:41 | INFO | full_table_name : audit.audit_load
+2026-09-01 20:24:41 | INFO | full_table_name : audit.audit_row_count
+2026-09-01 20:24:41 | INFO | full_table_name : silver.silver_nyc_taxi
+2026-09-01 20:24:43 | INFO | full_table_name : gold.gold_fact_trips
+2026-09-01 20:24:43 | INFO | full_table_name : gold.gold_dim_date
+2026-09-01 20:24:44 | INFO | full_table_name : gold.gold_kpi_daily
+2026-09-01 20:24:45 | INFO | Environnement = local
+2026-09-01 20:24:45 | INFO | catalog_name : nyc_taxi
+2026-09-01 20:24:45 | INFO | 
+ ========================================================================================================================
+2026-09-01 20:24:45 | INFO | context.row_count = {}
+2026-09-01 20:24:45 | INFO | 
+ ========================================================================================================================
+2026-09-01 20:24:45 | INFO | ************************* periode : 202507
+2026-09-01 20:24:45 | INFO | ******************** taxi_type : yellow ******************** 
+2026-09-01 20:24:45 | INFO | ******************** periode : 202507 ******************** 
+2026-09-01 20:24:45 | INFO | ******************** table_name : silver_nyc_taxi ******************** 
+2026-09-01 20:24:45 | INFO | ========================================================================================================================
+2026-09-01 20:24:45 | INFO | audit_table : audit.audit_load
+2026-09-01 20:24:45 | INFO | Tables disponibles dans le catalogue : []
+2026-09-01 20:25:00 | INFO | ********************************************* Starting UberBronze *********************************************
+2026-09-01 20:25:00 | INFO | File name: yellow_tripdata_2025-07.parquet
+2026-09-01 20:25:00 | INFO | get_file_name completed in 0.0s
+2026-09-01 20:25:00 | INFO | File name: yellow_tripdata_2025-07.parquet
+2026-09-01 20:25:00 | INFO | get_file_name completed in 0.0s
+2026-09-01 20:25:00 | INFO | get_path_file completed in 0.0s
+2026-09-01 20:25:00 | INFO | ========================= dataset_url https://d37ci6vzurychx.cloudfront.net/trip-data ========================= 
+2026-09-01 20:25:00 | INFO | Bronze path : /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files
+2026-09-01 20:25:00 | INFO | Extracting yellow_tripdata_2025-07.parquet from /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-09-01 20:25:00 | INFO | ========================= Downloading yellow_tripdata_2025-07.parquet ========================= 
+2026-09-01 20:25:04 | INFO | path_file = /mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files/yellow/2025/yellow_tripdata_2025-07.parquet
+2026-09-01 20:25:17 | INFO | ======================================================= Bronze rows : 3898963 ======================================================= 
+2026-09-01 20:25:17 | INFO | run completed in 17.06s
+2026-09-01 20:25:17 | INFO | ********************************************* Finished UberBronze *********************************************
+2026-09-01 20:25:17 | INFO | ========================================================================================================================
+2026-09-01 20:25:17 | INFO | ********************************************* Starting UberSilver *********************************************
+2026-09-01 20:25:17 | INFO | add_trip_duration completed in 0.05s
+2026-09-01 20:25:17 | INFO | add_date_key completed in 0.05s
+2026-09-01 20:25:17 | INFO | add_tip_percent completed in 0.22s
+2026-09-01 20:25:18 | INFO | add_average_speed completed in 0.09s
+2026-09-01 20:25:18 | INFO | add_date_features completed in 0.07s
+2026-09-01 20:25:18 | INFO | cast_columns completed in 0.12s
+2026-09-01 20:25:18 | INFO | apply_quality_rules completed in 0.07s
+2026-09-01 20:25:21 | INFO | Silver rows : 3898963 -> 3648251
+2026-09-01 20:25:21 | INFO | Environment : local
+2026-09-01 20:25:21 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:25:21 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 20:25:21 | INFO | path_manager : <nyc_taxi.src.common.path_manager.PathManager object at 0x7ccb7953b230>
+2026-09-01 20:25:25 | INFO | run completed in 7.75s
+2026-09-01 20:25:25 | INFO | ********************************************* Finished UberSilver *********************************************
+2026-09-01 20:25:25 | INFO | ========================================================================================================================
+2026-09-01 20:25:25 | INFO | ********************************************* Starting UberGold *********************************************
+2026-09-01 20:25:25 | INFO | ============ Construction des DataFrames Gold ============
+2026-09-01 20:25:25 | INFO | get_fact_trips completed in 0.03s
+2026-09-01 20:25:25 | INFO | get_dim_date completed in 0.21s
+2026-09-01 20:25:26 | INFO | get_kpi_daily completed in 0.4s
+2026-09-01 20:25:26 | INFO | ============ Fin Construction Gold ============
+2026-09-01 20:25:26 | INFO | run completed in 1.01s
+2026-09-01 20:25:26 | INFO | ********************************************* Finished UberGold *********************************************
+2026-09-01 20:25:26 | INFO | ========================================================================================================================
+2026-09-01 20:25:26 | INFO | ********************************************* Starting DataLoader *********************************************
+2026-09-01 20:25:26 | INFO | Environment : local
+2026-09-01 20:25:26 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:25:26 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 20:25:26 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/silver_nyc_taxi.json
+2026-09-01 20:25:26 | INFO | Missing columns: set()
+2026-09-01 20:25:26 | INFO | Schema valide pour silver_nyc_taxi
+2026-09-01 20:25:26 | INFO | None
+2026-09-01 20:26:01 | INFO | silver_nyc_taxi : 3648251 rows
+2026-09-01 20:26:01 | INFO | Partitions : 2
+2026-09-01 20:26:01 | INFO | START WRITE silver_nyc_taxi
+2026-09-01 20:26:01 | INFO | Table TO SAVE : silver.silver_nyc_taxi
+2026-09-01 20:27:19 | INFO | Table silver.silver_nyc_taxi saved
+2026-09-01 20:27:19 | INFO | END WRITE silver_nyc_taxi
+2026-09-01 20:27:19 | INFO | Environment : local
+2026-09-01 20:27:19 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:27:19 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 20:27:19 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_fact_trips.json
+2026-09-01 20:27:19 | INFO | Missing columns: set()
+2026-09-01 20:27:19 | INFO | Schema valide pour gold_fact_trips
+2026-09-01 20:27:19 | INFO | None
+2026-09-01 20:27:36 | INFO | gold_fact_trips : 3648251 rows
+2026-09-01 20:27:36 | INFO | Partitions : 2
+2026-09-01 20:27:36 | INFO | START WRITE gold_fact_trips
+2026-09-01 20:27:36 | INFO | Table TO SAVE : gold.gold_fact_trips
+2026-09-01 20:28:11 | INFO | Table gold.gold_fact_trips saved
+2026-09-01 20:28:11 | INFO | END WRITE gold_fact_trips
+2026-09-01 20:28:11 | INFO | Environment : local
+2026-09-01 20:28:11 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:28:11 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 20:28:11 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_dim_date.json
+2026-09-01 20:28:11 | INFO | Missing columns: set()
+2026-09-01 20:28:11 | INFO | Schema valide pour gold_dim_date
+2026-09-01 20:28:11 | INFO | None
+2026-09-01 20:28:18 | INFO | gold_dim_date : 33 rows
+2026-09-01 20:28:18 | INFO | Partitions : 200
+2026-09-01 20:28:18 | INFO | START WRITE gold_dim_date
+2026-09-01 20:28:18 | INFO | Table TO SAVE : gold.gold_dim_date
+2026-09-01 20:28:33 | INFO | Table gold.gold_dim_date saved
+2026-09-01 20:28:33 | INFO | END WRITE gold_dim_date
+2026-09-01 20:28:33 | INFO | Environment : local
+2026-09-01 20:28:33 | INFO | Path.cwd(): /mnt/d/data-ai-engineer-roadmap
+2026-09-01 20:28:33 | INFO | Path manager initialized at /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema
+2026-09-01 20:28:33 | INFO | Validation schema : /mnt/d/data-ai-engineer-roadmap/nyc_taxi/schema/yellow/gold_kpi_daily.json
+2026-09-01 20:28:34 | INFO | Missing columns: set()
+2026-09-01 20:28:34 | INFO | Schema valide pour gold_kpi_daily
+2026-09-01 20:28:34 | INFO | None
+2026-09-01 20:28:52 | INFO | gold_kpi_daily : 33 rows
+2026-09-01 20:28:52 | INFO | Partitions : 200
+2026-09-01 20:28:52 | INFO | START WRITE gold_kpi_daily
+2026-09-01 20:28:52 | INFO | Table TO SAVE : gold.gold_kpi_daily
+2026-09-01 20:29:08 | INFO | Table gold.gold_kpi_daily saved
+2026-09-01 20:29:08 | INFO | END WRITE gold_kpi_daily
+2026-09-01 20:29:08 | INFO | run completed in 221.85s
+2026-09-01 20:29:08 | INFO | ********************************************* Finished DataLoader *********************************************
+2026-09-01 20:29:08 | INFO | ========================================================================================================================
+2026-09-01 20:29:08 | INFO | MaintenanceJob started
+2026-09-01 20:29:08 | INFO | Processing silver.silver_nyc_taxi
+2026-09-01 20:30:46 | INFO | VACUUM DRY RUN on silver.silver_nyc_taxi
+2026-09-01 20:32:18 | INFO | 0 files can be removed
+2026-09-01 20:33:21 | INFO | VACUUM completed on silver.silver_nyc_taxi
+2026-09-01 20:33:21 | INFO | Maintenance completed for silver_nyc_taxi
+2026-09-01 20:33:21 | INFO | Processing gold.gold_fact_trips
+2026-09-01 20:34:02 | INFO | VACUUM DRY RUN on gold.gold_fact_trips
+2026-09-01 20:35:16 | INFO | 0 files can be removed
+2026-09-01 20:36:18 | INFO | VACUUM completed on gold.gold_fact_trips
+2026-09-01 20:36:18 | INFO | Maintenance completed for gold_fact_trips
+2026-09-01 20:36:18 | INFO | Processing gold.gold_dim_date
+2026-09-01 20:36:28 | INFO | VACUUM DRY RUN on gold.gold_dim_date
+2026-09-01 21:17:03 | INFO | 0 files can be removed
+2026-09-01 21:18:29 | INFO | VACUUM completed on gold.gold_dim_date
+2026-09-01 21:18:29 | INFO | Maintenance completed for gold_dim_date
+2026-09-01 21:18:29 | INFO | Processing gold.gold_kpi_daily
+2026-09-01 21:19:11 | INFO | VACUUM DRY RUN on gold.gold_kpi_daily
+2026-09-01 21:21:06 | INFO | 0 files can be removed
+2026-09-01 21:22:26 | INFO | VACUUM completed on gold.gold_kpi_daily
+2026-09-01 21:22:26 | INFO | Maintenance completed for gold_kpi_daily
+2026-09-01 21:22:26 | INFO | MaintenanceJob finished
+2026-09-01 21:22:26 | INFO | AUDIT | run_id=1788287085 | periode=202507 | table=silver_nyc_taxi | taxi_type=yellow | status=SUCCESS
+2026-09-01 21:22:28 | INFO | audit_table = audit.audit_load
+2026-09-01 21:22:42 | INFO | Inserting row count for bronze with 3898963 rows
+2026-09-01 21:22:42 | INFO | Inserting row count for silver with 3648251 rows
+2026-09-01 21:22:42 | INFO | Inserting row count for silver_nyc_taxi with 3648251 rows
+2026-09-01 21:22:42 | INFO | Inserting row count for gold_fact_trips with 3648251 rows
+2026-09-01 21:22:42 | INFO | Inserting row count for gold_dim_date with 33 rows
+2026-09-01 21:22:42 | INFO | Inserting row count for gold_kpi_daily with 33 rows

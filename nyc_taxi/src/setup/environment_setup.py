@@ -50,6 +50,7 @@ class EnvironmentSetup:
             logger
         )
 
+
     def run(
             self,
             path_sql_schema,
@@ -99,6 +100,9 @@ class EnvironmentSetup:
                     schema_name=schema_name,
                     table_name=table_name
                 )
+            )
+            self.logger.info(
+                "full_table_name : {}".format(full_table_name)
             )
 
             if not self.spark.catalog.tableExists(
