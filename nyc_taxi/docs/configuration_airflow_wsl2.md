@@ -382,6 +382,11 @@ python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
 --taxi_type yellow
 
 
+source ~/spark4_env/bin/activate
+cd /mnt/d/data-ai-engineer-roadmap
+airflow standalone
+http://localhost:8080
+
 cd /mnt/d/data-ai-engineer-roadmap
 python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
 --periode 202504 \
@@ -459,3 +464,60 @@ DeltaTable.forName(spark, table).vacuum(168)
 
 cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi/src/common
 python spark_manager.py
+
+
+which python
+python --version
+which pip
+pip list | grep airflow
+python -m pip show apache-airflow
+python -m pip install apache-airflow
+airflow version
+python -m airflow version
+ls -la /home/alpha/airflow
+echo $AIRFLOW_HOME
+grep "^dags_folder" /home/alpha/airflow/airflow.cfg
+ls -la /mnt/d/data-ai-engineer-roadmap/airflow/dags/
+nano /home/alpha/airflow/airflow.cfg
+ls -la /mnt/d/data-ai-engineer-roadmap/airflow/dags/
+grep "^dags_folder" /home/alpha/airflow/airflow.cfg
+dags_folder = /mnt/d/data-ai-engineer-roadmap/airflow/dags
+python -m airflow dags list-import-errors
+python -m airflow dags list | grep nyc
+python -m airflow dags report
+cat /mnt/d/data-ai-engineer-roadmap/airflow/dags/nyc_taxi_dag.py
+python -m airflow dags report | grep nyc_taxi
+sudo lsof -i :8080
+ss -ltnp | grep :8080
+curl.exe http://localhost:8080
+hostname -I
+
+source ~/spark4_env/bin/activate
+cat ~/airflow/simple_auth_manager_passwords.json.generated
+cat ~/airflow/simple_auth_manager_passwords.json.generated
+{"admin": "rbFQkhHXU2rmZUht"}
+python -m airflow dags report
+
+Le fichier DAG est trouvé
+Le DAG est correctement parsé
+Airflow CLI le voit comme actif
+
+
+✅ Pipeline local stable  
+✅ Audit fonctionnel  
+✅ get_next_period fonctionnel  
+✅ DAG Airflow avec 1 tâche  
+✅ Paramétrage Airflow (taxi_type)  
+✅ DAG découpé Bronze → Silver → Gold  
+✅ Maintenance automatisée  
+✅ Dashboard de monitoring (Airflow + tables audit)  
+
+✅ Airflow est installé et fonctionne  
+✅ L'interface Web est accessible  
+✅ Le DAG est détecté et enregistré  
+✅ Le parsing du fichier nyc_taxi_dag.py est correct  
+✅ On est prêt à exécuter le pipeline depuis Airflow  
+
+
+### démarrer Airflow
+python -m airflow standalone
