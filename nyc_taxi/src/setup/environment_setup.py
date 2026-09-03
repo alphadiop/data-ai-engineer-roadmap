@@ -146,11 +146,10 @@ class EnvironmentSetup:
             ("audit", "audit_row_count", None),
 
             ("silver", "silver_nyc_taxi", "periode"),
-
             ("gold", "gold_fact_trips", "periode"),
             ("gold", "gold_kpi_daily", "periode"),
-            ("gold", "gold_dim_date", None),
 
+            ("gold", "gold_dim_date", None),
             ("ref", "gold_dim_location", None)
         ]
 
@@ -229,7 +228,7 @@ class EnvironmentSetup:
 
 if __name__=='__main__':
 
-    logger = PipelineLogger("Setup")
+    logger = PipelineLogger("Setup",env="local")
     spark = SparkManager(
         app_name="Setup",
         env="local",

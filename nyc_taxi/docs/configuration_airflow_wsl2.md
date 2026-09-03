@@ -1,3 +1,5 @@
+source ~/spark4_env/bin/activate
+cd /mnt/d/data-ai-engineer-roadmap
 
 ## Tu as actuellement deux environnements bien séparés :
 
@@ -208,10 +210,19 @@ Audit
 ## Lancement manuelle depuis terminal wsl
 * se placer dans : /mnt/d/data-ai-engineer-roadmap/nyc_taxi
 * python -c "from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner; print('PipelineRunner OK')"
+
+
+
 python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
   --periode 202503 \
   --taxi_type yellow \
   --env local \
+
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+--env local \
+--periode 202504 \
+--taxi_type yellow
+
 
 python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles --periode 202502 --taxi_type yellow --env local
 
@@ -521,3 +532,32 @@ Airflow CLI le voit comme actif
 
 ### démarrer Airflow
 python -m airflow standalone
+
+
+cd /mnt/d/data-ai-engineer-roadmap
+
+/home/alpha/spark4_env/bin/python -c '
+from nyc_taxi.src.common.spark_manager import SparkManager
+
+spark = SparkManager(
+app_name="audit_check",
+env="local"
+).get_spark()
+
+spark.sql("""
+SELECT
+run_id,
+periode,
+table_name,
+taxi_type,
+status,
+start_time,
+end_time,
+duration_seconds,
+error_step,
+message
+FROM audit.audit_load
+ORDER BY end_time DESC
+LIMIT 10
+""").show(truncate=False)
+'

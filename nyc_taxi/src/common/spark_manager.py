@@ -7,7 +7,7 @@ from delta import configure_spark_with_delta_pip
 
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.utils.config.load_config import load_config
-
+import logging
 
 class SparkManager:
     """
@@ -28,7 +28,7 @@ class SparkManager:
 
         self.config = load_config(
             "variable_environnement",
-            self.logger
+            self.logger or logging.getLogger(__name__)
         )
 
     def get_spark(self):

@@ -300,7 +300,7 @@ class MetadataExplorer:
 
 if __name__ == "__main__":
 
-    logger = PipelineLogger("MetadataExplorer")
+    logger = PipelineLogger("MetadataExplorer", env='local')
 
     spark = SparkManager(
         app_name="purge_local",

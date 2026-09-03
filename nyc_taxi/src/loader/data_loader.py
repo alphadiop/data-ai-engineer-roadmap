@@ -14,18 +14,13 @@ class DataLoader(PipelineStep):
     charge les données dans Delta.
     """
 
-    def __init__(
-            self,
-            spark,
-            logger=None
-    ):
-        super().__init__(
-            spark,
-            self.__class__.__name__
-        )
+    def __init__(self,spark,logger=None):
+
+        super().__init__(spark,self.__class__.__name__)
 
         self.spark = spark
         self.logger = logger
+
 
     @log_execution
     def run(self, context):
@@ -76,11 +71,12 @@ class DataLoader(PipelineStep):
                 df=df,
                 schema_name=schema_name,
                 table_name=table_name,
-                periode=context.periode
+                periode=context.periode,
+                replace=True
             )
             self.logger.info(f"END WRITE {table_name}")
-
             df.unpersist()
+
 
     def validate_schema(
             self,
@@ -88,7 +84,6 @@ class DataLoader(PipelineStep):
             table_name,
             df
     ):
-
         schema_manager = SchemaManager(
             spark=self.spark,
             logger=self.logger
@@ -109,6 +104,7 @@ class DataLoader(PipelineStep):
         )
 
         schema_json = load_json(schema_file)
+
         schema_manager.validate_columns(
             df=df,
             schema_json=schema_json

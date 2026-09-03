@@ -1,13 +1,5 @@
 
-import os
 
-from pathlib import Path
-
-import uuid
-from datetime import datetime
-from nyc_taxi.src.common.decorators import log_execution
-from nyc_taxi.src.common.delta_manager import DeltaManager
-from pyspark.sql import SparkSession
 from datetime import datetime
 from typing import TYPE_CHECKING
 import sys
@@ -63,9 +55,6 @@ class PipelineRunner:
             spark=self.spark,
             logger=self.logger
         )
-        self.maintenance = MaintenanceJob(
-            spark=self.spark,
-            logger=self.logger)
 
         self.setup_env = EnvironmentSetup(
             spark=self.spark,
@@ -130,6 +119,7 @@ class PipelineRunner:
             f"path_sql_schema : {context.config['path_sql_schema']}"
         )
         if not self.setup_env.environment_exists():
+
             self.setup_env.run(
                 path_sql_schema=context.config["path_sql_schema"],
                 taxi_type=self.taxi_type
@@ -189,8 +179,6 @@ class PipelineRunner:
             context.message = "OK"
             context.error_step = ""
 
-            self.maintenance.run(context)
-            
         except DataNotAvailableError as e:
             context.status = "NO_DATA"
             context.error_step = context.current_step
@@ -283,6 +271,10 @@ if __name__ == "__main__":
                 logger=logger
             ),
             DataLoader(
+                spark=spark,
+                logger=logger
+            ),
+            MaintenanceJob(
                 spark=spark,
                 logger=logger
             )

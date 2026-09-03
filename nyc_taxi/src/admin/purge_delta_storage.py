@@ -1,9 +1,3 @@
-# src/jobs/purge_delta_storage.py
-
-import shutil
-from pathlib import Path
-
-from nyc_taxi.src.utils.config.load_config import load_config
 
 import logging
 import shutil
@@ -82,7 +76,10 @@ class PurgeDeltaStorage:
 
     def truncate(self):
         """
-        Vide les tables mais conserve les schémas.
+        conserve les tables
+        conserve les schémas
+        conserve le warehouse
+        conserve le metastore Derby
         """
 
         self._validate_env()
@@ -110,9 +107,7 @@ class PurgeDeltaStorage:
                 )
 
     def drop_schemas(self):
-
         for schema in self.SCHEMAS:
-
             try:
 
                 self.logger.info(
@@ -130,35 +125,36 @@ class PurgeDeltaStorage:
                 )
 
     def delete_local_storage(self):
-
         paths = [
             Path(self.config["local"]["warehouse_dir"]),
             Path(self.config["local"]["metastore_dir"])
         ]
 
         for path in paths:
+            try:
+                if not path.exists():
+                    self.logger.warning(
+                        f"Répertoire introuvable : {path}"
+                    )
+                    continue
 
-            if not path.exists():
-
-                self.logger.warning(
-                    f"Répertoire introuvable : {path}"
+                self.logger.info(
+                    f"Suppression : {path}"
                 )
+                shutil.rmtree(path)
+                self.logger.info(
+                    f"Existe après suppression ? {path.exists()}"
+                )
+            except Exception as e:
+                self.logger.error(
+                    f"Erreur suppression {path} : {e}"
+                )
+                raise
 
-                continue
 
-            self.logger.info(
-                f"Suppression : {path}"
-            )
-
-            shutil.rmtree(
-                path,
-                ignore_errors=True
-            )
 
     def _validate_env(self):
-
         if self.env != "local":
-
             raise ValueError(
                 "Cette opération est autorisée uniquement en local"
             )
@@ -167,7 +163,7 @@ if __name__ == "__main__":
     from nyc_taxi.src.common.spark_manager import SparkManager
     from nyc_taxi.src.common.logger import PipelineLogger
 
-    logger = PipelineLogger("PURGE")
+    logger = PipelineLogger("PURGE",env="local")
 
     spark = SparkManager(
         app_name="purge_local",

@@ -9,7 +9,7 @@ import shutil
 from pathlib import Path
 from nyc_taxi.src.common.logger import PipelineLogger
 from pyspark.sql import DataFrame
-
+import logging
 
 from nyc_taxi.src.common.spark_manager import SparkManager
 from typing import TYPE_CHECKING
@@ -22,7 +22,7 @@ class DeltaManager:
     def __init__(self, spark, catalog_manager, logger: PipelineLogger):
         self.spark = spark
         self.catalog_manager = catalog_manager
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
         self.nombre_partition = 8
 
 

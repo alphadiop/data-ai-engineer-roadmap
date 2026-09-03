@@ -1,9 +1,10 @@
 import os
 import sys
 from pyspark.sql import SparkSession
-
+from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.common.catalog_manager import CatalogManager
+from nyc_taxi.src.common.decorators import log_execution
 
 from typing import TYPE_CHECKING
 
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from nyc_taxi.src.common.logger import PipelineLogger
 
 
-class MaintenanceJob:
+class MaintenanceJob(PipelineStep):
     """ attention :
             vacuum est lancé tous les jours car stockage limité avec l'édition free de databricks
             cela supprime les fichiers historiques de delta de 24h
@@ -19,11 +20,14 @@ class MaintenanceJob:
             optimize periode est lancé tous les jours car stockage limité avec l'édition free de databricks
             cela compacte les fichiers delta pour diminuer la taille des fichiers
     """
-    def __init__(self, spark: SparkSession, logger):
+    def __init__(self, spark: SparkSession, logger=None):
+        super().__init__(spark, self.__class__.__name__)
+
         self.spark = spark
         self.logger = logger
-        
 
+
+    @log_execution
     def run(self, context):
         if self.logger:
             self.logger.info(
@@ -95,14 +99,12 @@ class MaintenanceJob:
         self.logger.info(
             "MaintenanceJob finished"
         )
- 
-        # "nyc_taxi.audit.audit_load",
-        # "nyc_taxi.audit.audit_row_count"
-    #
-    # def get_liste_tables(self):
-    #     return [
-    #         "nyc_taxi.silver.silver_nyc_taxi",
-    #         "nyc_taxi.gold.gold_fact_trips",
-    #         "nyc_taxi.gold.gold_dim_date",
-    #         "nyc_taxi.gold.gold_kpi_daily",
-    #     ]
+
+
+    def get_liste_tables(self):
+        return [
+            "nyc_taxi.silver.silver_nyc_taxi",
+            "nyc_taxi.gold.gold_fact_trips",
+            "nyc_taxi.gold.gold_dim_date",
+            "nyc_taxi.gold.gold_kpi_daily",
+        ]
