@@ -51,7 +51,7 @@ class DataLoader(PipelineStep):
                 table_name=table_name,
                 df=df
             )
-            df.persist()
+            #df.persist()
 
             row_count = df.count()
 
@@ -75,7 +75,7 @@ class DataLoader(PipelineStep):
                 replace=True
             )
             self.logger.info(f"END WRITE {table_name}")
-            df.unpersist()
+            #df.unpersist()
 
 
     def validate_schema(
