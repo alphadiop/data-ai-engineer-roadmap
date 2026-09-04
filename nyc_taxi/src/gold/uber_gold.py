@@ -53,9 +53,9 @@ class UberGold(PipelineStep):
             f"{'=' * 12} Construction des DataFrames Gold {'=' * 12}"
         )
 
-        context.df_fact_trips = self.get_fact_trips(df_silver).persist()
-        context.df_dim_date = self.get_dim_date(df_silver).persist()
-        context.df_kpi_daily = self.get_kpi_daily(df_silver).persist()
+        context.df_fact_trips = self.get_fact_trips(df_silver)
+        context.df_dim_date = self.get_dim_date(df_silver)
+        context.df_kpi_daily = self.get_kpi_daily(df_silver)
 
         context.tables_to_load = [
             (
