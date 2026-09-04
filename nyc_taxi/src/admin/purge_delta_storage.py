@@ -63,10 +63,12 @@ class PurgeDeltaStorage:
         self.logger.info("DEBUT PURGE COMPLETE")
         self.logger.info("=" * 80)
 
-        self.drop_schemas()
+        try:
+            self.drop_schemas()
 
-        self.logger.info("Arrêt de Spark")
-        self.spark.stop()
+        finally:
+            self.logger.info("Arrêt de Spark")
+            self.spark.stop()
 
         self.delete_local_storage()
 
@@ -159,23 +161,7 @@ class PurgeDeltaStorage:
                 "Cette opération est autorisée uniquement en local"
             )
 
-if __name__ == "__main__":
-    from nyc_taxi.src.common.spark_manager import SparkManager
-    from nyc_taxi.src.common.logger import PipelineLogger
 
-    logger = PipelineLogger("PURGE",env="local")
-
-    spark = SparkManager(
-        app_name="purge_local",
-        env="local",
-        logger=logger
-    ).get_spark()
-
-    PurgeDeltaStorage(
-        spark=spark,
-        logger=logger,
-        env="local"
-    ).run()
 
     # PurgeDeltaStorage(
     #     spark=spark,

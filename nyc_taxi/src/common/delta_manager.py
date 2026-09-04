@@ -1,8 +1,3 @@
-import os
-import sys
-from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
-from nyc_taxi.src.utils.sql_schema.get_columns_from_schema import get_columns_from_schema
-from nyc_taxi.src.utils.load_json import load_json
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union,Tuple
 import shutil
@@ -98,7 +93,7 @@ class DeltaManager:
             f"Creating table : {full_table_name}"
         )
 
-        self.logger.info(ddl)
+        # self.logger.info(ddl)
 
         self.spark.sql(ddl)
 

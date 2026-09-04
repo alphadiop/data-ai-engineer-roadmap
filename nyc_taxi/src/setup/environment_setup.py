@@ -5,7 +5,7 @@ from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.spark_manager import SparkManager
 
-from nyc_taxi.src.utils.config.load_config import load_config
+
 from nyc_taxi.src.utils.load_json import load_json
 
 from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
@@ -28,6 +28,7 @@ class EnvironmentSetup(PipelineStep):
             self,
             spark,
             env="local",
+            config=None,
             logger=None
     ):
         super().__init__(spark,self.__class__.__name__)
@@ -48,16 +49,12 @@ class EnvironmentSetup(PipelineStep):
             logger=logger
         )
 
-        self.config = load_config(
-            "variable_environnement",
-            logger
-        )
-
     @log_execution
     def run(self,context):
-        """
-        """
-        context.config = self.config[self.env]
+
+        self.logger.info("=" * 80)
+        self.logger.info("EnvironmentSetup")
+        self.logger.info("=" * 80)
 
         context.path_sql_schema = Path(
             context.config["path_sql_schema"]
@@ -75,14 +72,19 @@ class EnvironmentSetup(PipelineStep):
         self.logger.info("Initialisation environnement")
         self.logger.info("=" * 80)
 
-        self.create_catalog(context.config)
-
+        self.create_catalog(
+            context.config
+        )
         self.create_schemas()
+
         self.create_tables(
-            path_sql_schema=context.path_sql_schema,
+            config=context.config,
             taxi_type=context.taxi_type
         )
 
+        # ----------------------------------------------------------
+        # Metastore
+        # ----------------------------------------------------------
         if self.env == "local":
             self.repair_metastore()
 
@@ -141,11 +143,7 @@ class EnvironmentSetup(PipelineStep):
         self.catalog_manager.create_environment_schemas()
 
 
-    def create_tables(
-            self,
-            path_sql_schema,
-            taxi_type
-    ):
+    def create_tables(self, config, taxi_type):
 
         tables = [
             ("audit", "audit_load", None),
@@ -162,7 +160,7 @@ class EnvironmentSetup(PipelineStep):
         for schema_name, table_name, partition_by in tables:
 
             self.create_table(
-                path_sql_schema=path_sql_schema,
+                path_sql_schema=config['path_sql_schema'],
                 taxi_type=taxi_type,
                 schema_name=schema_name,
                 table_name=table_name,

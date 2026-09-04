@@ -179,7 +179,10 @@ class PipelineRunner:
 
         finally:
             context.end_time = datetime.now()
-            context.duration_seconds = (context.end_time - context.start_time).total_seconds()
+            context.duration_seconds = (
+                    context.end_time - context.start_time
+            ).total_seconds()
+
             try:
                 self.audit_manager.insert_audit(context)
             except Exception as e:
@@ -192,6 +195,14 @@ class PipelineRunner:
                 self.logger.error(
                     f"Row count insert failed: {e}"
                 )
+
+            # ==========================================================
+            # FINALISATION DU FICHIER DE LOG
+            # ==========================================================
+            self.logger.finalize(
+                success=context.status == "SUCCESS"
+            )
+
         return context
 
 if __name__ == "__main__":
@@ -240,8 +251,8 @@ if __name__ == "__main__":
     # DEBUG METASTORE
     # =====================================================
     logger.info("===============DEBUG METASTORE=============")
-    spark.sql("SHOW DATABASES").show(200, truncate=False)
-    spark.sql("SHOW TABLES IN audit").show(200, truncate=False)
+    # spark.sql("SHOW DATABASES").show(200, truncate=False)
+    # spark.sql("SHOW TABLES IN audit").show(200, truncate=False)
 
 
     # =====================================================

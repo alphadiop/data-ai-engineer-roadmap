@@ -256,3 +256,27 @@ class PipelineLogger:
         self.logger.exception(e)
         self.flush()
 
+
+    def finalize(self, success: bool):
+        """
+        Renomme le fichier de log avec l'extension finale
+        .ok ou .nook selon le statut du pipeline.
+        """
+        self.flush()
+        extension = ".ok" if success else ".nook"
+        current_path = Path(self.path_log)
+        final_path = current_path.with_suffix(extension)
+
+        # Fermer le FileHandler avant de renommer le fichier
+        for handler in self.logger.handlers[:]:
+            try:
+                handler.flush()
+            except Exception:
+                pass
+
+            if isinstance(handler, logging.FileHandler):
+                handler.close()
+                self.logger.removeHandler(handler)
+
+        current_path.rename(final_path)
+        self.path_log = str(final_path)

@@ -1,5 +1,17 @@
 # Architecture du projet NYC Taxi
 
+config
+├── chemins
+├── warehouse
+├── catalog
+└── environnement
+
+context
+├── taxi_type
+├── periode
+└── config
+
+
 * [ ] Airflow = orchestrateur local
 * [ ] Databricks Jobs = orchestrateur cloud
 * [ ] PipelineRunner = orchestrateur métier
