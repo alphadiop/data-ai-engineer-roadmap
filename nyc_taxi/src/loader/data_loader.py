@@ -61,9 +61,9 @@ class DataLoader(PipelineStep):
                 f"{table_name} : {row_count} rows"
             )
 
-            self.logger.info(
-                f"Partitions : {df.rdd.getNumPartitions()}"
-            )
+            # self.logger.info(
+            #     f"Partitions : {df.rdd.getNumPartitions()}"
+            # )
 
             self.logger.info(f"START WRITE {table_name}")
 
