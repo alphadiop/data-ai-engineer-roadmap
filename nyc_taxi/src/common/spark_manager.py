@@ -3,7 +3,6 @@ import logging
 from pyspark.sql import SparkSession
 from delta import configure_spark_with_delta_pip
 
-from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.utils.config.load_config import load_config
 from nyc_taxi.src.common.spark_environment_logger import (
     SparkEnvironmentLogger
@@ -108,10 +107,17 @@ class SparkManager:
         self.logger.info(
             f"warehouse = {spark.conf.get('spark.sql.warehouse.dir')}"
         )
-
         self.logger.info(
             f"metastore = {spark.conf.get('javax.jdo.option.ConnectionURL')}"
         )
+        self.logger.info(
+            f"warehouse_yaml = {self.config['local']['warehouse_dir']}"
+        )
+
+        self.logger.info(
+            f"metastore_yaml = {self.config['local']['metastore_dir']}"
+        )
+
 
         # ==========================================================
         # LOG CONFIGURATION
@@ -128,7 +134,6 @@ class SparkManager:
         # REPAIR DU METASTORE LOCAL
         # ==========================================================
         if self.env == "local":
-
             self.logger.info(
                 "Checking local metastore..."
             )

@@ -54,11 +54,13 @@ class EnvironmentSetup(PipelineStep):
         )
 
     @log_execution
-    def run(self, context):
+    def run(self,context):
         """
         """
+        context.config = self.config[self.env]
+
         context.path_sql_schema = Path(
-            self.config[self.env]["path_sql_schema"]
+            context.config["path_sql_schema"]
         )
 
         if self.environment_exists():
@@ -73,7 +75,8 @@ class EnvironmentSetup(PipelineStep):
         self.logger.info("Initialisation environnement")
         self.logger.info("=" * 80)
 
-        self.create_catalog()
+        self.create_catalog(context.config)
+
         self.create_schemas()
         self.create_tables(
             path_sql_schema=context.path_sql_schema,
@@ -117,7 +120,7 @@ class EnvironmentSetup(PipelineStep):
         return True
 
 
-    def create_catalog(self):
+    def create_catalog(self, config):
         if self.env == "local":
             if self.logger:
                 self.logger.info(
@@ -125,9 +128,8 @@ class EnvironmentSetup(PipelineStep):
                 )
             return
 
-        catalog_name = self.config[self.env]["catalog_name"]
         self.catalog_manager.create_catalog(
-            catalog_name=catalog_name
+            catalog_name=config["catalog_name"]
         )
 
 

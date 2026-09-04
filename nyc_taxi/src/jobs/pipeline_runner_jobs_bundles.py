@@ -13,17 +13,15 @@ from nyc_taxi.src.loader.data_loader import DataLoader
 
 from nyc_taxi.src.logger.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
-
 from nyc_taxi.src.common.spark_manager import SparkManager
-
+from nyc_taxi.src.admin.metastore_repair import MetastoreRepair
+from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.jobs.maintenance_job import MaintenanceJob
 
 from nyc_taxi.src.utils.config.load_config import load_config
 
 from nyc_taxi.src.audit.audit_manager import AuditManager
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
-
-
 
 
 if TYPE_CHECKING:
@@ -53,12 +51,6 @@ class PipelineRunner:
 
         self.audit_manager = AuditManager(
             spark=self.spark,
-            logger=self.logger
-        )
-
-        self.setup_env = EnvironmentSetup(
-            spark=self.spark,
-            env=self.env,
             logger=self.logger
         )
 
@@ -98,11 +90,6 @@ class PipelineRunner:
             taxi_type=self.taxi_type
         )
 
-        self.logger.info(
-            f"Période sélectionnée automatiquement : "
-            f"{context.periode}"
-        )
-
         # ==========================================================
         # PIPELINE
         # ==========================================================
@@ -114,6 +101,10 @@ class PipelineRunner:
         context.taxi_type = self.taxi_type
         context.periode = int(self.periode)
 
+        self.logger.info(
+            f"Période sélectionnée automatiquement : "
+            f"{context.periode}"
+        )
         self.logger.info(
             f"path_sql_schema : {context.config['path_sql_schema']}"
         )
@@ -238,6 +229,25 @@ if __name__ == "__main__":
 
     spark = spark_manager.get_spark()
 
+    MetastoreRepair(
+        spark=spark,
+        env=args.env,
+        logger=logger
+    ).repair()
+
+
+    # =====================================================
+    # DEBUG METASTORE
+    # =====================================================
+    logger.info("===============DEBUG METASTORE=============")
+    spark.sql("SHOW DATABASES").show(200, truncate=False)
+    spark.sql("SHOW TABLES IN audit").show(200, truncate=False)
+
+
+    # =====================================================
+    # PIPELINE
+    # =====================================================
+    logger.info("===============PIPELINE=============")
     logger.info(f"sys.argv  : {sys.argv}")
     logger.info(f"env       : {env}")
     logger.info(f"args      : {args}")

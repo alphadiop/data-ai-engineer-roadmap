@@ -6,6 +6,12 @@ python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
 --periode 202501 \
 --taxi_type yellow
 
+python -c "from nyc_taxi.src.utils.config.load_config import load_config; import logging; c=load_config('variable_environnement', logging.getLogger()); print('WAREHOUSE =', c['local']['warehouse_dir']); print('METASTORE =', c['local']['metastore_dir'])"
+
+ls -la /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+find /mnt/d/data-ai-engineer-roadmap/spark-warehouse -name "_delta_log"
+
+
 ## Tu as actuellement deux environnements bien séparés :
 
 #### Environnement Conda Windows

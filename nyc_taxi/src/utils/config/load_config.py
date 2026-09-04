@@ -25,6 +25,11 @@ def load_config(file_name: str, logger=None) -> dict:
                 for key, value in config[env_name].items():
                     if isinstance(value, str):
                         config[env_name][key] = normalize_path(value)
+
+                        if logger and key in ["warehouse_dir", "metastore_dir", "bronze_path"]:
+                            logger.info(
+                                f"Config Linux | {key} : {config[env_name][key]}"
+                            )
         return config
 
 
