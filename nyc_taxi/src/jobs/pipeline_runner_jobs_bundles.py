@@ -64,7 +64,6 @@ class PipelineRunner:
         # ==========================================================
         # DÉTERMINATION DE LA PÉRIODE
         # ==========================================================
-
         if self.periode is None:
 
             self.periode = self.audit_manager.get_next_period(

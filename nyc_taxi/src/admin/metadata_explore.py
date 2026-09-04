@@ -19,7 +19,7 @@ class MetadataExplorer:
     ):
         self.spark = spark
         self.env = env
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
 
         self.catalog_manager = CatalogManager(
             spark=spark,
@@ -61,7 +61,6 @@ class MetadataExplorer:
 
 
     def show_databricks(self):
-
         self.logger.info("\n" + "=" * 100)
         self.logger.info("CATALOGS")
         self.logger.info("=" * 100)
@@ -71,9 +70,7 @@ class MetadataExplorer:
         )
 
         catalogs.show(truncate=False)
-
         for catalog in catalogs.collect():
-
             catalog_name = catalog.catalog
 
             print("\n" + "=" * 100)
