@@ -139,6 +139,7 @@ class PipelineRunner:
 
             context.status = "ALREADY_LOADED"
             context.message = f"Period {context.periode} already loaded"
+            
             self.logger.info(
                 f"Period {context.periode} already loaded {'=' * 85 }"
             )
@@ -146,7 +147,6 @@ class PipelineRunner:
             return
         
         try:
-
             for step in self.steps:
                 context.current_step = step.__class__.__name__
                 self.logger.info(f"{'*' * 45} Starting {context.current_step} {'*' * 45}")
