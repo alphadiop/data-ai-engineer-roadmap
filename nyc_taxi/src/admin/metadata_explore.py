@@ -26,6 +26,7 @@ class MetadataExplorer:
             env=env,
             logger=logger
         )
+        #self.catalog_manager.repair_local_metastore()
 
     def run(self):
         if self.env == "local":
@@ -50,9 +51,9 @@ class MetadataExplorer:
 
             schema_name = row.namespace
 
-            print("\n" + "=" * 100)
-            print(f"SCHEMA : {schema_name}")
-            print("=" * 100)
+            self.logger.info("\n" + "=" * 100)
+            self.logger.info(f"SCHEMA : {schema_name}")
+            self.logger.info("=" * 100)
 
             self.spark.sql(
                 f"SHOW TABLES IN {schema_name}"
@@ -61,9 +62,9 @@ class MetadataExplorer:
 
     def show_databricks(self):
 
-        print("\n" + "=" * 100)
-        print("CATALOGS")
-        print("=" * 100)
+        self.logger.info("\n" + "=" * 100)
+        self.logger.info("CATALOGS")
+        self.logger.info("=" * 100)
 
         catalogs = self.spark.sql(
             "SHOW CATALOGS"
@@ -89,11 +90,11 @@ class MetadataExplorer:
 
                 schema_name = schema.databaseName
 
-                print("\n" + "-" * 100)
-                print(
+                self.logger.info("\n" + "-" * 100)
+                self.logger.info(
                     f"{catalog_name}.{schema_name}"
                 )
-                print("-" * 100)
+                self.logger.info("-" * 100)
 
                 self.spark.sql(
                     f"SHOW TABLES IN {catalog_name}.{schema_name}"
@@ -112,9 +113,9 @@ class MetadataExplorer:
             )
         )
 
-        print("\n" + "=" * 100)
-        print(full_table_name)
-        print("=" * 100)
+        self.logger.info("\n" + "=" * 100)
+        self.logger.info(full_table_name)
+        self.logger.info("=" * 100)
 
         self.spark.sql(
             f"DESCRIBE TABLE {full_table_name}"
@@ -139,7 +140,7 @@ class MetadataExplorer:
             ).count()
         )
 
-        print(
+        self.logger.info(
             f"{full_table_name} : {count:,} rows"
         )
 
@@ -303,10 +304,25 @@ if __name__ == "__main__":
     logger = PipelineLogger("MetadataExplorer", env='local')
 
     spark = SparkManager(
-        app_name="purge_local",
+        app_name="metadata_explorer",
         env="local",
         logger=logger
     ).get_spark()
+
+    catalog_manager = CatalogManager(
+        spark=spark,
+        env="local",
+        logger=logger
+    )
+    catalog_manager.repair_local_metastore()
+
+    print("=" * 80)
+    print("TEST METASTORE")
+    print("=" * 80)
+
+    spark.sql("SHOW DATABASES").show(
+        truncate=False
+    )
 
     MetadataExplorer(
         spark=spark,
@@ -314,24 +330,24 @@ if __name__ == "__main__":
         logger=logger
     ).run()
 
-    MetadataExplorer(
-        spark=spark,
-        env="local"
-    ).show_table_details(
-        schema_name="gold",
-        table_name="gold_fact_trips"
-    )
+    # MetadataExplorer(
+    #     spark=spark,
+    #     env="local"
+    # ).show_table_details(
+    #     schema_name="gold",
+    #     table_name="gold_fact_trips"
+    # )
+    #
+    # MetadataExplorer(
+    #     spark=spark,
+    #     env="local"
+    # ).show_row_count(
+    #     "silver",
+    #     "silver_nyc_taxi"
+    # )
 
-    MetadataExplorer(
-        spark=spark,
-        env="local"
-    ).show_row_count(
-        "silver",
-        "silver_nyc_taxi"
-    )
-
-    MetadataExplorer(
-        spark=spark,
-        env="local",
-        logger=logger
-    ).show_all_row_counts()
+    # MetadataExplorer(
+    #     spark=spark,
+    #     env="local",
+    #     logger=logger
+    # ).show_all_row_counts()

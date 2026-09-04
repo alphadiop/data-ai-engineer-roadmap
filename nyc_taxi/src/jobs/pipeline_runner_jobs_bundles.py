@@ -11,7 +11,7 @@ from nyc_taxi.src.silver.uber_silver import UberSilver
 from nyc_taxi.src.gold.uber_gold import UberGold
 from nyc_taxi.src.loader.data_loader import DataLoader
 
-from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.logger.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
 
 from nyc_taxi.src.common.spark_manager import SparkManager
@@ -114,25 +114,16 @@ class PipelineRunner:
         context.taxi_type = self.taxi_type
         context.periode = int(self.periode)
 
-
         self.logger.info(
             f"path_sql_schema : {context.config['path_sql_schema']}"
         )
-        if not self.setup_env.environment_exists():
-
-            self.setup_env.run(
-                path_sql_schema=context.config["path_sql_schema"],
-                taxi_type=self.taxi_type
-            )
 
         self.logger.info(
             f"Environnement = {context.env}"
         )
-
         self.logger.info(
             f"catalog_name : {context.config['catalog_name']}"
         )
-
 
         context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()
@@ -233,9 +224,11 @@ if __name__ == "__main__":
     taxi_type = args.taxi_type
 
     logger = PipelineLogger(
-        "uber_pipeline",
-        env=env
-    )
+        name="pipeline_runner",
+        env=args.env,
+        periode=args.periode,
+        taxi_type=args.taxi_type
+    ).logger
 
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",
@@ -257,7 +250,13 @@ if __name__ == "__main__":
         taxi_type = taxi_type,
         periode = periode,
         logger=logger,
+
         steps=[
+            EnvironmentSetup(
+                spark=spark,
+                env=env,
+                logger=logger
+            ),
             UberBronze(
                 spark=spark,
                 logger=logger,
@@ -280,7 +279,6 @@ if __name__ == "__main__":
             )
         ]
     )
-
     runner.run()
     
     ## bash : python pipeline_runner.py --taxi_type yellow --periode 202603

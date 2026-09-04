@@ -20,6 +20,7 @@
 
 #### Étape 3 : Découper le DAG
 Quand la version actuelle sera stable :
+
 ````text
 setup_environment
         ↓
@@ -35,3 +36,32 @@ maintenance
 
 #### Étape 4 : Déploiement cloud
 * [ ] Airflow sur VM Linux ou Azure Data Factory ou Databricks Workflows
+
+
+````text
+    PipelineRunner
+    │
+    ▼
+    EnvironmentSetup
+    │
+    ├── environnement existe
+    │       └── repair metastore local → return
+    │
+    └── environnement absent
+    ├── create catalog
+    ├── create schemas
+    ├── create tables
+    └── repair metastore local
+    │
+    ▼
+    Bronze
+    │
+    ▼
+    Silver
+    │
+    ▼
+    Gold
+    │
+    ▼
+    DataLoader
+````

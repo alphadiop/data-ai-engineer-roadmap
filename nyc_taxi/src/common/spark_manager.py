@@ -1,13 +1,13 @@
 import sys
 import logging
-from pathlib import Path
-
 from pyspark.sql import SparkSession
 from delta import configure_spark_with_delta_pip
 
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.utils.config.load_config import load_config
-import logging
+from nyc_taxi.src.common.spark_environment_logger import (
+    SparkEnvironmentLogger
+)
 
 class SparkManager:
     """
@@ -105,47 +105,24 @@ class SparkManager:
             .enableHiveSupport()
             .getOrCreate()
         )
+        self.logger.info(
+            f"warehouse = {spark.conf.get('spark.sql.warehouse.dir')}"
+        )
+
+        self.logger.info(
+            f"metastore = {spark.conf.get('javax.jdo.option.ConnectionURL')}"
+        )
 
         # ==========================================================
         # LOG CONFIGURATION
         # ==========================================================
-        self.logger.info("=" * 120)
-        self.logger.info("SPARK CONFIGURATION")
-        self.logger.info("=" * 120)
+        SparkEnvironmentLogger(
+            spark=spark,
+            config=self.config,
+            env=self.env,
+            logger=self.logger
+        ).log_environment()
 
-        self.logger.info(
-            f"cwd             = {Path.cwd()}"
-        )
-
-        self.logger.info(
-            f"python          = {sys.executable}"
-        )
-
-        self.logger.info(
-            f"spark_version   = {spark.version}"
-        )
-
-        self.logger.info(
-            f"warehouse       = "
-            f"{spark.conf.get('spark.sql.warehouse.dir')}"
-        )
-
-        self.logger.info(
-            f"warehouse_dir   = "
-            f"{self.config['local']['warehouse_dir']}"
-        )
-
-        self.logger.info(
-            f"metastore_dir   = "
-            f"{self.config['local']['metastore_dir']}"
-        )
-
-        self.logger.info(
-            f"bronze_path     = "
-            f"{self.config['local']['bronze_path']}"
-        )
-
-        self.logger.info("=" * 120)
 
         # ==========================================================
         # REPAIR DU METASTORE LOCAL
@@ -155,12 +132,6 @@ class SparkManager:
             self.logger.info(
                 "Checking local metastore..."
             )
-
-            CatalogManager(
-                spark=spark,
-                env=self.env,
-                logger=self.logger
-            ).repair_local_metastore()
 
         return spark
 

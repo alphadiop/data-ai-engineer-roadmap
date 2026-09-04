@@ -1,6 +1,7 @@
+
 import os
-import sys
-import os
+from urllib.parse import urlparse
+import platform
 from pathlib import Path
 import logging
 from typing import TYPE_CHECKING
@@ -463,7 +464,6 @@ class CatalogManager:
             """
         )
 
-
     def repair_local_metastore(self):
 
         if self.env != "local":
@@ -472,8 +472,11 @@ class CatalogManager:
             )
             return
 
-        warehouse = Path(
-            "/mnt/d/data-ai-engineer-roadmap/spark-warehouse"
+        warehouse = self.get_warehouse_path()
+
+        self.logger.info(
+            f"Warehouse Spark : "
+            f"{self.spark.conf.get('spark.sql.warehouse.dir')}"
         )
 
         self.logger.info(
@@ -488,35 +491,31 @@ class CatalogManager:
 
         for root, dirs, files in os.walk(warehouse):
 
+            # On cherche uniquement les répertoires Delta
             if "_delta_log" not in dirs:
                 continue
 
             table_path = Path(root)
 
-            print("=" * 80)
-            print(f"table_path  = {table_path}")
-            print(f"parent      = {table_path.parent}")
-            print(f"parent.name = {table_path.parent.name}")
+            schema_dir = table_path.parent
 
-            schema_name = (
-                table_path.parent.name
-                .replace(".db", "")
-            )
-
-            print(f"schema_name = {schema_name}")
-            print(f"table_name  = {table_path.name}")
-
+            schema_name = schema_dir.name.replace(".db", "")
             table_name = table_path.name
 
             full_table_name = (
-                f"{schema_name}.{table_name}"
+                f"`{schema_name}`.`{table_name}`"
             )
 
-            print(f"full_table_name = {full_table_name}")
+            self.logger.info(
+                f"Delta table found : {full_table_name}"
+            )
+            self.logger.info(
+                f"Location          : {table_path}"
+            )
 
             try:
 
-                # 1. Créer le schéma
+                # 1. Créer le schema s'il n'existe pas
                 self.spark.sql(
                     f"""
                     CREATE DATABASE IF NOT EXISTS
@@ -524,20 +523,22 @@ class CatalogManager:
                     """
                 )
 
-                # 2. Vérifier si la table est déjà connue
-                if self.spark.catalog.tableExists(
-                        full_table_name
-                ):
+                # 2. Vérifier si la table est déjà enregistrée
+                exists = self.spark.catalog.tableExists(
+                    f"{schema_name}.{table_name}"
+                )
+
+                if exists:
                     self.logger.info(
                         f"Already registered : "
-                        f"{full_table_name}"
+                        f"{schema_name}.{table_name}"
                     )
                     continue
 
-                # 3. Enregistrer la table Delta existante
+                # 3. Enregistrer la table Delta
                 self.spark.sql(
                     f"""
-                    CREATE TABLE `{full_table_name}`
+                    CREATE TABLE {full_table_name}
                     USING DELTA
                     LOCATION '{table_path.as_posix()}'
                     """
@@ -545,16 +546,151 @@ class CatalogManager:
 
                 self.logger.info(
                     f"Registered : "
-                    f"{full_table_name}"
+                    f"{schema_name}.{table_name}"
                 )
 
             except Exception as e:
 
                 self.logger.error(
                     f"Error repairing "
-                    f"{full_table_name} : {e}"
+                    f"{schema_name}.{table_name} : {e}"
                 )
 
+
+
+    def get_warehouse_path(self) -> Path:
+
+        warehouse_uri = self.spark.conf.get(
+            "spark.sql.warehouse.dir"
+        )
+        self.logger.info(
+            f"Warehouse URI       : {warehouse_uri}"
+        )
+        if warehouse_uri.startswith("file:"):
+
+            parsed = urlparse(warehouse_uri)
+
+            if platform.system() == "Windows":
+                warehouse_path = Path(
+                    parsed.path.lstrip("/")
+                )
+            else:
+                warehouse_path = Path(
+                    parsed.path
+                )
+
+        else:
+            warehouse_path = Path(
+                warehouse_uri
+            )
+
+        self.logger.info(
+            f"Warehouse path      : {warehouse_path}"
+        )
+
+        self.logger.info(
+            f"Warehouse exists     : {warehouse_path.exists()}"
+        )
+
+        return warehouse_path
+
+
+
+
+    #
+    # def repair_local_metastore(self):
+    #
+    #     if self.env != "local":
+    #         self.logger.info(
+    #             "repair_local_metastore skipped (not local)"
+    #         )
+    #         return
+    #
+    #     warehouse = self.get_warehouse_path()
+    #
+    #     self.logger.info(
+    #         f"Warehouse Spark : "
+    #         f"{self.spark.conf.get('spark.sql.warehouse.dir')}"
+    #     )
+    #     self.logger.info(
+    #             f"Scanning warehouse : {warehouse}"
+    #         )
+    #
+    #     if not warehouse.exists():
+    #         self.logger.warning(
+    #             f"Warehouse does not exist : {warehouse}"
+    #         )
+    #         return
+    #
+    #     for root, dirs, files in os.walk(warehouse):
+    #
+    #         if "_delta_log" not in dirs:
+    #             continue
+    #
+    #         table_path = Path(root)
+    #         schema_dir = table_path.parent
+    #
+    #         print("=" * 80)
+    #         print(f"table_path  = {table_path}")
+    #         print(f"parent      = {table_path.parent}")
+    #         print(f"parent.name = {table_path.parent.name}")
+    #
+    #         schema_name = (
+    #             table_path.parent.name
+    #             .replace(".db", "")
+    #         )
+    #
+    #         print(f"schema_name = {schema_name}")
+    #         print(f"table_name  = {table_path.name}")
+    #
+    #         table_name = table_path.name
+    #
+    #         full_table_name = (
+    #             f"{schema_name}.{table_name}"
+    #         )
+    #
+    #         print(f"full_table_name = {full_table_name}")
+    #
+    #         try:
+    #
+    #             # 1. Créer le schéma
+    #             self.spark.sql(
+    #                 f"""
+    #                 CREATE DATABASE IF NOT EXISTS
+    #                 `{schema_name}`
+    #                 """
+    #             )
+    #
+    #             # 2. Vérifier si la table est déjà connue
+    #             if self.spark.catalog.tableExists(
+    #                     full_table_name
+    #             ):
+    #                 self.logger.info(
+    #                     f"Already registered : "
+    #                     f"{full_table_name}"
+    #                 )
+    #                 continue
+    #
+    #             # 3. Enregistrer la table Delta existante
+    #             self.spark.sql(
+    #                 f"""
+    #                 CREATE TABLE `{full_table_name}`
+    #                 USING DELTA
+    #                 LOCATION '{table_path.as_posix()}'
+    #                 """
+    #             )
+    #
+    #             self.logger.info(
+    #                 f"Registered : "
+    #                 f"{full_table_name}"
+    #             )
+    #
+    #         except Exception as e:
+    #
+    #             self.logger.error(
+    #                 f"Error repairing "
+    #                 f"{full_table_name} : {e}"
+    #             )
 
 
     #

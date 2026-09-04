@@ -1,6 +1,11 @@
 source ~/spark4_env/bin/activate
 cd /mnt/d/data-ai-engineer-roadmap
 
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+--env local \
+--periode 202501 \
+--taxi_type yellow
+
 ## Tu as actuellement deux environnements bien séparés :
 
 #### Environnement Conda Windows
@@ -413,7 +418,7 @@ python3 -m pip index versions pyspark
 df -h /
 du -sh /mnt/d/data-ai-engineer-roadmap/* 2>/dev/null | sort -h
 du -sh /mnt/d/data-ai-engineer-roadmap/spark-warehouse/* 2>/dev/null | sort -h
-
+ls -la /mnt/d/data-ai-engineer-roadmap/spark-warehouse/audit.db/audit_load
 
 du -sh /home/alpha/nyc_taxi_env
 du -sh /home/alpha/.ivy2
@@ -533,6 +538,9 @@ Airflow CLI le voit comme actif
 ### démarrer Airflow
 python -m airflow standalone
 
+Get-ChildItem D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow
+Test-Path "D:\data-ai-engineer-roadmap\metastore_db"
+
 
 cd /mnt/d/data-ai-engineer-roadmap
 
@@ -561,3 +569,8 @@ ORDER BY end_time DESC
 LIMIT 10
 """).show(truncate=False)
 '
+
+
+
+jps
+tasklist | findstr java

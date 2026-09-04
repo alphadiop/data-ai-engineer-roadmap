@@ -9,10 +9,11 @@ from nyc_taxi.src.utils.config.load_config import load_config
 from nyc_taxi.src.utils.load_json import load_json
 
 from nyc_taxi.src.utils.sql_schema.build_schema import build_schema
+from nyc_taxi.src.common.pipeline_step import PipelineStep
+from nyc_taxi.src.common.decorators import log_execution
+from nyc_taxi.src.common.pipeline_context import PipelineContext
 
-
-
-class EnvironmentSetup:
+class EnvironmentSetup(PipelineStep):
     """
     Initialise complètement l'environnement.
     c'est une opération d'initialisation.
@@ -29,6 +30,8 @@ class EnvironmentSetup:
             env="local",
             logger=None
     ):
+        super().__init__(spark,self.__class__.__name__)
+
         self.spark = spark
         self.env = env
         self.logger = logger
@@ -50,28 +53,31 @@ class EnvironmentSetup:
             logger
         )
 
+    @log_execution
+    def run(self, context):
+        """
+        """
+        context.path_sql_schema = Path(
+            self.config[self.env]["path_sql_schema"]
+        )
 
-    def run(
-            self,
-            path_sql_schema,
-            taxi_type="yellow"
-    ):
+        if self.environment_exists():
+            self.logger.info(
+                "Environnement déjà initialisé"
+            )
+            if self.env == "local":
+                self.repair_metastore()
+            return
 
-        if isinstance(path_sql_schema, str):
-            path_sql_schema = Path(path_sql_schema)
+        self.logger.info("=" * 80)
+        self.logger.info("Initialisation environnement")
+        self.logger.info("=" * 80)
 
-        if self.logger:
-            self.logger.info("=" * 80)
-            self.logger.info("Initialisation environnement")
-            self.logger.info("=" * 80)
-
-        if self.env != "local":
-            self.create_catalog()
+        self.create_catalog()
         self.create_schemas()
-
         self.create_tables(
-            path_sql_schema=path_sql_schema,
-            taxi_type=taxi_type
+            path_sql_schema=context.path_sql_schema,
+            taxi_type=context.taxi_type
         )
 
         if self.env == "local":
@@ -81,7 +87,6 @@ class EnvironmentSetup:
             self.logger.info("=" * 80)
             self.logger.info("Initialisation terminée")
             self.logger.info("=" * 80)
-
 
 
     def environment_exists(self):
@@ -127,7 +132,6 @@ class EnvironmentSetup:
 
 
     def create_schemas(self):
-
         if self.logger:
             self.logger.info(
                 "Création des schémas"
@@ -150,7 +154,7 @@ class EnvironmentSetup:
             ("gold", "gold_kpi_daily", "periode"),
 
             ("gold", "gold_dim_date", None),
-            ("ref", "gold_dim_location", None)
+            ("ref", "ref_dim_location", None)
         ]
 
         for schema_name, table_name, partition_by in tables:
@@ -223,23 +227,30 @@ class EnvironmentSetup:
             self.logger.info(
                 "Réparation metastore local"
             )
-
         self.catalog_manager.repair_local_metastore()
 
-if __name__=='__main__':
 
-    logger = PipelineLogger("Setup",env="local")
+if __name__=='__main__':
+    env="local"
+    taxi_type = "yellow"
+
+    logger = PipelineLogger(
+        name="Setup",
+        env=env
+    )
     spark = SparkManager(
         app_name="Setup",
-        env="local",
+        env=env,
         logger=logger
     ).get_spark()
 
+    context = PipelineContext(
+        env=env,
+        taxi_type=taxi_type
+    )
     EnvironmentSetup(
         spark=spark,
         env="local",
         logger=logger
-    ).run(
-        path_sql_schema="/nyc_taxi/schema",
-        taxi_type="yellow"
-    )
+    ).run(context)
+
