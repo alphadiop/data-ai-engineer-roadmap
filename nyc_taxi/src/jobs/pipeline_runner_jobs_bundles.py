@@ -1,5 +1,5 @@
 
-
+import logging
 from datetime import datetime
 from typing import TYPE_CHECKING
 import sys
@@ -46,7 +46,7 @@ class PipelineRunner:
         self.env = env
         self.taxi_type = taxi_type
         self.periode = periode
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
         self.steps = steps
 
         self.audit_manager = AuditManager(
@@ -230,7 +230,7 @@ if __name__ == "__main__":
         env=args.env,
         periode=args.periode,
         taxi_type=args.taxi_type
-    ).logger
+    )
 
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",
@@ -240,12 +240,12 @@ if __name__ == "__main__":
 
     spark = spark_manager.get_spark()
 
-    MetastoreRepair(
+    repair = MetastoreRepair(
         spark=spark,
         env=args.env,
         logger=logger
-    ).repair()
-
+    )
+    repair.repair()
 
     # =====================================================
     # DEBUG METASTORE
