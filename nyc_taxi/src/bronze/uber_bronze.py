@@ -1,7 +1,4 @@
-import os
-import sys
-from pyspark.sql import SparkSession
-from nyc_taxi.src.utils.config import load_config
+
 import logging
 from datetime import datetime
 from urllib.request import urlretrieve
@@ -155,7 +152,10 @@ class UberBronze(PipelineStep):
         self.logger.info(f"path_file = {path_file}")
         print("\n =============================================")
 
-        df_bronze = df.withColumn("periode", lit(context.periode)).cache()
+        df_bronze = df.withColumn(
+            "periode",
+            lit(context.periode)
+        )
         row_count = df_bronze.count()
 
         context.df_bronze = df_bronze

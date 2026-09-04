@@ -1,9 +1,4 @@
-### %pip install tabulate
-import os
-import sys
-import re
-from pyspark.sql.functions import lit
-#from tabulate import tabulate
+
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 
