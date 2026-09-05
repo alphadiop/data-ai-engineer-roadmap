@@ -231,6 +231,7 @@ if __name__ == "__main__":
         taxi_type=args.taxi_type
     )
 
+
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",
         env=env,

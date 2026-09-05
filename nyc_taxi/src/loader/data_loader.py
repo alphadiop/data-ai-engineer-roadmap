@@ -6,6 +6,7 @@ from nyc_taxi.src.utils.load_json import load_json
 import logging
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.decorators import log_execution
+from pathlib import Path
 
 class DataLoader(PipelineStep):
     """
@@ -84,6 +85,14 @@ class DataLoader(PipelineStep):
             table_name,
             df
     ):
+        log_path = Path(context.config["databricks"]["path_logs"])
+
+        self.logger.info(f"=============validate_schema=================")
+        self.logger.info(f"path_logs = {log_path}")
+        self.logger.info(f"exists = {log_path.exists()}")
+        self.logger.info(f"is_dir = {log_path.is_dir()}")
+        self.logger.info(f"=============validate_schema=================")
+
         schema_manager = SchemaManager(
             spark=self.spark,
             logger=self.logger
@@ -111,10 +120,10 @@ class DataLoader(PipelineStep):
             schema_json=schema_json
         )
 
-        # schema_manager.validate_columns(
-        #     df=df,
-        #     schema_json=schema_json
-        # )
+        schema_manager.validate_columns(
+            df=df,
+            schema_json=schema_json
+        )
 
         self.logger.info(
             f"Schema valide pour {table_name}"
