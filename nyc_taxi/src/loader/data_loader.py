@@ -298,7 +298,7 @@ class DataLoader(PipelineStep):
         self.logger.info( f"periode présente DANS schema JSON = {'periode' in schema_json}")
         # récupérer le DataFrame retourné par SchemaManager
         df = schema_manager.apply_schema( df=df, schema_json=schema_json )
-        self.logger.nfo('=========ici')
+        self.logger.info('=========ici')
 
         # récupérer le DataFrame retourné par SchemaManager
         df = schema_manager.apply_schema(
