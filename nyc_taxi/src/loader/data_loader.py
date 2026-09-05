@@ -8,7 +8,6 @@ from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.decorators import log_execution
 from pathlib import Path
 from pyspark.sql.functions import lit
-from pyspark.sql.functions import lit
 
 class DataLoader(PipelineStep):
     """
@@ -58,8 +57,8 @@ class DataLoader(PipelineStep):
                 context.df_fact_trips
             ),
             (
-                "gold",
-                "gold_dim_date",
+                "ref",
+                "dim_date",
                 context.df_dim_date
             ),
             (

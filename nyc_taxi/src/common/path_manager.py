@@ -66,8 +66,8 @@ class PathManager:
         return Path.cwd()
 
     def _get_schema_root(self):
-
         return self.project_root / "schema"
+
 
     def _resolve_path(self, path):
 
