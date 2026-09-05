@@ -68,7 +68,8 @@ class DataLoader(PipelineStep):
             self.logger.info(f"START WRITE {table_name}")
 
             self.logger.info(f"=============DEBUG===========")
-            self.logger.info(df.schema.simpleString())
+            self.spark.table("nyc_taxi.silver.silver_nyc_taxi").printSchema()
+            df.printSchema()
             self.logger.info(f"=============FIN===========")
 
             delta_manager.sauvegarde_tables_delta(
@@ -90,7 +91,7 @@ class DataLoader(PipelineStep):
     ):
         schema_manager = SchemaManager(
             spark=self.spark,
-            logger=self.logger
+            # logger=self.logger
         )
 
         path_manager = PathManager(
