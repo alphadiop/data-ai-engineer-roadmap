@@ -67,6 +67,10 @@ class DataLoader(PipelineStep):
 
             self.logger.info(f"START WRITE {table_name}")
 
+            self.logger.info(f"=============DEBUG===========")
+            self.logger.info(df.schema.simpleString())
+            self.logger.info(f"=============FIN===========")
+
             delta_manager.sauvegarde_tables_delta(
                 df=df,
                 schema_name=schema_name,
