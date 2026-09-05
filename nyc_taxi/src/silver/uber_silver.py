@@ -144,7 +144,7 @@ class UberSilver(PipelineStep):
             df
             .withColumn("tpep_pickup_datetime",col("tpep_pickup_datetime").cast("timestamp"))
             .withColumn("passenger_count", col("passenger_count").cast("bigint"))
-            .withColumn("payment_type", col("payment_type").cast("bigint"))
+            .withColumn("payment_type", col("payment_type").cast("TINYINT"))
             .withColumn("tpep_dropoff_datetime",col("tpep_dropoff_datetime").cast("timestamp"))
             .withColumn("trip_distance",col("trip_distance").cast("decimal(19,5)"))
             .withColumn("fare_amount",col("fare_amount").cast("decimal(19,5)"))
