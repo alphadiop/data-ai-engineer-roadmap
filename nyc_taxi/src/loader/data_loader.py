@@ -67,15 +67,6 @@ class DataLoader(PipelineStep):
             # )
 
             self.logger.info(f"START WRITE {table_name}")
-
-            self.logger.info("===== DF AVANT WRITE =====")
-            df.printSchema()
-            self.logger.info(
-                f"TYPE trip_duration_minute DF : "
-                f"{df.schema['trip_duration_minute'].dataType}"
-            )
-            df.select("trip_duration_minute").printSchema()
-
             delta_manager.sauvegarde_tables_delta(
                 df=df,
                 schema_name=schema_name,
@@ -115,10 +106,15 @@ class DataLoader(PipelineStep):
         schema_json = load_json(schema_file)
 
         # récupérer le DataFrame retourné par SchemaManager
-        df = schema_manager.validate_columns(
+        df = schema_manager.apply_schema(
             df=df,
             schema_json=schema_json
         )
+
+        # schema_manager.validate_columns(
+        #     df=df,
+        #     schema_json=schema_json
+        # )
 
         self.logger.info(
             f"Schema valide pour {table_name}"
