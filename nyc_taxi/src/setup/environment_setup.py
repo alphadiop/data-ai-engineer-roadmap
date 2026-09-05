@@ -28,7 +28,6 @@ class EnvironmentSetup(PipelineStep):
             self,
             spark,
             env="local",
-            config=None,
             logger=None
     ):
         super().__init__(spark,self.__class__.__name__)

@@ -296,7 +296,9 @@ class PipelineLogger:
 
         self.flush()
         extension = ".ok" if success else ".nook"
+
         current_path = Path(self.path_log)
+
         final_path = current_path.with_suffix(extension)
 
         # ----------------------------------------------------------

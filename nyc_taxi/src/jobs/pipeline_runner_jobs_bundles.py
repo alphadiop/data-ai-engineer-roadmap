@@ -94,6 +94,8 @@ class PipelineRunner:
         # ==========================================================
         context.spark = self.spark
         context.logger = self.logger
+
+        # Configuration de l'environnement
         context.config = self.config[context.env]
 
         context.env = self.env
@@ -230,7 +232,6 @@ if __name__ == "__main__":
         periode=args.periode,
         taxi_type=args.taxi_type
     )
-
 
     spark_manager = SparkManager(
         app_name="nyc_taxi_pipeline",

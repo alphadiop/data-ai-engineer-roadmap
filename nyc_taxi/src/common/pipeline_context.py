@@ -3,6 +3,11 @@ class PipelineContext:
     def __init__(self,env:str = "local",taxi_type:str=None):
         self.env = env
         self.taxi_type = taxi_type
+
+        self.spark = None
+        self.logger = None
+        self.config = None
+
         self.periode = None
         self.table_name = None
 
@@ -18,13 +23,11 @@ class PipelineContext:
         self.dim_location = None
       
         self.nb_rows = 0
-        self.status = None
-
-        self.duration_seconds=0
+        self.status = "RUNNING"
 
         self.start_time=None
         self.end_time=None
-        self.path_sql_schema = None
+        self.duration_seconds=None
 
         self.message = ""
         self.current_step = ""

@@ -114,8 +114,8 @@ class DataLoader(PipelineStep):
         )
 
         path_manager = PathManager(
-            config=context.config,
-            logger=self.logger
+            context=context
+
         )
 
         schema_file = path_manager.schema_path(
