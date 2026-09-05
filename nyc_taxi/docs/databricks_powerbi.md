@@ -8,6 +8,9 @@
 * JDBC URL : jdbc:databricks://dbc-8c847397-3c66.cloud.databricks.com:443/default;transportMode=http;ssl=1;AuthMech=3;httpPath=/sql/1.0/warehouses/f9e12649f3131654;
 * OAuth URL : https://dbc-8c847397-3c66.cloud.databricks.com/oidc
 
+* Exposer tes tables Gold dans un workspace Databricks cloud, 
+* idéalement avec Unity Catalog + SQL Warehouse
+
 
 `````text
                  Databricks
@@ -29,4 +32,105 @@
               └──────┬──────┘
                      ▼
                 Dashboard
+`````
+
+
+`````text
+NYC Taxi Parquet
+      ↓
+   BRONZE
+      ↓
+   SILVER
+      ↓
+    GOLD
+      ↓
+Databricks SQL Warehouse
+      ↓
+    Power BI
+      ↓
+ Modèle en étoile
+      ↓
+ Mesures DAX
+      ↓
+ Dashboard NYC Taxi
+`````
+
+
+
+`````text
+                 DATA LAKE
+                    │
+             NYC Taxi Parquet
+                    │
+                    ▼
+             ┌──────────────┐
+             │    BRONZE    │
+             │ raw taxi     │
+             └──────┬───────┘
+                    │
+                    ▼
+             ┌──────────────┐
+             │    SILVER    │
+             │ cleaned data │
+             └──────┬───────┘
+                    │
+                    ▼
+             ┌──────────────┐
+             │     GOLD     │
+             │              │
+             │ fact_trips   │
+             │ dim_date     │
+             │ dim_location │
+             │ kpi_daily    │
+             └──────┬───────┘
+                    │
+                    ▼
+        ┌───────────────────────┐
+        │ Databricks SQL        │
+        │ Warehouse             │
+        └───────────┬───────────┘
+                    │
+             Azure Databricks
+              Power BI connector
+                    │
+                    ▼
+             ┌──────────────┐
+             │   Power BI   │
+             │ Semantic     │
+             │ Model       │
+             └──────┬───────┘
+                    │
+                    ▼
+               Dashboard
+`````
+
+
+`````text
+`````
+
+
+
+`````text
+`````
+
+
+`````text
+`````
+
+
+`````text
+`````
+
+
+`````text
+`````
+
+
+`````text
+`````
+
+`````text
+`````
+
+`````text
 `````
