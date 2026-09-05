@@ -71,7 +71,7 @@ class ReferenceDataLoader(PipelineStep):
         # ======================================================
 
         csv_path = Path(
-            context.config["path_ref_dim_location"]
+            context.config["ref_path"]
         )
 
         self.logger.info(
