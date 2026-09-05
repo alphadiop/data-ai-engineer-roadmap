@@ -36,7 +36,7 @@
   "nullable": ""
   },
 "payment_type": {
-  "sql_type": "TINYINT",
+  "sql_type": "BIGINT",
   "nullable": ""
   },
 "fare_amount": {
