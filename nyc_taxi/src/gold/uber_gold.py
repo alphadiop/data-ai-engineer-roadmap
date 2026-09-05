@@ -110,6 +110,7 @@ class UberGold(PipelineStep):
                 .alias("date")
             )
             .distinct()
+            .withColumn( "periode", (year(col("date")) * 100 + month(col("date"))).cast("int"))
             .withColumn("year", year("date").cast(ShortType()))
             .withColumn("quarter", quarter("date").cast(ByteType()))
             .withColumn("month", month("date").cast(ByteType()))
