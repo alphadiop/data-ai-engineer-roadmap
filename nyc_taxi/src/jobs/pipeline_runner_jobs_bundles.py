@@ -22,7 +22,7 @@ from nyc_taxi.src.utils.config.load_config import load_config
 
 from nyc_taxi.src.audit.audit_manager import AuditManager
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
-
+from nyc_taxi.src.table_reference.load_tab_ref import ReferenceDataLoader
 
 if TYPE_CHECKING:
     from nyc_taxi.src.logger.logger import PipelineLogger
@@ -275,6 +275,11 @@ if __name__ == "__main__":
 
         steps=[
             EnvironmentSetup(
+                spark=spark,
+                env=env,
+                logger=logger
+            ),
+            ReferenceDataLoader(
                 spark=spark,
                 env=env,
                 logger=logger

@@ -24,7 +24,7 @@ class DataLoader(PipelineStep):
         self.logger = logger
 
 
-
+    @log_execution
     def run(self, context):
 
         # ==========================================================
@@ -289,16 +289,6 @@ class DataLoader(PipelineStep):
         )
 
         schema_json = load_json(schema_file)
-
-        self.logger.info('=========ici')
-        self.logger.info( f"TABLE = {table_name}" )
-        self.logger.info( f"Colonnes AVANT apply_schema = {df.columns}" )
-        self.logger.info( f"periode présente AVANT apply_schema = {'periode' in df.columns}" )
-        self.logger.info( f"Schema JSON columns = {list(schema_json.keys())}" )
-        self.logger.info( f"periode présente DANS schema JSON = {'periode' in schema_json}")
-        # récupérer le DataFrame retourné par SchemaManager
-        df = schema_manager.apply_schema( df=df, schema_json=schema_json )
-        self.logger.info('=========ici')
 
         # récupérer le DataFrame retourné par SchemaManager
         df = schema_manager.apply_schema(
