@@ -91,6 +91,21 @@ class DataLoader(PipelineStep):
         self.logger.info(f"path_logs = {log_path}")
         self.logger.info(f"exists = {log_path.exists()}")
         self.logger.info(f"is_dir = {log_path.is_dir()}")
+
+        log_path = Path(context.config["path_logs"])
+
+        test_file = log_path / "test.log"
+
+        test_file.touch(exist_ok=True)
+
+        self.logger.info(
+            f"TEST FILE = {test_file}"
+        )
+
+        self.logger.info(
+            f"TEST FILE EXISTS = {test_file.exists()}"
+        )
+
         self.logger.info(f"=============validate_schema=================")
 
         schema_manager = SchemaManager(

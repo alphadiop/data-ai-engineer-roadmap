@@ -42,41 +42,25 @@ class PipelineLogger:
         # ==========================================================
         # DATABRICKS
         # ==========================================================
-        if self.env == "databricks":
-
-            # ------------------------------------------------------
-            # Databricks gère déjà les logs d'exécution.
-            # Pas de warehouse_dir
-            # Pas de metastore_dir
-            # Pas de path_logs obligatoire
-            # ------------------------------------------------------
-
-            root_log_dir = None
-
-        # ==========================================================
-        # LOCAL / WSL
-        # ==========================================================
-        else:
-
-            if self.env not in config:
-                raise ValueError(
-                    f"Environment '{self.env}' not found "
-                    f"in variable_environnement configuration."
-                )
-
-            if "path_logs" not in config[self.env]:
-                raise KeyError(
-                    f"'path_logs' is missing for environment "
-                    f"'{self.env}' in variable_environnement."
-                )
-
-            root_log_dir = config[self.env]["path_logs"]
-
-            self.path_log = self.get_path_logs(
-                root_log_dir=root_log_dir,
-                periode=periode,
-                taxi_type=taxi_type
+        if self.env not in config:
+            raise ValueError(
+                f"Environment '{self.env}' not found "
+                f"in variable_environnement configuration."
             )
+
+        if "path_logs" not in config[self.env]:
+            raise KeyError(
+                f"'path_logs' is missing for environment "
+                f"'{self.env}' in variable_environnement."
+            )
+
+        root_log_dir = config[self.env]["path_logs"]
+
+        self.path_log = self.get_path_logs(
+            root_log_dir=root_log_dir,
+            periode=periode,
+            taxi_type=taxi_type
+        )
 
         # ----------------------------------------------------------
         # Suppression des anciens handlers
@@ -104,23 +88,19 @@ class PipelineLogger:
             console_handler
         ]
 
-        # ==========================================================
-        # FILE HANDLER UNIQUEMENT EN LOCAL
-        # ==========================================================
-        if self.env != "databricks":
 
-            file_handler = logging.FileHandler(
-                self.path_log,
-                mode="a",
-                encoding="utf-8"
-            )
+        file_handler = logging.FileHandler(
+            self.path_log,
+            mode="a",
+            encoding="utf-8"
+        )
 
-            file_handler.setLevel(level)
-            file_handler.setFormatter(formatter)
+        file_handler.setLevel(level)
+        file_handler.setFormatter(formatter)
 
-            self.logger.addHandler(file_handler)
+        self.logger.addHandler(file_handler)
 
-            self.handlers.append(file_handler)
+        self.handlers.append(file_handler)
 
         # ----------------------------------------------------------
         # Informations de démarrage
@@ -131,13 +111,9 @@ class PipelineLogger:
         self.info(f"environment      = {env}")
         self.info(f"periode          = {periode}")
         self.info(f"taxi_type        = {taxi_type}")
-
-        if self.env == "databricks":
-            self.info("logging_mode     = Databricks console")
-        else:
-            self.info(f"path_logs        = {root_log_dir}")
-            self.info(f"log_file         = {self.path_log}")
-
+        self.info(f"path_logs        = {root_log_dir}")
+        self.info(f"log_file         = {self.path_log}")
+        self.info(f"logging_mode     = console + file")
         self.info("=" * 120)
 
     # ==================================================================
@@ -303,38 +279,24 @@ class PipelineLogger:
 
     def finalize(self, success: bool):
         """
-        Finalise le fichier de log en local.
+        Finalise le fichier de log en local et Databricks.
 
-        En Databricks, aucun fichier n'est renommé :
-        les logs restent dans les logs d'exécution Databricks.
+        Le fichier est renommé :
+            .ok   -> pipeline réussi
+            .nook -> pipeline en erreur
         """
-
-        self.flush()
-
         # ----------------------------------------------------------
         # Databricks
         # ----------------------------------------------------------
+        status = "OK" if success else "NOOK"
 
-        if self.env == "databricks":
+        self.info("=" * 120)
+        self.info(f"PIPELINE FINALIZED - STATUS = {status}")
+        self.info("=" * 120)
 
-            status = "OK" if success else "NOOK"
-
-            self.info("=" * 120)
-            self.info(
-                f"PIPELINE FINALIZED - STATUS = {status}"
-            )
-            self.info("=" * 120)
-
-            return
-
-        # ----------------------------------------------------------
-        # Local
-        # ----------------------------------------------------------
-
+        self.flush()
         extension = ".ok" if success else ".nook"
-
         current_path = Path(self.path_log)
-
         final_path = current_path.with_suffix(extension)
 
         # ----------------------------------------------------------
@@ -360,16 +322,13 @@ class PipelineLogger:
         # ----------------------------------------------------------
         # Renommage
         # ----------------------------------------------------------
-
         if current_path.exists():
-
             current_path.rename(final_path)
-
             self.path_log = str(final_path)
 
+            # Le FileHandler est fermé, donc ce message
+            # ira uniquement dans la console.
+            self.logger.info(f"Log file finalized: {self.path_log }")
         else:
-
-            self.logger.warning(
-                f"Log file not found: {current_path}"
-            )
+            self.logger.warning(f"Log file not found: {current_path}")
 

@@ -25,7 +25,7 @@ from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
 
 
 if TYPE_CHECKING:
-    from nyc_taxi.src.common.logger import PipelineLogger
+    from nyc_taxi.src.logger.logger import PipelineLogger
 
 
 class PipelineRunner:
