@@ -45,7 +45,11 @@ class DataLoader(PipelineStep):
             ("gold", "gold_kpi_daily", context.df_kpi_daily)
         ]
 
-        partitioned_tables = { "silver_nyc_taxi", "gold_fact_trips", "gold_kpi_daily" }
+        partitioned_tables = {
+            "silver_nyc_taxi",
+            "gold_fact_trips",
+            "gold_kpi_daily"
+        }
 
         for schema_name, table_name, df in tables:
             self.logger.info( f"START VALIDATION {table_name}")

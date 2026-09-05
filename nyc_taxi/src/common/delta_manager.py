@@ -467,44 +467,106 @@ class DeltaManager:
                 f"Period {periode} deleted from {full_table_name}"
             )
 
+
     def sauvegarde_tables_delta(
-        self,
-        df: DataFrame,
-        schema_name: str,
-        table_name: str,
-        periode:int,
-        replace:bool=False
+            self,
+            df: DataFrame,
+            schema_name: str,
+            table_name: str,
+            periode: int,
+            replace: bool = False
     ):
         full_table_name = self.catalog_manager.get_table_name(
             schema_name=schema_name,
             table_name=table_name
         )
+
         self.logger.info(
             f"Table TO SAVE : {full_table_name}"
         )
 
+        # ============================================================
+        # TABLES PARTITIONNÉES PAR PERIODE
+        # ============================================================
+
+        partitioned_tables = {
+            "silver_nyc_taxi",
+            "gold_fact_trips",
+            "gold_kpi_daily"
+        }
+
         if replace:
-            (
-                df.write
-                .format("delta")
-                .mode("overwrite")
-                .option("replaceWhere", f"periode = {periode}")
-                .saveAsTable(full_table_name)
-            )
+
+            if table_name in partitioned_tables:
+
+                # ----------------------------------------------------
+                # Vérification de la colonne periode
+                # ----------------------------------------------------
+
+                if "periode" not in df.columns:
+                    raise ValueError(
+                        f"La table {table_name} est partitionnée "
+                        f"par 'periode', mais la colonne est absente "
+                        f"du DataFrame."
+                    )
+
+                self.logger.info(
+                    f"Overwrite partiel : "
+                    f"{full_table_name} | periode={periode}"
+                )
+
+                (
+                    df.write
+                    .format("delta")
+                    .mode("overwrite")
+                    .option(
+                        "replaceWhere",
+                        f"periode = {periode}"
+                    )
+                    .saveAsTable(full_table_name)
+                )
+
+            # ========================================================
+            # TABLE NON PARTITIONNÉE
+            # ========================================================
+
+            else:
+
+                self.logger.info(
+                    f"Overwrite complet : {full_table_name}"
+                )
+
+                (
+                    df.write
+                    .format("delta")
+                    .mode("overwrite")
+                    .saveAsTable(full_table_name)
+                )
+
             self.logger.info(
                 f"Table {full_table_name} replaced"
             )
 
+        # ============================================================
+        # APPEND
+        # ============================================================
+
         else:
+
+            self.logger.info(
+                f"Append : {full_table_name}"
+            )
+
             (
-            df.coalesce(self.nombre_partition)
+                df.coalesce(self.nombre_partition)
                 .write
                 .format("delta")
                 .mode("append")
                 .saveAsTable(full_table_name)
             )
+
             self.logger.info(
-                f"Table {full_table_name} saved"
+                f"Table {full_table_name} appended"
             )
 
 

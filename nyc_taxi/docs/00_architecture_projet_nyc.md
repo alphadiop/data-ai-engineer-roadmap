@@ -82,6 +82,28 @@ env
 │
 └── configuration
 ```
+```text
+DataFrame Silver/Gold
+        ↓
+Ajouter periode
+        ↓
+validate_schema()
+        ↓
+count()
+        ↓
+DeltaManager
+        ↓
+┌───────────────────────────────┐
+│ partitionnée par periode ?    │
+└───────────────┬───────────────┘
+                │
+       ┌────────┴────────┐
+       ↓                 ↓
+      OUI               NON
+       ↓                 ↓
+replaceWhere       overwrite
+periode=202501      complet
+```
 
 
 ## Classes principales
