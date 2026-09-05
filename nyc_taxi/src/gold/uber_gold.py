@@ -255,13 +255,13 @@ class UberGold(PipelineStep):
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.silver.silver_nyc_taxi")
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_fact_trips")
         self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_kpi_daily")
-        self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.gold.gold_dim_date")
+        self.spark.sql("DROP TABLE IF EXISTS nyc_taxi.ref.dim_date")
 
 
     @log_execution
     def purges_tables(self):
         self.spark.sql("TRUNCATE TABLE nyc_taxi.silver.silver_nyc_taxi").show(truncate=False)
-        self.spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_dim_date").show(truncate=False)
+        self.spark.sql("TRUNCATE TABLE nyc_taxi.ref.dim_date").show(truncate=False)
         self.spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_kpi_daily").show(truncate=False)
         self.spark.sql("TRUNCATE TABLE nyc_taxi.gold.gold_fact_trips").show(truncate=False)
 
