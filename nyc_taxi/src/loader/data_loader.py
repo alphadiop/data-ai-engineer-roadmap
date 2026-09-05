@@ -91,7 +91,7 @@ class DataLoader(PipelineStep):
     ):
         schema_manager = SchemaManager(
             spark=self.spark,
-            # logger=self.logger
+            logger=self.logger
         )
 
         path_manager = PathManager(
