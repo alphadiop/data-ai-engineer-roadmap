@@ -12,6 +12,24 @@
 * idéalement avec Unity Catalog + SQL Warehouse
 
 
+#### gold_fact_trips
+* periode
+* trip_date
+* date
+* PULocationID
+* DOLocationID
+* trip_duration_minute
+* trip_distance
+* passenger_count
+* fare_amount
+* tip_amount
+* total_amount
+* payment_type
+
+PULocationID  = Pickup Location
+DOLocationID  = Dropoff Location
+
+
 `````text
                  Databricks
                      │

@@ -69,8 +69,8 @@ class UberGold(PipelineStep):
                 context.df_fact_trips
             ),
             (
-                "gold",
-                "gold_dim_date",
+                "ref",
+                "dim_date",
                 context.df_dim_date
             ),
             (
@@ -84,10 +84,9 @@ class UberGold(PipelineStep):
             f"{'=' * 12} Fin Construction Gold {'=' * 12}"
         )
 
-
-
     @log_execution
     def get_dim_date(self, df_silver: DataFrame) -> DataFrame:
+
         from pyspark.sql.functions import (
             col,
             year,
@@ -106,8 +105,9 @@ class UberGold(PipelineStep):
         return (
             df_silver
             .select(
-                col("periode").cast("int").alias("periode"),
-                col("tpep_pickup_datetime").cast("date").alias("date")
+                col("tpep_pickup_datetime")
+                .cast("date")
+                .alias("date")
             )
             .distinct()
             .withColumn("year", year("date").cast(ShortType()))
@@ -120,12 +120,55 @@ class UberGold(PipelineStep):
             .withColumn(
                 "trip_date",
                 (
-                    year(col("date")) * 10000
+                        year(col("date")) * 10000
                         + month(col("date")) * 100
                         + dayofmonth(col("date"))
                 ).cast("int")
             )
         )
+
+
+    #
+    # @log_execution
+    # def get_dim_date(self, df_silver: DataFrame) -> DataFrame:
+    #     from pyspark.sql.functions import (
+    #         col,
+    #         year,
+    #         month,
+    #         dayofmonth,
+    #         quarter,
+    #         dayofweek,
+    #         date_format
+    #     )
+    #
+    #     from pyspark.sql.types import (
+    #         ByteType,
+    #         ShortType
+    #     )
+    #
+    #     return (
+    #         df_silver
+    #         .select(
+    #             col("periode").cast("int").alias("periode"),
+    #             col("tpep_pickup_datetime").cast("date").alias("date")
+    #         )
+    #         .distinct()
+    #         .withColumn("year", year("date").cast(ShortType()))
+    #         .withColumn("quarter", quarter("date").cast(ByteType()))
+    #         .withColumn("month", month("date").cast(ByteType()))
+    #         .withColumn("day", dayofmonth("date").cast(ByteType()))
+    #         .withColumn("day_of_week", dayofweek("date").cast(ByteType()))
+    #         .withColumn("day_name", date_format("date", "EEEE"))
+    #         .withColumn("month_name", date_format("date", "MMMM"))
+    #         .withColumn(
+    #             "trip_date",
+    #             (
+    #                 year(col("date")) * 10000
+    #                     + month(col("date")) * 100
+    #                     + dayofmonth(col("date"))
+    #             ).cast("int")
+    #         )
+    #     )
 
     # "gold_dim_date", "gold_kpi_daily", "gold_fact_trips", "dim_location"
 

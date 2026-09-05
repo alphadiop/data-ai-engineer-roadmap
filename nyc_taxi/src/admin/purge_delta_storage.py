@@ -29,7 +29,7 @@ class PurgeDeltaStorage:
         "audit.audit_row_count",
         "silver.silver_nyc_taxi",
         "gold.gold_fact_trips",
-        "gold.gold_dim_date",
+        "ref.dim_date",
         "gold.gold_kpi_daily"
     ]
 

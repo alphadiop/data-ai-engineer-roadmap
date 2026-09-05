@@ -10,7 +10,7 @@ from typing import List, Tuple
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from common.logger import PipelineLogger
+    from logger.logger import PipelineLogger
 
 def get_columns_from_schema(schema: List[Tuple[str, str, str]], logger: 'PipelineLogger' = None) -> List[str]:
     try:

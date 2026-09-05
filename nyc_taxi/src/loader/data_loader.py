@@ -41,7 +41,7 @@ class DataLoader(PipelineStep):
         tables = [
             ("silver", "silver_nyc_taxi", context.df_silver),
             ("gold", "gold_fact_trips", context.df_fact_trips),
-            ("gold", "gold_dim_date", context.df_dim_date),
+            ("ref", "dim_date", context.df_dim_date),
             ("gold", "gold_kpi_daily", context.df_kpi_daily)
         ]
 

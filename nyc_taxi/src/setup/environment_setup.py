@@ -98,8 +98,8 @@ class EnvironmentSetup(PipelineStep):
             ("audit", "audit_load"),
             ("audit", "audit_row_count"),
             ("silver", "silver_nyc_taxi"),
+            ("ref", "dim_date"),
             ("gold", "gold_fact_trips"),
-            ("gold", "gold_dim_date"),
             ("gold", "gold_kpi_daily")
         ]
 
@@ -152,7 +152,7 @@ class EnvironmentSetup(PipelineStep):
             ("gold", "gold_fact_trips", "periode"),
             ("gold", "gold_kpi_daily", "periode"),
 
-            ("gold", "gold_dim_date", None),
+            ("ref", "dim_date", None),
             ("ref", "ref_dim_location", None)
         ]
 

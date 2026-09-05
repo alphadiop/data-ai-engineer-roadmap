@@ -51,7 +51,7 @@ class MaintenanceJob(PipelineStep):
         tables = [
             ("silver", "silver_nyc_taxi"),
             ("gold", "gold_fact_trips"),
-            ("gold", "gold_dim_date"),
+            ("ref", "dim_date"),
             ("gold", "gold_kpi_daily")
         ]
 
@@ -105,6 +105,6 @@ class MaintenanceJob(PipelineStep):
         return [
             "nyc_taxi.silver.silver_nyc_taxi",
             "nyc_taxi.gold.gold_fact_trips",
-            "nyc_taxi.gold.gold_dim_date",
+            "nyc_taxi.ref.dim_date",
             "nyc_taxi.gold.gold_kpi_daily",
         ]
