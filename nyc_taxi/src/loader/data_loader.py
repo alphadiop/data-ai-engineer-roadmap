@@ -85,7 +85,7 @@ class DataLoader(PipelineStep):
             table_name,
             df
     ):
-        log_path = Path(context.config["databricks"]["path_logs"])
+        log_path = Path(context.config["path_logs"])
 
         self.logger.info(f"=============validate_schema=================")
         self.logger.info(f"path_logs = {log_path}")
