@@ -12,7 +12,7 @@
   "nullable": ""
   },
 "passenger_count": {
-  "sql_type": "INT",
+  "sql_type": "BIGINT",
   "nullable": ""
   },
 "trip_distance": {

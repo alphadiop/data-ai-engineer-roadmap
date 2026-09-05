@@ -142,10 +142,8 @@ class UberSilver(PipelineStep):
     def cast_columns(self, df: DataFrame) -> DataFrame:
         return (
             df
-            .withColumn(
-                "tpep_pickup_datetime",
-                col("tpep_pickup_datetime").cast("timestamp")
-            )
+            .withColumn("tpep_pickup_datetime",col("tpep_pickup_datetime").cast("timestamp"))
+            .withColumn("passenger_count", col("passenger_count").cast("bigint"))
             .withColumn(
                 "tpep_dropoff_datetime",
                 col("tpep_dropoff_datetime").cast("timestamp")
