@@ -1,8 +1,4 @@
 {
-  "periode": {
-    "sql_type": "INT",
-    "nullable": "NOT NULL"
-  },
   "date": {
     "sql_type": "DATE",
     "nullable": "NOT NULL"
