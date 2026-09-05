@@ -70,6 +70,11 @@ class DataLoader(PipelineStep):
 
             self.logger.info("===== DF AVANT WRITE =====")
             df.printSchema()
+            self.logger.info(
+                f"TYPE trip_duration_minute DF : "
+                f"{df.schema['trip_duration_minute'].dataType}"
+            )
+            df.select("trip_duration_minute").printSchema()
 
             delta_manager.sauvegarde_tables_delta(
                 df=df,
