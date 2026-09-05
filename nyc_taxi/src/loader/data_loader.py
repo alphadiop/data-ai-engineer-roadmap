@@ -46,7 +46,8 @@ class DataLoader(PipelineStep):
 
         for schema_name, table_name, df in tables:
 
-            self.validate_schema(
+            # récupérer le DataFrame éventuellement casté
+            df = self.validate_schema(
                 context=context,
                 table_name=table_name,
                 df=df
@@ -67,10 +68,8 @@ class DataLoader(PipelineStep):
 
             self.logger.info(f"START WRITE {table_name}")
 
-            self.logger.info(f"=============DEBUG===========")
-            self.spark.table("nyc_taxi.silver.silver_nyc_taxi").printSchema()
+            self.logger.info("===== DF AVANT WRITE =====")
             df.printSchema()
-            self.logger.info(f"=============FIN===========")
 
             delta_manager.sauvegarde_tables_delta(
                 df=df,
@@ -110,7 +109,8 @@ class DataLoader(PipelineStep):
 
         schema_json = load_json(schema_file)
 
-        schema_manager.validate_columns(
+        # récupérer le DataFrame retourné par SchemaManager
+        df = schema_manager.validate_columns(
             df=df,
             schema_json=schema_json
         )
@@ -118,5 +118,7 @@ class DataLoader(PipelineStep):
         self.logger.info(
             f"Schema valide pour {table_name}"
         )
+
+        return df
 
 
