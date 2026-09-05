@@ -290,7 +290,7 @@ class DataLoader(PipelineStep):
 
         schema_json = load_json(schema_file)
 
-        self.logger.nfo('=========ici')
+        self.logger.info('=========ici')
         self.logger.info( f"TABLE = {table_name}" )
         self.logger.info( f"Colonnes AVANT apply_schema = {df.columns}" )
         self.logger.info( f"periode présente AVANT apply_schema = {'periode' in df.columns}" )
