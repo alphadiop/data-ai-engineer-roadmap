@@ -1,25 +1,33 @@
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution
-from pyspark.sql.functions import lit
 import logging
 
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import expr
+
+
 
 from pyspark.sql.functions import (
-    unix_timestamp,
+    col,
+    lit,
     year,
     month,
     dayofmonth,
-    hour, dayofweek,
+    quarter,
+    dayofweek,
+    date_format,
     to_date,
-    sum,
+    concat,
+    lpad,
     avg,
-    count,
-    col,
-    round,
-    when
+    count
+)
+
+from pyspark.sql.types import (
+    ByteType,
+    ShortType
 )
 
 
@@ -47,7 +55,6 @@ class UberGold(PipelineStep):
             ne sont pas des tables optimisables par période
         """
         self.ref_path = context.config["ref_path"]
-        self.periode = context.periode
 
         df_silver = context.df_silver
         self.logger.info(
@@ -55,7 +62,7 @@ class UberGold(PipelineStep):
         )
 
         context.df_fact_trips = self.get_fact_trips(df_silver)
-        context.df_dim_date = self.get_dim_date(df_silver)
+        context.df_dim_date = self.get_dim_date(df_silver,context.periode)
         context.df_kpi_daily = self.get_kpi_daily(df_silver)
 
         context.tables_to_load = [
@@ -85,64 +92,8 @@ class UberGold(PipelineStep):
             f"{'=' * 12} Fin Construction Gold {'=' * 12}"
         )
 
-    @log_execution
-    def get_dim_date(self, df_silver: DataFrame) -> DataFrame:
-
-        from pyspark.sql.functions import (
-            col,
-            year,
-            month,
-            dayofmonth,
-            quarter,
-            dayofweek,
-            date_format
-        )
-
-        from pyspark.sql.types import (
-            ByteType,
-            ShortType
-        )
-
-        return (
-            df_silver
-            .select(
-                col("tpep_pickup_datetime")
-                .cast("date")
-                .alias("date")
-            )
-            .distinct()
-            .withColumn("periode",lit(self.periode).cast("int"))
-            .withColumn("year", year("date").cast(ShortType()))
-            .withColumn("quarter", quarter("date").cast(ByteType()))
-            .withColumn("month", month("date").cast(ByteType()))
-            .withColumn("day", dayofmonth("date").cast(ByteType()))
-            .withColumn("day_of_week", dayofweek("date").cast(ByteType()))
-            .withColumn("day_name", date_format("date", "EEEE"))
-            .withColumn("month_name", date_format("date", "MMMM"))
-            .withColumn(
-                "trip_date",
-                (
-                        year(col("date")) * 10000
-                        + month(col("date")) * 100
-                        + dayofmonth(col("date"))
-                ).cast("int")
-            )
-        )
-
-
-    #
     # @log_execution
-    # def get_dim_date(self, df_silver: DataFrame) -> DataFrame:
-    #     from pyspark.sql.functions import (
-    #         col,
-    #         year,
-    #         month,
-    #         dayofmonth,
-    #         quarter,
-    #         dayofweek,
-    #         date_format
-    #     )
-    #
+    # def get_dim_date(self, df_silver: DataFrame, periode: int) -> DataFrame:
     #     from pyspark.sql.types import (
     #         ByteType,
     #         ShortType
@@ -151,10 +102,12 @@ class UberGold(PipelineStep):
     #     return (
     #         df_silver
     #         .select(
-    #             col("periode").cast("int").alias("periode"),
-    #             col("tpep_pickup_datetime").cast("date").alias("date")
+    #             col("tpep_pickup_datetime")
+    #             .cast("date")
+    #             .alias("date")
     #         )
     #         .distinct()
+    #         .withColumn("periode",lit(periode).cast("int"))
     #         .withColumn("year", year("date").cast(ShortType()))
     #         .withColumn("quarter", quarter("date").cast(ByteType()))
     #         .withColumn("month", month("date").cast(ByteType()))
@@ -165,7 +118,7 @@ class UberGold(PipelineStep):
     #         .withColumn(
     #             "trip_date",
     #             (
-    #                 year(col("date")) * 10000
+    #                     year(col("date")) * 10000
     #                     + month(col("date")) * 100
     #                     + dayofmonth(col("date"))
     #             ).cast("int")
@@ -198,6 +151,118 @@ class UberGold(PipelineStep):
                 "payment_type"
             )
         )
+
+    @log_execution
+    def get_dim_date(
+            self,
+            df_silver: DataFrame,
+            periode: int
+    ) -> DataFrame:
+
+
+        # ---------------------------------------------------------
+        # 1. Construire les bornes du mois à partir de periode
+        # ---------------------------------------------------------
+
+        periode_str = str(periode)
+
+        annee = periode_str[:4]
+        mois = periode_str[4:6]
+
+        date_debut = f"{annee}-{mois}-01"
+
+        # Premier jour du mois suivant
+        date_fin = (
+                to_date(lit(date_debut))
+                + expr("INTERVAL 1 MONTH")
+        )
+
+        # ---------------------------------------------------------
+        # 2. Extraire la date du trajet
+        # ---------------------------------------------------------
+
+        df = (
+            df_silver
+            .select(
+                col("tpep_pickup_datetime")
+                .cast("date")
+                .alias("date")
+            )
+            .distinct()
+        )
+
+        # ---------------------------------------------------------
+        # 3. Garder UNIQUEMENT les dates du mois de la période
+        # ---------------------------------------------------------
+
+        df = (
+            df
+            .filter(
+                (col("date") >= to_date(lit(date_debut))) &
+                (col("date") < date_fin)
+            )
+        )
+
+        # ---------------------------------------------------------
+        # 4. Construire dim_date
+        # ---------------------------------------------------------
+
+        return (
+            df
+
+            # periode = période du batch
+            .withColumn(
+                "periode",
+                lit(periode).cast("int")
+            )
+
+            .withColumn(
+                "year",
+                year("date").cast(ShortType())
+            )
+
+            .withColumn(
+                "quarter",
+                quarter("date").cast(ByteType())
+            )
+
+            .withColumn(
+                "month",
+                month("date").cast(ByteType())
+            )
+
+            .withColumn(
+                "day",
+                dayofmonth("date").cast(ByteType())
+            )
+
+            .withColumn(
+                "day_of_week",
+                dayofweek("date").cast(ByteType())
+            )
+
+            .withColumn(
+                "day_name",
+                date_format("date", "EEEE")
+            )
+
+            .withColumn(
+                "month_name",
+                date_format("date", "MMMM")
+            )
+
+            .withColumn(
+                "trip_date",
+                (
+                        year(col("date")) * 10000
+                        + month(col("date")) * 100
+                        + dayofmonth(col("date"))
+                ).cast("int")
+            )
+        )
+
+
+
 
     @log_execution
     def get_kpi_daily(self, df_silver: DataFrame) -> DataFrame:
