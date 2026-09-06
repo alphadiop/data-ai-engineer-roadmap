@@ -1,3 +1,22 @@
+### BI
+* [ ] SQL (requêtes, jointures, agrégations, fenêtres)
+* [ ] Modélisation décisionnelle (étoile, flocon)
+* [ ] Power BI (DAX, Power Query, rafraîchissement)
+* [ ] Cas métier et KPI
+* [ ] Performance et bonnes pratiques
+````sql
+````
+
+
+````sql
+````
+
+````sql
+````
+
+````sql
+````
+
 ### Quelle est la différence entre Power Query, DAX et SQL ?
 * [ ] SQL : Extraction des données
 * [ ] Power Query : Transformation ETL

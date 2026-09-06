@@ -64,21 +64,21 @@ class PipelineRunner:
         # ==========================================================
         # DÉTERMINATION DE LA PÉRIODE
         # ==========================================================
-        if self.periode is None:
-
-            self.periode = self.audit_manager.get_next_period(
-                table_name="silver_nyc_taxi",
-                taxi_type=self.taxi_type
-            )
-            self.logger.info(
-                f"Période déterminée automatiquement : "
-                f"{self.periode}"
-            )
-        else:
-            self.logger.info(
-                f"Période fournie explicitement : "
-                f"{self.periode}"
-            )
+        # if self.periode is None:
+        #
+        #     self.periode = self.audit_manager.get_next_period(
+        #         table_name="silver_nyc_taxi",
+        #         taxi_type=self.taxi_type
+        #     )
+        #     self.logger.info(
+        #         f"Période déterminée automatiquement : "
+        #         f"{self.periode}"
+        #     )
+        # else:
+        #     self.logger.info(
+        #         f"Période fournie explicitement : "
+        #         f"{self.periode}"
+        #     )
 
         # ==========================================================
         # CONTEXTE

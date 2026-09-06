@@ -1,7 +1,7 @@
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution
-
+from pyspark.sql.functions import lit
 import logging
 
 from pyspark.sql import SparkSession
@@ -47,6 +47,7 @@ class UberGold(PipelineStep):
             ne sont pas des tables optimisables par période
         """
         self.ref_path = context.config["ref_path"]
+        self.periode = context.periode
 
         df_silver = context.df_silver
         self.logger.info(
@@ -110,7 +111,7 @@ class UberGold(PipelineStep):
                 .alias("date")
             )
             .distinct()
-            .withColumn( "periode", (year(col("date")) * 100 + month(col("date"))).cast("int"))
+            .withColumn("periode",lit(self.periode).cast("int"))
             .withColumn("year", year("date").cast(ShortType()))
             .withColumn("quarter", quarter("date").cast(ByteType()))
             .withColumn("month", month("date").cast(ByteType()))

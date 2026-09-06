@@ -12,7 +12,6 @@ local:
   metastore_dir: "D:/data-ai-engineer-roadmap/metastore_db"
   log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/"
 
-
 databricks:
   env: databricks
   catalog_name: "nyc_taxi"
