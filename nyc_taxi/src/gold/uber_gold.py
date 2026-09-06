@@ -7,7 +7,11 @@ from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import expr
 
+from pyspark.sql.functions import (
+    col, count, sum, avg, round
+)
 
+from pyspark.sql.types import DecimalType
 from pyspark.sql.functions import (
     col,
     lit,
@@ -48,7 +52,6 @@ class UberGold(PipelineStep):
 
     @log_execution
     def run(self, context):
-
         """ 
             attention : ["nyc_taxi.gold.gold_dim_date", "nyc_taxi.ref.gold_dim_location"]
             ne sont pas des tables optimisables par période
