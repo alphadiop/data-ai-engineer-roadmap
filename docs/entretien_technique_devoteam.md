@@ -6,7 +6,42 @@
 * [ ] Performance et bonnes pratiques
 ````sql
 ````
+### fenêtres : Structure générale
+* [ ] fonction() OVER(PARTITION BY ... ORDER BY ...)
+* [ ] PARTITION BY ... découpe les données en groupes
+* [ ] ORDER BY ... définit l'ordre dans chaque groupe
 
+* Les fonctions de fenêtrage permettent d'effectuer des calculs analytiques 
+* sur un ensemble de lignes liées sans agréger les données comme le ferait un GROUP BY. 
+* Je les utilise notamment pour les classements (ROW_NUMBER, RANK), les cumuls (SUM OVER), 
+* les moyennes mobiles, ainsi que pour comparer une ligne avec la précédente 
+* ou la suivante grâce à LAG et LEAD. 
+* Dans mon projet NYC Taxi, elles servent par exemple à calculer les revenus cumulés, 
+* identifier les trajets les plus rentables par jour et produire des KPI temporels destinés à Power BI.
+
+
+
+### Point essentiel : 
+* [ ] les dimensions servent à filtrer et analyser, la table de faits sert à mesurer
+* [ ] Les dimensions décrivent qui / où / quand.
+* [ ] une mesure DAX est recalculée automatiquement selon le contexte de filtre  
+* [ ] Les faits décrivent combien / combien de fois / quelle distance
+
+
+````sql
+````
+
+J'ai construit un modèle en étoile dans Power BI connecté à Databricks, 
+avec une table de faits gold_fact_trips et des dimensions Date, Pickup Location et Dropoff Location. 
+Les dimensions fournissent le contexte de filtrage et mes mesures DAX calculent dynamiquement 
+les KPI comme le CA, le nombre de courses, la distance moyenne et la croissance 
+selon le contexte de filtre. »
+
+````sql
+````
+## Analyse temporelle
+* [ ] LAG( : variation journalière
+* [ ] LEAD() : variation mensuelle
 
 ````sql
 ````
@@ -25,6 +60,14 @@
 ````
 ````sql
 ````
+
+### Pourquoi utiliser une fonction fenêtre plutôt qu'un GROUP BY ?
+Avec un GROUP BY, on agrège les données et on perd le détail des lignes. 
+Les fonctions de fenêtre permettent d'effectuer des 
+calculs analytiques (classement, cumul, comparaison temporelle, total par groupe) 
+tout en conservant les lignes d'origine. 
+Elles sont très utiles pour les KPI et les analyses de tendance dans les projets BI.
+
 
 
 ### Pourquoi Devoteam ?
