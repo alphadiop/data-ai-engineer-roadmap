@@ -3,8 +3,11 @@ cd /mnt/d/data-ai-engineer-roadmap
 
 python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
 --env local \
---periode 202501 \
+--periode 202504 \
 --taxi_type yellow
+
+python -m nyc_taxi.src.admin.run_purge_delta_storage.py
+
 
 python -c "from nyc_taxi.src.utils.config.load_config import load_config; import logging; c=load_config('variable_environnement', logging.getLogger()); print('WAREHOUSE =', c['local']['warehouse_dir']); print('METASTORE =', c['local']['metastore_dir'])"
 
@@ -542,7 +545,12 @@ Airflow CLI le voit comme actif
 
 
 ### démarrer Airflow
+cd /mnt/d/data-ai-engineer-roadmap/
 python -m airflow standalone
+
+source ~/spark4_env/bin/activate
+cd /mnt/d/data-ai-engineer-roadmap
+
 
 Get-ChildItem D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow
 Test-Path "D:\data-ai-engineer-roadmap\metastore_db"
@@ -580,3 +588,114 @@ LIMIT 10
 
 jps
 tasklist | findstr java
+
+
+### Docker
+* docker system df
+* docker container prune -f
+* docker image prune -a -f
+* docker volume prune -f
+* docker system prune -a --volumes -f
+* docker images
+* docker image prune -a
+Docker Desktop → Settings → Kubernetes → désactiver Kubernetes, puis Docker Desktop redémarrera
+
+### Installer Airflow avec Docker
+* Docker Desktop → Settings → Resources → WSL Integration
+* wsl --shutdown
+* cd /mnt/d/data-ai-engineer-roadmap/airflow
+* docker compose version
+* docker compose config
+* docker compose up airflow-init
+* docker compose up -d 
+* docker compose ps
+* docker compose up airflow-init
+* docker compose up -d
+* http://localhost:8080
+
+### Configurer user
+* depuis /mnt/d/data-ai-engineer-roadmap/airflow
+* docker compose exec airflow-apiserver airflow users list
+* je dois obtenir comme résultat une ligne marquée : admin
+
+---
+* si admin n'existe pas alors faut la creer
+* docker compose exec airflow-apiserver airflow users reset-password --username admin --password admin
+* docker compose logs airflow-init --tail=100
+* docker compose logs airflow-apiserver --tail=50
+* docker compose exec airflow-apiserver airflow config get-value core auth_manager
+* docker compose exec airflow-apiserver airflow config get-value api auth_backends
+
+* docker compose config
+* docker compose down
+* docker compose down -v
+* docker compose up airflow-init
+* docker compose up -d
+* docker compose ps
+* http://localhost:8080
+* {"admin": "Mtg46dzedhTFCrUM"}
+* docker compose exec airflow-apiserver airflow config get-value core simple_auth_manager_users
+* http://localhost:8080
+* Utilisateur : admin
+* Mot de passe : Mtg46dzedhTFCrUM
+* docker compose exec airflow-apiserver airflow config get-value core simple_auth_manager_users
+* docker compose exec airflow-apiserver sh -c 'python -c "import json; d=json.load(open(\"/opt/airflow/simple_auth_manager_passwords.json.generated\")); print(list(d.keys()))"'
+* docker compose exec airflow-apiserver sh -c 'python -c "import json; d=json.load(open(\"/opt/airflow/simple_auth_manager_passwords.json.generated\")); print(len(d.get(\"admin\", \"\")))"'
+* cd /mnt/d/data-ai-engineer-roadmap
+* tree -L 2
+
+* cd /mnt/d/data-ai-engineer-roadmap/airflow
+* docker compose down
+
+* docker compose exec airflow-apiserver bash
+* ls -la /opt/airflow
+* ls -la /opt/airflow/nyc_taxi/src/jobs
+
+python -c "import sys sys.path.append('/opt/airflow') import nyc_taxi print('OK')"
+
+docker compose exec airflow-apiserver airflow users create \
+--username alphadiop \
+--password Ibrahima@1diop \
+--firstname Alpha \
+--lastname Oumar \
+--role Admin \
+--email alphadiop@gmail.com
+
+
+---
+* docker compose up airflow-init
+* cette commande va
+---
+````text
+PostgreSQL
+    ↓
+création de la base airflow
+    ↓
+airflow db migrate
+    ↓
+création de l'utilisateur admin
+````
+
+
+````text
+                 Docker Desktop
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+      PostgreSQL                 Airflow
+          │                         │
+  metadata DB             ┌───────┴───────┐
+  │               │
+  API Server       Scheduler
+  │               │
+  └───────┬───────┘
+  │
+  DAG
+  │
+  NYC Taxi Pipeline
+  │
+  ┌──────────┼──────────┐
+  ↓          ↓          ↓
+  Bronze     Silver      Gold
+
+````

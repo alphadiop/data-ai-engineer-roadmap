@@ -34,11 +34,7 @@ class UberBronze(PipelineStep):
         self.logger = logger or logging.getLogger(__name__)
 
 
-    # def __repr__(self):
-    #     return f"UberBronze(path_volume={self.path_volume})"
-    #
-    # def __str__(self):
-    #     return f"UberBronze(path_volume={self.path_volume})"
+
 
     def avoid_future_period(self, periode:int):
         current_period = int(datetime.now().strftime("%Y%m"))

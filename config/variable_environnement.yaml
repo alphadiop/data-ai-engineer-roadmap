@@ -12,6 +12,20 @@ local:
   metastore_dir: "D:/data-ai-engineer-roadmap/metastore_db"
   log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/"
 
+docker:
+  env: docker
+  catalog_name: "nyc_taxi"
+  project_root: "/opt/airflow/nyc_taxi"
+  path_sql_schema: "/opt/airflow/nyc_taxi/schema"
+  path_data: "/opt/airflow/nyc_taxi/data"
+  path_logs: "/opt/airflow/nyc_taxi/logs"
+  bronze_path: "/opt/airflow/data/bronze/raw_files"
+  dataset_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"
+  ref_path: "/opt/airflow/data/ref/taxi_zone_lookup.csv"
+  warehouse_dir: "/opt/airflow/spark-warehouse"
+  metastore_dir: "/opt/airflow/metastore_db"
+  log_dir: "/opt/airflow/nyc_taxi/"
+
 databricks:
   env: databricks
   catalog_name: "nyc_taxi"

@@ -292,7 +292,13 @@
 - [ ] Tu peux voir : FAILED
 - [ ] Tu peux voir : SUCCESS
 
-
+````text
+MERGE INTO customer_target t
+USING customer_source s
+ON t.customer_id=s.customer_id
+WHEN MATCHED THEN UPDATE
+WHEN NOT MATCHED THEN INSERT
+````
 
 ### comment créer un Job ?
 - [ ] Jobs & Pipelines
@@ -324,7 +330,7 @@
 - [ ] Historique : permet de voir toutes les opérations effectuées sur une table Delta 
 - [ ] DESCRIBE DETAIL : Voir les métadonnées de la table
 - [ ] MERGE INTO : Faire des UPDATE + INSERT en une seule commande
-- [ ] OPTIMIZE : Réduire le nombre de fichiers et accélérer les lectures
+- [ ] OPTIMIZE : Réduire le nombre de fichiers et accélérer les lectures (Réorganise physiquement les données)
 - [ ] VACUUM DRY RUN : montrer les fichiers devenus inutiles
 - [ ] VACUUM : Supprime les anciens fichiers nécessaires au Time Travel
 - [ ] ANALYZE TABLE
@@ -342,6 +348,8 @@
 - [ ] Commande : DESCRIBE DETAIL nyc_taxi.silver.silver_nyc_taxi;
 - [ ] Cas d'usage : Vérifier le partitionnement ; Connaître la taille de la table ; Vérifier les fonctionnalités Delta activées
 ---
+
+
 
 ### MERGE INTO
 
@@ -584,7 +592,7 @@ Version 3
 #### Que signifie ACID ?
 - [ ] c'est cette garantie qui fait qu'une table Delta peut être utilisée pour des données critiques 
 - [ ] finance, santé, facturation, reporting...
-- [ ] niveau de fiabililité proche d'une base de données classique
+- [ ] niveau de fiabilité proche d'une base de données classique
 
 
 ---
@@ -632,6 +640,7 @@ Version 3
 - [ ] Delta crée une nouvelle transaction.
 - [ ] Un nouveau numéro de version est généré.
 - [ ] L'historique complet est conservé.
+
 
 ### À retenir
 - [ ] Rollback = annuler une transaction avant son commit
@@ -775,3 +784,382 @@ Version 3
 
 
 ### la gestion de la configuration selon l'environnement (local, dev Databricks, prod Databricks).
+
+
+
+
+
+### Comment gérez-vous les chargements incrémentaux ?
+- [ ] J'utilise principalement une stratégie basée sur un watermark métier, généralement une colonne last_update
+- [ ] Je conserve la dernière valeur traitée dans une table d'audit.
+- [ ] À chaque exécution, je récupère uniquement les données dont last_update est supérieur au watermark enregistré.
+- [ ] Ensuite, j'utilise un MERGE INTO Delta Lake pour gérer les insertions et les mises à jour de manière idempotente.
+- [ ] Lorsque la source ne fournit pas de date de modification, j'utilise une clé technique ou une période métier comme dans mon projet NYC Taxi où je traite les données mois par mois
+
+```text
+MERGE INTO silver.customer t
+USING source_incremental s
+ON t.customer_id = s.customer_id
+
+WHEN MATCHED THEN
+UPDATE SET *
+
+WHEN NOT MATCHED THEN
+INSERT *
+```
+
+* Watermark -> Lecture incrémentale -> MERGE INTO -> Table Delta -> Mise à jour du watermark
+
+- [ ] Dans les traitements batch, j'utilise généralement un watermark pour mémoriser la dernière donnée traitée,
+- [ ] souvent une colonne **last_update** ou une date métier.
+- [ ] Cela permet de réaliser des chargements incrémentaux efficaces.
+- [ ] En streaming, le watermark a un autre rôle :
+- [ ] il définit la fenêtre pendant laquelle Spark accepte des événements arrivant en retard avant de considérer
+- [ ] les agrégations comme définitives.
+
+
+
+
+
+
+#### Pourquoi partitionner une table ? Pour éviter de lire inutilement les données.
+- [ ] fact_trips
+    * periode=202501
+    * periode=202502
+    * periode=202503
+* WHERE periode=202503 ne lira qu'une partition.
+
+
+
+---
+* Peut-on trop partitionner ? Oui.
+* Conséquences :
+  * millions de petits fichiers
+  * métadonnées volumineuses
+  * dégradation des performances
+
+
+
+---
+* Que choisir entre cache et persist ? Cache :
+* df.cache() : stockage mémoire uniquement.
+
+---
+* Tu arrives chez un client.
+
+* Chaque nuit :
+
+* 200 millions de lignes
+* fichiers CSV
+* Power BI le matin
+
+* Comment conçois-tu la solution ?
+- [ ] Reponse : ADLS -> Databricks Auto Loader -> Bronze -> Silver -> Gold -> SQL Warehouse -> Power BI
+- [ ] Delta Lake
+- [ ] Unity Catalog
+- [ ] Airflow
+- [ ] CI/CD
+- [ ] Monitoring
+- [ ] Audit
+
+
+
+---
+### Pourquoi un shuffle est coûteux ?
+
+### Réponse Senior
+* Il implique :
+
+- [ ] sérialisation
+- [ ] transfert réseau
+- [ ] écriture disque temporaire
+- [ ] lecture disque
+
+
+
+Donc il augmente fortement la latence.
+---
+
+
+---
+### Pourquoi Delta Lake est-il indispensable dans Databricks ?
+
+##### Réponse Senior
+
+##### Sans Delta Lake, on stocke simplement des fichiers Parquet.
+
+##### Delta Lake ajoute :
+- [ ] les transactions ACID
+- [ ] le versionnement
+- [ ] le Time Travel
+- [ ] les MERGE
+- [ ] l'évolution du schéma
+- [ ] l'optimisation automatique des fichiers -> OPTIMIZE
+
+
+MERGE INTO customer_target t
+USING customer_source s
+ON t.customer_id=s.customer_id
+WHEN MATCHED THEN UPDATE
+WHEN NOT MATCHED THEN INSERT
+
+
+
+---
+#### Que se passe-t-il si la source ajoute une colonne demain ?
+
+- [ ] Avec Delta Lake, j'utilise le Schema Evolution. 
+- [ ] Si la nouvelle colonne est compatible avec le modèle de données, 
+- [ ] Delta peut l'ajouter automatiquement au schéma de la table via mergeSchema ou les fonctionnalités Auto Loader. 
+- [ ] Les anciennes lignes conserveront une valeur NULL pour cette nouvelle colonne.
+
+
+
+---
+### Quelle est la Différence entre Schema Evolution et Schema Enforcement ?
+
+- [ ] Le Schema Evolution permet à une table Delta d'accepter automatiquement des évolutions compatibles du schéma, notamment l'ajout de nouvelles colonnes. 
+- [ ] Cela évite de casser les pipelines lorsqu'une source évolue. 
+- [ ] J'utilise cette fonctionnalité avec précaution et sous contrôle, car toutes les évolutions de schéma ne doivent pas forcément être acceptées automatiquement en production.
+- [ ] Cette dernière phrase est importante : un profil senior ne dit pas seulement "j'active mergeSchema partout", il montre qu'il réfléchit à la gouvernance et à l'impact métier des changements de schéma.
+
+
+
+---
+### Une requête Databricks devient lente, Comment investigues-tu ?
+
+- [ ] 1. Spark UI
+
+* Regarder :
+  * DAG
+  * nombre de stages
+  * skew
+  * shuffle
+
+- [ ] 2. Plan d'exécution : df.explain("formatted")
+- [ ] 3. Taille des partitions
+
+* Chercher :
+* partitions trop grosses
+* partitions trop petites
+
+- [ ] 4. Jointures
+* Vérifier :
+* broadcast join possible
+
+
+
+---
+### Quand utiliser un Broadcast Join ?
+- [ ] Lorsque l'une des tables est petite.
+- [ ] from pyspark.sql.functions import broadcast
+- [ ] df.join(broadcast(dim_client),"id")
+
+
+### Que fait OPTIMIZE ?
+- [ ] Fusionne les petits fichiers Delta.
+
+
+
+### Que fait ZORDER ?
+- [ ] Réorganise physiquement les données.
+
+---
+---
+### Comment gérer les doublons ?
+- [ ] Window.partitionBy("trip_id")
+- [ ] row_number()
+- [ ] Conserver uniquement : row_number = 1
+---
+---
+
+
+
+### Comment garantis-tu la qualité des données ?
+- [ ] Je vérifie que les champs obligatoires ne sont pas nuls, notamment les clés métier, les dates de référence ou les identifiants utilisés dans les jointures
+- [ ] Je vérifie que les identifiants métiers censés être uniques ne présentent pas de doublons avant l'intégration dans les couches Silver ou Gold
+- [ ] Je valide les types attendus afin d'éviter les erreurs de calcul ou les anomalies lors des agrégations.
+- [ ] Je vérifie que les clés étrangères correspondent bien aux référentiels métiers afin d'éviter les incohérences analytique
+- [ ] Les règles métier sont généralement les contrôles les plus critiques. Elles permettent de détecter des données techniquement valides mais incohérentes du point de vue du métier
+- [ ] nullité
+- [ ] unicité : Détecter les doublons
+- [ ] Contrôle des types : Vérifier que les données respectent le format attendu
+- [ ] Contrôle de référentiel : Vérifier qu'une valeur existe dans une table de référence
+- [ ] Contrôle des règles métier : Le métier définit ce qui est acceptable ou non
+---
+
+### Comment garantissez-vous la qualité des données ?
+- [ ] Je mets en place plusieurs niveaux de contrôles dans la couche Silver :
+
+- [ ] contrôle de nullité sur les champs obligatoires ;
+- [ ] contrôle d'unicité sur les clés métier ;
+- [ ] validation des types et formats ;
+- [ ] vérification de l'intégrité référentielle avec les dimensions ;
+- [ ] application des règles métier spécifiques au domaine.
+
+* Les anomalies sont historisées dans des tables d'audit afin d'assurer la traçabilité et le suivi des rejets.
+---
+
+
+
+#### Databricks avancé
+- [ ] Explique Unity Catalog.
+- [ ] Reponse : Unity Catalog est la couche de gouvernance de Databricks.
+- [ ] Il permet :
+  * gestion des droits
+  * catalogues
+  * audit
+  * lineage
+  * partage sécurisé
+
+Structure
+    Catalog
+        └ Schema
+            └ Table
+---
+
+### Différence entre Hive Metastore et Unity Catalog ?
+
+- [ ] Hive Metastore :
+    * ancien modèle
+    * gouvernance limitée
+
+- [ ] Unity Catalog :
+    * centralisé
+    * multi-workspace
+    * audit
+    * lineage
+
+---
+
+
+### omment sécuriser des données sensibles ?
+- [ ] RBAC = Role-Based Access Control
+- [ ] Unity Catalog
+- [ ] Dynamic Views
+- [ ] Column Masking
+- [ ] séparation Bronze/Silver/Gold
+* On ne donne pas les droits directement à chaque utilisateur. 
+* On donne des droits à des rôles, puis on affecte les utilisateurs à ces rôles
+
+---
+---
+### Comment sécuriseriez-vous des données sensibles dans Databricks ?
+- [ ] Je commencerais par mettre en place Unity Catalog comme couche de gouvernance centralisée. 
+- [ ] Ensuite, j'utiliserais du RBAC pour contrôler les accès selon les rôles et le principe du moindre privilège.
+- [ ] Pour les données sensibles, je pourrais utiliser du column masking afin de masquer certaines colonnes 
+- [ ] et des dynamic views pour adapter les données accessibles selon le profil de l'utilisateur.
+
+- [ ] Enfin, je séparerais les couches Bronze, Silver et Gold et je limiterais l'accès aux données brutes. 
+- [ ] Les consommateurs BI accéderaient principalement aux tables Gold, 
+- [ ] ce qui permet également de réduire l'exposition des données sensibles.
+
+
+| Concept                | Question à laquelle il répond              |
+| ---------------------- | ------------------------------------------ |
+| **RBAC**               | Qui peut faire quoi ?                      |
+| **Unity Catalog**      | Où centraliser la gouvernance ?            |
+| **Dynamic Views**      | Quelles données montrer à qui ?            |
+| **Column Masking**     | Comment masquer une colonne sensible ?     |
+| **Bronze/Silver/Gold** | Comment limiter l'exposition des données ? |
+
+
+---
+---
+
+
+
+#### Definition
+- [ ] Un watermark est la dernière valeur traitée que l'on mémorise afin de savoir où reprendre le traitement suivant.
+- [ ] Un Metastore est essentiellement un catalogue qui contient les métadonnées de tes données.
+- [ ] ff
+- [ ] ff
+- [ ] gg
+- [ ] ff
+
+### Quelle est la différence entre Hive Metastore et Unity Catalog ?
+- [ ] Hive Metastore est le modèle historique de catalogue utilisé avec Spark et Databricks. 
+- [ ] Il permet notamment de gérer les métadonnées des tables et certains contrôles d'accès, mais sa gouvernance est plus limitée et davantage liée aux environnements ou workspaces.
+- [ ] Unity Catalog fournit une couche de gouvernance centralisée et moderne. 
+- [ ] Il permet de gérer les permissions, l'audit et le lineage, et de gouverner les données de manière cohérente à travers plusieurs workspaces.
+- [ ] Dans une architecture Databricks moderne, je privilégierais donc Unity Catalog pour centraliser la gouvernance et appliquer le principe du moindre privilège.
+- [ ] Hive Metastore = catalogue historique.
+- [ ] Unity Catalog = catalogue + gouvernance centralisée + sécurité + audit + lineage.
+
+
+### qu'est-ce qu'un Metastore ?
+* Par exemple, tu as une table : nyc_taxi.gold.gold_fact_trips
+* Le Metastore sait notamment :
+- [ ] Nom de la table
+- [ ] Colonnes
+- [ ] Types
+- [ ] Emplacement des fichiers
+- [ ] Partitions
+- [ ] Le Metastore ne contient pas nécessairement les données elles-mêmes
+- [ ] Les données peuvent être dans : ADLS S3 GCS
+- [ ] Le Metastore contient surtout les informations permettant de retrouver et gérer ces données
+
+
+### Hive Metastore
+* Le Hive Metastore est l'ancien modèle de catalogue utilisé avec Databricks/Spark.
+* Hive Metastore offre des capacités de catalogue et de contrôle d'accès, mais sa gouvernance est plus limitée et moins centralisée que celle offerte par Unity Catalog
+
+
+
+### Unity Catalog
+* Unity Catalog a été conçu pour fournir une gouvernance centralisée des données dans Databricks
+* Unity Catalog est la couche centrale de gouvernance de Databricks
+* Il permet notamment de gérer :
+  - [ ] les permissions ;
+  - [ ] les tables ;
+  - [ ] les vues ;
+  - [ ] les données ;
+  - [ ] le lineage ;
+  - [ ] l'audit.
+
+
+### Audit
+* Unity Catalog permet de disposer d'informations d'audit sur les accès et activités liées aux données
+* Cela est particulièrement important pour les entreprises qui manipulent des données sensibles.
+
+
+### Lineage
+* Lineage = traçabilité des données.
+* Le lineage permet de comprendre les relations entre les différents objets de données
+* Tu peux alors répondre à une question métier du type : "D'où vient le chiffre d'affaires affiché dans mon dashboard ?"
+* C'est extrêmement utile pour :
+- [ ] comprendre les dépendances ;
+- analyser l'impact d'un changement ;
+- auditer les données ;
+- résoudre des problèmes de qualité.
+
+
+
+---
+---
+---
+---
+
+
+
+
+
+
+
+---
+---
+---
+---
+
+
+
+---
+---
+---
+---
+
+
+---
+---
+---
+---

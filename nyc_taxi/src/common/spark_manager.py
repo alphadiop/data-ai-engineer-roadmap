@@ -44,7 +44,7 @@ class SparkManager:
         builder = (
             SparkSession.builder
             .appName(self.app_name)
-            .master(f"local[{self.nombre_coeur}]")
+            .master(f"{self.env} [{self.nombre_coeur}]")
 
             # ------------------------------------------------------
             # Delta Lake
@@ -63,7 +63,7 @@ class SparkManager:
             # ------------------------------------------------------
             .config(
                 "spark.sql.warehouse.dir",
-                self.config["local"]["warehouse_dir"]
+                self.config[self.env]["warehouse_dir"]
             )
 
             # ------------------------------------------------------
@@ -71,7 +71,7 @@ class SparkManager:
             # ------------------------------------------------------
             .config(
                 "javax.jdo.option.ConnectionURL",
-                f"jdbc:derby:{self.config['local']['metastore_dir']};create=true"
+                f"jdbc:derby:{self.config[self.env]['metastore_dir']};create=true"
             )
 
             # ------------------------------------------------------
@@ -111,11 +111,11 @@ class SparkManager:
             f"metastore = {spark.conf.get('javax.jdo.option.ConnectionURL')}"
         )
         self.logger.info(
-            f"warehouse_yaml = {self.config['local']['warehouse_dir']}"
+            f"warehouse_yaml = {self.config[self.env]['warehouse_dir']}"
         )
 
         self.logger.info(
-            f"metastore_yaml = {self.config['local']['metastore_dir']}"
+            f"metastore_yaml = {self.config[self.env]['metastore_dir']}"
         )
 
 

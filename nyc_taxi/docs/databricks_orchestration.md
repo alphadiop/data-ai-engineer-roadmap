@@ -46,8 +46,8 @@
 
 
 * Par analogie : imagine un GPS 
-* le DAG est l'intinéraire
-* l'orchestrateur est le chauffeur qui suit l'intinéraire
+* le DAG est l'itinéraire
+* l'orchestrateur est le chauffeur qui suit l'itinéraire
 
 
 

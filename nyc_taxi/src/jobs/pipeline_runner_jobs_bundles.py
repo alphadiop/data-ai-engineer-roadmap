@@ -15,7 +15,6 @@ from nyc_taxi.src.logger.logger import PipelineLogger
 from nyc_taxi.src.common.pipeline_context import PipelineContext
 from nyc_taxi.src.common.spark_manager import SparkManager
 from nyc_taxi.src.admin.metastore_repair import MetastoreRepair
-from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.jobs.maintenance_job import MaintenanceJob
 
 from nyc_taxi.src.utils.config.load_config import load_config
@@ -64,21 +63,21 @@ class PipelineRunner:
         # ==========================================================
         # DÉTERMINATION DE LA PÉRIODE
         # ==========================================================
-        # if self.periode is None:
-        #
-        #     self.periode = self.audit_manager.get_next_period(
-        #         table_name="silver_nyc_taxi",
-        #         taxi_type=self.taxi_type
-        #     )
-        #     self.logger.info(
-        #         f"Période déterminée automatiquement : "
-        #         f"{self.periode}"
-        #     )
-        # else:
-        #     self.logger.info(
-        #         f"Période fournie explicitement : "
-        #         f"{self.periode}"
-        #     )
+        if self.periode is None:
+
+            self.periode = self.audit_manager.get_next_period(
+                table_name="silver_nyc_taxi",
+                taxi_type=self.taxi_type
+            )
+            self.logger.info(
+                f"Période déterminée automatiquement : "
+                f"{self.periode}"
+            )
+        else:
+            self.logger.info(
+                f"Période fournie explicitement : "
+                f"{self.periode}"
+            )
 
         # ==========================================================
         # CONTEXTE
@@ -215,7 +214,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env", choices=["local", "databricks"],default='local')
+    parser.add_argument("--env", choices=["local","docker", "databricks"],default='local')
     parser.add_argument("--periode", type=int, default=None)
     parser.add_argument("--taxi_type", type=str, default="yellow")
 
