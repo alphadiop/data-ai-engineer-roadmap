@@ -720,5 +720,6 @@ création de l'utilisateur admin
   --periode 202501 \
   --taxi_type yellow
 
-  mkdir -p /opt/airflow/nyc_taxi/logs
+* grep -R "load_config(" nyc_taxi/src
+* mkdir -p /opt/airflow/nyc_taxi/logs
 * python -c "from pathlib import Path; p=Path('/opt/airflow/nyc_taxi/src/utils/config/load_config.py'); print(p.parents[4]); print(p.parents[5])"

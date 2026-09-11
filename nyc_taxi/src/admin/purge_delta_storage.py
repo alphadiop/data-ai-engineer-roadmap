@@ -44,8 +44,9 @@ class PurgeDeltaStorage:
         self.logger = logger or logging.getLogger(__name__)
 
         self.config = load_config(
-            "variable_environnement",
-            self.logger
+            file_name="variable_environnement",
+            env=self.env,
+            logger=self.logger
         )
 
     def run(self):

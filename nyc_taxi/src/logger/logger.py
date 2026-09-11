@@ -35,8 +35,9 @@ class PipelineLogger:
         # Configuration
         # ----------------------------------------------------------
         config = load_config(
-            "variable_environnement",
-            self.logger
+            file_name="variable_environnement",
+            env=self.env,
+            logger=self.logger
         )
 
         # ==========================================================

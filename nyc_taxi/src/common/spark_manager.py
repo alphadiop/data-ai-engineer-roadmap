@@ -26,8 +26,9 @@ class SparkManager:
         self.nombre_coeur = 2
 
         self.config = load_config(
-            "variable_environnement",
-            self.logger or logging.getLogger(__name__)
+            file_name="variable_environnement",
+            env=self.env,
+            logger=self.logger or logging.getLogger(__name__)
         )
 
     def get_spark(self):
@@ -44,7 +45,11 @@ class SparkManager:
         builder = (
             SparkSession.builder
             .appName(self.app_name)
-            .master(f"{self.env} [{self.nombre_coeur}]")
+
+            # ------------------------------------------------------
+            # Spark Master
+            # ------------------------------------------------------
+            .master(f"local[{self.nombre_coeur}]")
 
             # ------------------------------------------------------
             # Delta Lake

@@ -31,6 +31,9 @@ class AuditManager:
             logger=self.logger,
             env=context.env
         )
+        self.logger.info(
+            f"DEBUG context.env = {context.env}"
+        )
         audit_table = catalog_manager.audit_load()
 
         self.logger.info(f"audit_table : {audit_table}")

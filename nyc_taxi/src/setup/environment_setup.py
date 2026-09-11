@@ -84,7 +84,7 @@ class EnvironmentSetup(PipelineStep):
         # ----------------------------------------------------------
         # Metastore
         # ----------------------------------------------------------
-        if self.env == "local":
+        if self.env in ("local", "docker"):
             self.repair_metastore()
 
         if self.logger:
@@ -122,7 +122,7 @@ class EnvironmentSetup(PipelineStep):
 
 
     def create_catalog(self, config):
-        if self.env == "local":
+        if self.env in ("local", "docker"):
             if self.logger:
                 self.logger.info(
                     "Local mode : catalogue ignoré"

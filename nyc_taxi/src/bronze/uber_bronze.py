@@ -193,7 +193,7 @@ if __name__ == "__main__":
         logger=logger
     )
 
-    config = load_config('pilotage_tables',env,logger)
+    config = load_config(file_name='pilotage_tables',env=env,logger=logger)
     logger.info(f"Bronze config : {config}")
     logger.info(f"Bronze config : {config['tables']}")
     logger.info(f"Bronze config : {config['tables']['silver_nyc_taxi']}")
