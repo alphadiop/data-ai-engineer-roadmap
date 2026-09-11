@@ -180,6 +180,7 @@ if __name__ == "__main__":
     taxi_type = "yellow"
     # #taxi_type = "green"
     # #taxi_type = "fhv"
+    env='local'
     logger = PipelineLogger('Bronze')
 
     spark_manager = SparkManager(
@@ -192,7 +193,7 @@ if __name__ == "__main__":
         logger=logger
     )
 
-    config = load_config('pilotage_tables', logger)
+    config = load_config('pilotage_tables',env,logger)
     logger.info(f"Bronze config : {config}")
     logger.info(f"Bronze config : {config['tables']}")
     logger.info(f"Bronze config : {config['tables']['silver_nyc_taxi']}")

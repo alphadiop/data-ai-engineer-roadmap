@@ -47,7 +47,6 @@ class UberGold(PipelineStep):
         self.spark = spark
         self.logger = logger or logging.getLogger(__name__)
 
-        #self.config_table = load_config("pilotage_tables", self.logger)
 
 
     @log_execution

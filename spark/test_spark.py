@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     logger = PipelineLogger('Bronze')
 
-    config_all = load_config("variable_environnement", logger)
+    config_all = load_config("variable_environnement", env,logger)
     config = config_all[env]
 
     context = PipelineContext(

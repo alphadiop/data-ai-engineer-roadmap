@@ -54,7 +54,7 @@ class PipelineRunner:
         )
 
         self.config = load_config(
-            'variable_environnement', self.logger
+            'variable_environnement', self.env, self.logger
         )
 
 

@@ -1,6 +1,8 @@
 x-airflow-common:
   &airflow-common
-  image: apache/airflow:3.0.6
+  build:
+    context: .
+    dockerfile: Dockerfile
 
   environment:
     &airflow-common-env
@@ -20,8 +22,9 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - ./config:/opt/airflow/config
+    - ../config:/opt/airflow/config
     - ../nyc_taxi:/opt/airflow/nyc_taxi
+    - ../data:/opt/airflow/data
 
   depends_on:
     postgres:

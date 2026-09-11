@@ -651,6 +651,10 @@ Docker Desktop → Settings → Kubernetes → désactiver Kubernetes, puis Dock
 * ls -la /opt/airflow
 * ls -la /opt/airflow/nyc_taxi/src/jobs
 
+dans docker
+* python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles     --env docker     --periode 202501     --taxi_type yellow
+
+
 python -c "import sys sys.path.append('/opt/airflow') import nyc_taxi print('OK')"
 
 docker compose exec airflow-apiserver airflow users create \
@@ -699,3 +703,22 @@ création de l'utilisateur admin
   Bronze     Silver      Gold
 
 ````
+
+* Power Shell --> admin
+* wsl
+* cd /mnt/d/data-ai-engineer-roadmap/airflow
+* docker compose ps -> vérification des container
+* docker compose up -d -> demmarrer les container si absent
+* docker compose exec airflow-apiserver bash -> Entrer dans le conteneur Airflow
+* ls -la /opt/airflow/nyc_taxi
+* docker compose down
+* docker compose up -d
+* docker compose exec airflow-apiserver bash
+* python -c "import nyc_taxi; print('OK')"
+  python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+  --env docker \
+  --periode 202501 \
+  --taxi_type yellow
+
+  mkdir -p /opt/airflow/nyc_taxi/logs
+* python -c "from pathlib import Path; p=Path('/opt/airflow/nyc_taxi/src/utils/config/load_config.py'); print(p.parents[4]); print(p.parents[5])"
