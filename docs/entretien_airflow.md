@@ -188,3 +188,397 @@ Task Instance = Cron
   * les reprises sur erreur, 
   * le monitoring 
   * et l'historisation des exécutions
+
+### Quels sont les composants principaux d'Airflow ? »
+Dans Airflow 3, le DAG Processor parse les fichiers DAG et synchronise leur définition avec la metadata database. 
+Le Scheduler décide quelles tâches doivent être exécutées en fonction du calendrier et des dépendances. 
+L'API Server expose l'interface et les APIs. 
+La metadata database, ici PostgreSQL, stocke l'état et les métadonnées des DAGs, runs et tâches.
+
+Airflow orchestre mon pipeline PySpark NYC Taxi. 
+Le DAG déclenche mon run_pipeline.py, qui exécute mon PipelineRunner et mes traitements Bronze, Silver et Gold.
+
+```text
+Windows
+   │
+   └── WSL Ubuntu
+          │
+          └── Docker
+                │
+                ├── PostgreSQL
+                ├── Airflow API Server
+                ├── Airflow Scheduler
+                └── Airflow DAG Processor
+```
+
+#### Pourquoi Docker ?
+* Tu aurais pu installer Airflow directement dans WSL
+* Mais tu as choisi Docker parce que cela permet d'avoir un environnement Airflow isolé et reproductible.
+
+```text
+WSL
+ │
+ └── Docker Compose
+       │
+       ├── conteneur PostgreSQL
+       ├── conteneur API Server
+       ├── conteneur Scheduler
+       └── conteneur DAG Processor
+```
+Chaque composant tourne dans son propre conteneur.
+
+
+### Docker Compose
+* Ton fichier principal est : Ton fichier principal est :
+* c'est lui qui décrit ton infrastructure
+* services:
+  * postgres:
+  * ...
+  * airflow-apiserver:
+  * ...
+  * airflow-scheduler:
+  * ...
+  * airflow-dag-processor:
+  * ...
+
+* quand tu fait : docker compose up -d alors Docker Compose démarre les services
+* quand tu fais docker compose ps alors tu vois leur état
+
+### PostgreSQL : la mémoire d'Airflow
+* PostgreSQL ne contient pas tes données NYC Taxi.
+* Il contient les métadonnées Airflow.
+* par exemple :
+  * DAGs
+  * DAG Runs
+  * Task Instances
+  * états des tâches
+  * utilisateurs
+  * connexions
+  * variables
+  * historique des exécutions
+  * etc.
+  * Ton Airflow utilise : postgresql+psycopg2://airflow:airflow@postgres/airflow
+  * PostgreSQL est la mémoire de fonctionnement d'Airflow.
+
+
+
+
+### le DAG
+* airflow/dags/nyc_taxi_airflow.py : C'est le fichier qui décrit le workflow.
+* Le DAG ne réalise pas directement ton pipeline Data Engineering. il orchestre tion pieline
+
+
+
+
+### DAG Processor
+* Lire les fichiers Python présents dans dags/, les parser et enregistrer les DAGs dans la base Airflow.
+* airflow dag-processor -n 1 -v : a produit Creating ORM DAG for nyc_taxi_airflow
+* puis airflow dags list a enfin affiché : nyc_taxi_airflow
+* Le DAG Processor parse les fichiers DAG et synchronise leur définition avec les métadonnées Airflow.
+
+
+
+
+### Scheduler
+* Il regarde les DAGs et décide : Quelles tâches doivent être exécutées maintenant ?
+* Il surveille notamment :
+  * DAG Runs
+  * Task Instances
+  * dependencies
+  * schedule
+  * états des tâches
+
+```text
+DAG
+ │
+ └── run_nyc_taxi_pipeline
+          │
+          ▼
+       Scheduler
+          │
+          ▼
+      exécution
+```
+
+
+### API Server
+* Il expose l'interface et les APIs Airflow
+* on navigateur communique avec : http://localhost:8080
+* L'API Server permet notamment à l'interface de voir :
+  * DAGs
+  * Runs
+  * Tasks
+  * Logs
+  * Variables
+  * Connections
+
+```text
+Navigateur
+    │
+    ▼
+API Server
+    │
+    ▼
+PostgreSQL
+```
+
+
+#### L'interface Web
+* Quand tu vas sur : localhost:8080
+* tu n'exécutes pas directement le fichier : nyc_taxi_airflow.py
+* L'interface interroge l'API Server.
+* Et PostgreSQL sait : nyc_taxi_airflow grâce au DAG Processor.
+
+```text
+Navigateur
+    ↓
+API Server
+    ↓
+PostgreSQL
+```
+
+
+### Chemin complet
+```text
+nyc_taxi_airflow.py
+        │
+        ▼
+   DAG Processor
+        │
+        ▼
+   PostgreSQL
+        │
+        ▼
+    API Server
+        │
+        ▼
+   Interface Web
+```
+
+* Puis, lorsqu'on lance le DAG :
+```text
+Interface Web
+      │
+      ▼
+  API Server
+      │
+      ▼
+ PostgreSQL
+      │
+      ▼
+ Scheduler
+      │
+      ▼
+   Task
+      │
+      ▼
+run_nyc_taxi_pipeline()
+      │
+      ▼
+ PipelineRunner
+      │
+      ├── Bronze
+      ├── Silver
+      ├── Gold
+      └── Maintenance
+```
+
+### Tes volumes Docker
+```text
+volumes:
+  - ./dags:/opt/airflow/dags
+  - ./logs:/opt/airflow/logs
+  - ./plugins:/opt/airflow/plugins
+  - ../config:/opt/airflow/config
+  - ../nyc_taxi:/opt/airflow/nyc_taxi
+  - ../data:/opt/data
+```
+
+* Par exemple :
+```text
+WSL
+airflow/dags/
+       │
+       │ volume
+       ▼
+Docker
+/opt/airflow/dags/
+```
+
+* Donc ton fichier local : airflow/dags/nyc_taxi_airflow.py
+* est visible dans Docker comme : /opt/airflow/dags/nyc_taxi_airflow.py
+
+
+
+### PYTHONPATH
+* PYTHONPATH: /opt/airflow
+* Parce que ton DAG fait : from nyc_taxi.src.jobs.run_pipeline import run_nyc_taxi_pipeline
+* Python doit donc savoir où chercher : /opt/airflow/nyc_taxi
+* Avec : PYTHONPATH=/opt/airflow
+
+
+
+### Ton Dockerfile : airflow/Dockerfile
+* sert à construire ton image Airflow.
+* Il permet notamment d'installer ce dont ton environnement a besoin.
+* Conceptuellement :
+```text
+Dockerfile
+     │
+     ▼
+docker build
+     │
+     ▼
+Airflow Image
+     │
+     ├── Airflow
+     ├── Python
+     ├── Providers
+     └── dépendances
+```
+* Puis tes services utilisent cette image :
+build:
+  context: .
+  dockerfile: Dockerfile
+
+
+
+### airflow-init
+* Son rôle est de préparer la base Airflow.
+* Il ne sert pas à exécuter ton DAG quotidiennement.
+```text
+airflow-init
+     │
+     ▼
+PostgreSQL
+     │
+     ▼
+tables Airflow
+```
+
+
+
+### Les logs
+```text
+```
+
+
+### Tes fichiers importants
+* Ton environnement peut être résumé ainsi :
+```text
+airflow/
+│
+├── docker-compose.yml       ← infrastructure
+├── Dockerfile               ← image Airflow
+│
+├── dags/
+│   └── nyc_taxi_airflow.py  ← orchestration
+│
+├── logs/                    ← logs Airflow
+│
+└── plugins/                 ← plugins éventuels
+```
+
+
+### Les commandes essentielles à connaître
+* Voir les conteneurs : docker compose ps
+* Démarrer : docker compose up -d
+* Arrêter : docker compose down
+* Logs Scheduler : docker compose logs airflow-scheduler
+* Entrer dans le conteneur : docker compose exec airflow-scheduler bash
+* Lister les DAGs : docker compose exec airflow-scheduler airflow dags list
+* Tester le parsing : docker compose exec airflow-scheduler airflow dag-processor -n 1 -v
+* Tester un DAG : docker compose exec airflow-scheduler \
+  airflow dags test nyc_taxi_airflow 2026-09-11
+
+
+```text
+                    ┌──────────────────────┐
+                    │      Navigateur      │
+                    │   Airflow UI :8080   │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │     API Server       │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │     PostgreSQL       │
+                    │   Metadata Database  │
+                    └───────┬────────┬─────┘
+                            ▲        ▲
+                            │        │
+                 ┌──────────┘        └──────────┐
+                 │                              │
+        ┌────────┴─────────┐          ┌─────────┴────────┐
+        │  DAG Processor   │          │    Scheduler     │
+        │                  │          │                  │
+        │ Parse les DAGs   │          │ Planifie les     │
+        │                  │          │ tâches            │
+        └────────┬─────────┘          └─────────┬────────┘
+                 │                              │
+                 ▼                              ▼
+       dags/nyc_taxi_airflow.py       run_nyc_taxi_pipeline
+                                                │
+                                                ▼
+                                         PipelineRunner
+                                                │
+                                  ┌─────────────┼─────────────┐
+                                  ▼             ▼             ▼
+                               Bronze        Silver         Gold
+```
+
+
+| Élément            | Problème                        | État         |
+| ------------------ | ------------------------------- | ------------ |
+| DAG Processor      | absent du Compose initial       | ✅ corrigé    |
+| Détection du DAG   | DAG absent de `serialized_dag`  | ✅ corrigé    |
+| Pipeline PySpark   | suspicion initiale              | ✅ fonctionne |
+| Spark              | suspicion initiale              | ✅ fonctionne |
+| Bronze/Silver/Gold | suspicion initiale              | ✅ fonctionne |
+| LocalExecutor      | worker lancé mais bloqué        | 🔧 en cours  |
+| Execution API      | URL non configurée correctement | ✅ corrigée   |
+| Réseau Docker      | suspicion                       | ✅ fonctionne |
+
+
+
+```text
+Airflow UI
+    │
+    ▼
+DAG Processor ──────────────┐
+    │                       │
+    ▼                       │
+PostgreSQL ◄──────── Scheduler
+                            │
+                            ▼
+                      LocalExecutor
+                            │
+                            ▼
+                         Worker
+                            │
+                            ▼
+                Execution API
+                            │
+                            ▼
+                airflow-apiserver:8080
+                            │
+                            ▼
+                         ✅ OK
+```
+
+
+```text
+```
+
+
+```text
+```
+
+```text
+```
+
+```text
+```

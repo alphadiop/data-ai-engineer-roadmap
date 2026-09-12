@@ -1,191 +1,209 @@
-source ~/spark4_env/bin/activate
-cd /mnt/d/data-ai-engineer-roadmap
+# NYC Taxi — Environnements, Spark local et Airflow
 
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
---env local \
---periode 202504 \
---taxi_type yellow
+## 1. Objectif du projet
 
-python -m nyc_taxi.src.admin.run_purge_delta_storage.py
+L'objectif est de construire un pipeline Data Engineering complet autour des données NYC Taxi :
 
-
-python -c "from nyc_taxi.src.utils.config.load_config import load_config; import logging; c=load_config('variable_environnement', logging.getLogger()); print('WAREHOUSE =', c['local']['warehouse_dir']); print('METASTORE =', c['local']['metastore_dir'])"
-
-ls -la /mnt/d/data-ai-engineer-roadmap/spark-warehouse
-find /mnt/d/data-ai-engineer-roadmap/spark-warehouse -name "_delta_log"
-
-
-## Tu as actuellement deux environnements bien séparés :
-
-#### Environnement Conda Windows
 ```text
-WINDOWS
+Source
+  ↓
+Bronze
+  ↓
+Silver
+  ↓
+Gold
+  ↓
+Audit
+  ↓
+Maintenance
+```
+
+Le pipeline est piloté par :
+
+```text
+Airflow
+   ↓
+DAG
+   ↓
+run_pipeline.py
+   ↓
+PipelineRunner
+   ↓
+Bronze → Silver → Gold → Audit → Maintenance
+```
+
+---
+
+# 2. Architecture actuelle recommandée
+
+Le choix retenu est de faire fonctionner **Airflow et Spark dans le même environnement Linux/WSL ou Docker**, plutôt que de demander à Airflow sous Linux de lancer directement un environnement Conda Windows.
+
+Architecture cible :
+
+```text
+                         WSL2
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│                  Apache Airflow                     │
+│                       │                             │
+│                       ▼                             │
+│              NYC Taxi DAG                           │
+│                       │                             │
+│                       ▼                             │
+│                run_pipeline.py                      │
+│                       │                             │
+│                       ▼                             │
+│                PipelineRunner                       │
+│                       │                             │
+│          ┌────────────┼────────────┐                │
+│          ▼            ▼            ▼                │
+│       Bronze       Silver        Gold               │
+│          │            │            │                │
+│          └────────────┼────────────┘                │
+│                       ▼                             │
+│                     Audit                           │
+│                       │                             │
+│                       ▼                             │
+│                  Maintenance                        │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+                         │
+                         ▼
+              D:\data-ai-engineer-roadmap
+```
+
+Le projet peut cependant rester physiquement sur le disque `D:`.
+
+Depuis WSL :
+
+```text
+D:\data-ai-engineer-roadmap
+```
+
+correspond à :
+
+```text
+/mnt/d/data-ai-engineer-roadmap
+```
+
+---
+
+# 3. Environnements
+
+## 3.1 Ancien environnement Windows
+
+Historique :
+
+```text
+Windows
 │
 ├── D:\conda_envs\spark_local
-│      └── ton environnement Spark local
+│      └── environnement Conda Spark
 │
 └── D:\data-ai-engineer-roadmap
-└── nyc_taxi
+       └── nyc_taxi
 ```
 
----
-```text
-Linux / WSL2
-│
-├── /home/alpha/airflow_env
-│      └── Airflow
-│
-└── /home/alpha/airflow
-└── configuration / metadata / logs Airflow
-```
----
+Cet environnement a servi à exécuter Spark directement sous Windows.
+
+Il ne faut cependant plus chercher à faire communiquer directement :
 
 ```text
-                    CatalogManager
-                         │
-             ┌───────────┴───────────┐
-             │                       │
-          LOCAL                 DATABRICKS
-             │                       │
-       audit.audit_load       nyc_taxi.audit.audit_load
-       silver.xxx             nyc_taxi.silver.xxx
-       gold.xxx               nyc_taxi.gold.xxx
-             │                       │
-             └───────────┬───────────┘
-                         │
-                   AuditManager
-                         │
-                 utilise seulement
-                 audit_table = ...
-```
----
-
-
----
-* Ton projet NYC Taxi est actuellement sous Windows : D:\data-ai-engineer-roadmap\nyc_taxi
-* Environnement Spark : D:\conda_envs\spark_local
-* Airflow tourne sous WSL2 : /home/alpha/airflow_env
-* Environnement Airflow : /home/alpha/airflow_env
-
-
----
-* accès de mon projet depuis WSL : cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* Airflow qui tourne sous WSL ne peut pas simplement faire : source D:\conda_envs\spark_local\...
-* objectif : faire communiquer Airflow WSL → ton pipeline Spark local Windows, sans casser ton environnement actuel.
-
----
-
-
-```text
-                    WINDOWS
-┌──────────────────────────────────────────────┐
-│                                              │
-│  D:\data-ai-engineer-roadmap\nyc_taxi       │
-│                    │                         │
-│                    ▼                         │
-│        Conda : spark_local                   │
-│                    │                         │
-│                    ▼                         │
-│          Spark + Delta Lake                  │
-│                                              │
-└──────────────────────▲───────────────────────┘
-│
-│ déclenchement
-│
-┌──────────────────────┴───────────────────────┐
-│                    WSL2                      │
-│                                              │
-│  /home/alpha/airflow_env                     │
-│              │                               │
-│              ▼                               │
-│         Apache Airflow                       │
-│              │                               │
-│              ▼                               │
-│       NYC Taxi DAG                            │
-│                                              │
-└──────────────────────────────────────────────┘
+Airflow Linux
+      ↓
+Conda Windows
 ```
 
-* le plus propre pédagogiquement est de faire tourner Airflow et le pipeline Spark dans le même environnement Linux WSL.
+car cela complexifie inutilement l'architecture.
+
+---
+
+# 4. Environnement WSL
+
+L'environnement recommandé pour Spark local est maintenant :
 
 ```text
 WSL2
 │
-├── airflow_env
-│     └── Apache Airflow 3.3.1
+├── ~/spark4_env
+│      ├── Python
+│      ├── PySpark
+│      └── Delta Lake
 │
-└── nyc_taxi_env
-├── Python
-├── PySpark
-├── Delta Lake
-└── ton projet NYC Taxi
+├── ~/airflow_env
+│      └── Apache Airflow
+│
+└── /mnt/d/data-ai-engineer-roadmap
+       └── nyc_taxi
 ```
+
+Le projet reste donc sur `D:` mais il est exécuté depuis WSL.
+
+---
+
+# 5. Accès au projet depuis WSL
+
+Depuis WSL :
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap
+```
+
+Le projet NYC Taxi est alors accessible avec :
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
+```
+
+Vérification :
+
+```bash
+pwd
+```
+
+Résultat attendu :
 
 ```text
-Airflow
-│
-▼
-NYC Taxi DAG
-│
-▼
-PipelineRunner
-│
-├── EnvironmentSetup
-├── UberBronze
-├── UberSilver
-├── UberGold
-├── DataLoader
-└── MaintenanceJob
+/mnt/d/data-ai-engineer-roadmap/nyc_taxi
 ```
 
-metastore_db
-warehouse
-Hive
-Delta Catalog
-
-
-
-* Mais ton projet peut rester sur D:
-* Depuis WSL : /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* correspond à : D:\data-ai-engineer-roadmap\nyc_taxi
-
-* Vérifier si ton projet nyc_taxi peut être exécuté depuis WSL avec Python/PySpark. 
-* C'est cette étape qui va déterminer exactement comment Airflow doit lancer ton PipelineRunner.
-* L'objectif est de vérifier que WSL peut exécuter ton projet nyc_taxi, puis seulement après on branchera Airflow dessus.
-
-* Depuis WSL : cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* pwd : /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-
----
-### Créer l'environnement du projet sous WSL
-* cd ~
-* python3 -m venv ~/nyc_taxi_env
-* source ~/nyc_taxi_env/bin/activate
-* python --version
-* which python
-* python -m pip install --upgrade pip
-* pip install pyspark==3.5.1
-* pip install delta-spark==3.2.0
-
-### Tester PySpark
-* python -c "from pyspark.sql import SparkSession; print('PySpark OK')"
-* python -c "from delta import configure_spark_with_delta_pip; print('Delta OK')"
 ---
 
-### tester ton projet
-* cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* python -c "import nyc_taxi; print(nyc_taxi)"
-* cd /mnt/d/data-ai-engineer-roadmap
-* python -c "import nyc_taxi; print(nyc_taxi)"
-* python -c "from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner; print('PipelineRunner OK')"
+# 6. Environnement Python Spark
+Activer l'environnement Spark :
 
-### Installe PyYAML dans nyc_taxi_env
-* python -m pip install PyYAML
-* python -c "import yaml; print('YAML OK')"
-* python -c "from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner; print('PipelineRunner OK')"
-* Et tu dois lancer tes commandes depuis : cd /mnt/d/data-ai-engineer-roadmap
-* pas depuis /mnt/d/data-ai-engineer-roadmap/nyc_taxi
+```bash
+source ~/spark4_env/bin/activate
+```
 
+Vérifier :
+
+```bash
+which python
+python --version
+```
+
+Vérifier PySpark :
+
+```bash
+python -c "import pyspark; print('PySpark =', pyspark.__version__)"
+```
+
+Vérifier Delta :
+
+```bash
+python -c "import delta; print('Delta OK')"
+```
+
+Vérifier PyYAML :
+
+```bash
+python -c "import yaml; print('YAML OK')"
+```
+
+Vérification globale :
+
+```bash
 python -c "
 import sys
 import pyspark
@@ -197,262 +215,1043 @@ print('PySpark:', pyspark.__version__)
 print('Delta  :', delta.__version__)
 print('PyYAML :', yaml.__version__)
 "
+```
 
+---
 
+# 7. Tester le projet NYC Taxi
+
+Toujours se placer à la racine du projet :
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap
+```
+
+Tester l'import du package :
+
+```bash
+python -c "import nyc_taxi; print(nyc_taxi)"
+```
+
+Tester `PipelineRunner` :
+
+```bash
+python -c "
+from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
+print('PipelineRunner OK')
+"
+```
+
+Tester également le point d'entrée utilisé par Airflow :
+
+```bash
+python -c "
+from nyc_taxi.src.jobs.run_pipeline import run_nyc_taxi_pipeline
+print('run_pipeline OK')
+"
+```
+
+---
+
+# 8. Structure du projet
+
+La structure importante est :
+
+```text
+nyc_taxi/
+└── src/
+    ├── bronze/
+    │   └── uber_bronze.py
+    │
+    ├── silver/
+    │   └── uber_silver.py
+    │
+    ├── gold/
+    │   └── uber_gold.py
+    │
+    ├── loader/
+    │   └── data_loader.py
+    │
+    ├── audit/
+    │
+    ├── common/
+    │
+    ├── setup/
+    │
+    ├── table_reference/
+    │
+    └── jobs/
+        ├── pipeline_runner_jobs_bundles.py
+        ├── run_pipeline.py
+        └── maintenance_job.py
+```
+
+Les responsabilités sont séparées :
+
+```text
+nyc_taxi_airflow.py
+        │
+        │ orchestration Airflow
+        ▼
+run_pipeline.py
+        │
+        │ point d'entrée
+        ▼
+PipelineRunner
+        │
+        ├── EnvironmentSetup
+        ├── ReferenceDataLoader
+        ├── UberBronze
+        ├── UberSilver
+        ├── UberGold
+        ├── DataLoader
+        └── MaintenanceJob
+```
+
+---
+
+# 9. Exécution manuelle du pipeline Spark
+
+Avant de connecter Airflow, le pipeline doit pouvoir fonctionner seul.
+
+Depuis :
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap
+```
+
+avec l'environnement activé :
+
+```bash
+source ~/spark4_env/bin/activate
+```
+
+lancer :
+
+```bash
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+    --env local \
+    --periode 202504 \
+    --taxi_type yellow
+```
+
+### Exemple avec une autre période
+
+```bash
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+    --env local \
+    --periode 202503 \
+    --taxi_type yellow
+```
+
+Autre exemple :
+
+```bash
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+    --env local \
+    --periode 202507 \
+    --taxi_type yellow
+```
+
+La logique est :
+
+```text
+--env local
+       ↓
+Spark local WSL
+
+--periode 202504
+       ↓
+période de données à traiter
+
+--taxi_type yellow
+       ↓
+type de taxi
+```
+
+---
+
+# 10. Vérification du Warehouse Spark
+
+Le Warehouse local est configuré dans le projet.
+
+Pour vérifier sa configuration :
+
+```bash
+python -c "
+from nyc_taxi.src.utils.config.load_config import load_config
+import logging
+
+c = load_config(
+    'variable_environnement',
+    logging.getLogger()
+)
+
+print('WAREHOUSE =', c['local']['warehouse_dir'])
+print('METASTORE =', c['local']['metastore_dir'])
+"
+```
+
+Vérifier le Warehouse :
+
+```bash
+ls -la /mnt/d/data-ai-engineer-roadmap/spark-warehouse
+```
+
+Rechercher les tables Delta :
+
+```bash
+find /mnt/d/data-ai-engineer-roadmap/spark-warehouse \
+    -name "_delta_log"
+```
+
+---
+
+# 11. Metastore et Warehouse
+
+En environnement local, Spark utilise notamment :
+
+```text
+Metastore
+    ↓
+metastore_db
+
+Warehouse
+    ↓
+spark-warehouse
+```
+
+Le Warehouse contient les données physiques des tables.
+
+Exemple :
+
+```text
+spark-warehouse/
+│
+├── audit.db/
+│   ├── audit_load/
+│   └── audit_row_count/
+│
+├── silver.db/
+│   └── silver_nyc_taxi/
+│
+└── gold.db/
+    ├── gold_dim_date/
+    ├── gold_dim_location/
+    ├── gold_fact_trips/
+    └── gold_kpi_daily/
+```
+
+Une table Delta possède notamment :
+
+```text
+table/
+├── _delta_log/
+└── fichiers de données
+```
+
+Le dossier `_delta_log` est donc un indicateur important pour vérifier qu'une table est bien gérée comme une table Delta.
+
+---
+
+# 12. Vérification de l'espace disque
+
+Avant de faire du nettoyage :
+
+```bash
+df -h /
+```
+
+Taille des principaux dossiers du projet :
+
+```bash
+du -sh /mnt/d/data-ai-engineer-roadmap/* 2>/dev/null | sort -h
+```
+
+Taille du Warehouse :
+
+```bash
+du -sh /mnt/d/data-ai-engineer-roadmap/spark-warehouse/* 2>/dev/null | sort -h
+```
+
+Taille du HOME :
+
+```bash
+du -sh /home/alpha/* 2>/dev/null | sort -h
+```
+
+Taille de l'environnement Python :
+
+```bash
+du -sh /home/alpha/spark4_env
+```
+
+---
+
+# 13. Nettoyage des caches
+
+Ces commandes concernent uniquement les caches et non les données métier.
+
+Cache pip :
+
+```bash
+python -m pip cache purge
+```
+
+Cache Ivy utilisé par Spark :
+
+```bash
+rm -rf ~/.ivy2/cache
+rm -rf ~/.ivy2/jars
+```
+
+Cache utilisateur :
+
+```bash
+du -sh ~/.cache
+```
+
+Un nettoyage complet du cache peut être effectué avec :
+
+```bash
+rm -rf ~/.cache/*
+```
+
+⚠️ Ne pas confondre les caches avec :
+
+```text
+spark-warehouse
+metastore_db
+data/
+```
+
+qui contiennent des éléments nécessaires au projet.
+
+---
+
+# 14. Purge du stockage Delta
+
+Le projet possède également un script de maintenance :
+
+```bash
+python -m nyc_taxi.src.admin.run_purge_delta_storage.py
+```
+
+Son objectif est de nettoyer l'ancien stockage Delta selon les règles définies dans le projet.
+
+La purge Delta est différente du nettoyage des caches Python/Spark :
+
+```text
+Cache pip / Ivy
+        ↓
+fichiers temporaires
+
+Purge Delta
+        ↓
+anciens fichiers Delta devenus inutiles
+```
+
+---
+
+# 15. VACUUM Delta
+
+Pour une table Delta :
+
+```python
+from delta.tables import DeltaTable
+
+tables = [
+    "audit.audit_load",
+    "audit.audit_row_count",
+    "silver.silver_nyc_taxi",
+    "gold.gold_dim_date",
+    "gold.gold_dim_location",
+    "gold.gold_fact_trips",
+    "gold.gold_kpi_daily",
+]
+
+for table in tables:
+    print(f"VACUUM : {table}")
+    DeltaTable.forName(spark, table).vacuum(168)
+```
+
+Ici :
+
+```text
+168 heures = 7 jours
+```
+
+Le principe est de supprimer les anciens fichiers Delta qui ne sont plus nécessaires après la période de rétention.
+
+---
+
+# 16. CatalogManager
+
+La gestion des noms de tables est centralisée dans `CatalogManager`.
+
+L'objectif est d'avoir une différence entre local et Databricks :
+
+```text
+LOCAL
+
+audit.audit_load
+silver.silver_nyc_taxi
+gold.gold_fact_trips
+```
+
+et Databricks :
+
+```text
+DATABRICKS
+
+nyc_taxi.audit.audit_load
+nyc_taxi.silver.silver_nyc_taxi
+nyc_taxi.gold.gold_fact_trips
+```
+
+Architecture :
+
+```text
+                    CatalogManager
+                         │
+             ┌───────────┴───────────┐
+             │                       │
+           LOCAL                 DATABRICKS
+             │                       │
+      audit.audit_load       nyc_taxi.audit.audit_load
+      silver.xxx             nyc_taxi.silver.xxx
+      gold.xxx               nyc_taxi.gold.xxx
+             │                       │
+             └───────────┬───────────┘
+                         │
+                    AuditManager
+                         │
+                  utilise seulement
+                  audit_table = ...
+```
+
+L'intérêt est d'éviter de disperser les règles de nommage dans tout le projet.
+
+---
+
+# 17. Airflow — ancienne installation native WSL
+
+Une première approche a consisté à installer Airflow directement dans :
+
+```text
+/home/alpha/airflow_env
+```
+
+avec :
+
+```bash
+python3 -m venv ~/airflow_env
+source ~/airflow_env/bin/activate
+```
+
+Puis :
+
+```bash
+pip install apache-airflow
+```
+
+Vérification :
+
+```bash
+airflow version
+```
+
+Airflow utilise alors :
+
+```text
+/home/alpha/airflow
+```
+
+comme `AIRFLOW_HOME`.
+
+Configuration :
+
+```bash
+export AIRFLOW_HOME=~/airflow
+```
+
+ou :
+
+```bash
+echo 'export AIRFLOW_HOME=~/airflow' >> ~/.bashrc
+source ~/.bashrc
+```
+
+---
+
+# 18. Airflow natif — commandes principales
+
+Lister les DAG :
+
+```bash
+airflow dags list
+```
+
+Voir les erreurs d'import :
+
+```bash
+python -m airflow dags list-import-errors
+```
+
+Voir les informations sur les DAG :
+
+```bash
+python -m airflow dags report
+```
+
+Lancer Airflow :
+
+```bash
+python -m airflow standalone
+```
+
+Interface :
+
+```text
+http://localhost:8080
+```
+
+Cette installation native a permis de comprendre et tester Airflow.
+
+---
+
+# 19. Architecture Airflow actuelle : Docker
+
+L'architecture retenue pour le projet est désormais Docker.
+
+Structure :
+
+```text
+Docker Desktop
+│
+├── PostgreSQL
+│      └── metadata database Airflow
+│
+└── Airflow
+       │
+       ├── API Server
+       │
+       └── Scheduler
+              │
+              ▼
+             DAG
+              │
+              ▼
+        NYC Taxi Pipeline
+              │
+        ┌─────┼─────┐
+        ▼     ▼     ▼
+      Bronze Silver Gold
+```
+
+---
+
+# 20. Démarrage d'Airflow Docker
+
+Depuis WSL :
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap/airflow
+```
+
+Vérifier Docker Compose :
+
+```bash
+docker compose version
+```
+
+Vérifier la configuration :
+
+```bash
+docker compose config
+```
+
+Initialiser Airflow :
+
+```bash
+docker compose up airflow-init
+```
+
+Démarrer les services :
+
+```bash
+docker compose up -d
+```
+
+Vérifier :
+
+```bash
+docker compose ps
+```
+
+Interface :
+
+```text
+http://localhost:8080
+```
+
+---
+
+# 21. Accéder aux conteneurs Airflow
+
+Entrer dans le conteneur API Server :
+
+```bash
+docker compose exec airflow-apiserver bash
+```
+
+Entrer dans le Scheduler :
+
+```bash
+docker compose exec airflow-scheduler bash
+```
+
+Une fois dans le conteneur :
+
+```bash
+ls -la /opt/airflow
+```
+
+Projet NYC Taxi :
+
+```bash
+ls -la /opt/airflow/nyc_taxi
+```
+
+Jobs :
+
+```bash
+ls -la /opt/airflow/nyc_taxi/src/jobs
+```
+
+---
+
+# 22. Volumes Docker
+
+Le projet utilise notamment un montage permettant de rendre le projet accessible à Airflow :
+
+```text
+WSL
+/mnt/d/data-ai-engineer-roadmap/nyc_taxi
+              │
+              ▼
+Docker
+/opt/airflow/nyc_taxi
+```
+
+Les données :
+
+```text
+WSL
+/mnt/d/data-ai-engineer-roadmap/data
+              │
+              ▼
+Docker
+/opt/data
+```
+
+Architecture :
+
+```text
+Windows / WSL
+│
+├── data-ai-engineer-roadmap/
+│   ├── nyc_taxi/
+│   └── data/
+│
+└───────────────┐
+                │ volumes Docker
+                ▼
+          /opt/airflow
+          /opt/data
+```
+
+---
+
+# 23. Vérifier les volumes Docker
+
+Depuis :
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap/airflow
+```
+
+Vérifier :
+
+```bash
+docker compose config
+```
+
+Vérifier notamment les mappings :
+
+```bash
+docker compose config | grep -A5 -B5 "/opt/data"
+```
+
+Vérifier le contenu du conteneur :
+
+```bash
+docker compose exec airflow-apiserver bash
+```
+
+Puis :
+
+```bash
+ls -la /opt/data
+```
+
+Référence :
+
+```bash
+find /opt/data -name "taxi_zone_lookup.csv" 2>/dev/null
+```
+
+---
+
+# 24. Tester NYC Taxi dans Docker
+
+Dans le conteneur Airflow :
+
+```bash
+python -c "import nyc_taxi; print('OK')"
+```
+
+Puis :
+
+```bash
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+    --env docker \
+    --periode 202501 \
+    --taxi_type yellow
+```
+
+Cela permet de vérifier que le pipeline fonctionne indépendamment d'Airflow mais dans l'environnement Docker.
+
+---
+
+# 25. Architecture Airflow + NYC Taxi
+
+Le DAG ne doit pas contenir toute la logique métier.
+
+La séparation retenue est :
+
+```text
+Airflow DAG
+     │
+     ▼
+run_pipeline.py
+     │
+     ▼
+PipelineRunner
+     │
+     ├── EnvironmentSetup
+     ├── ReferenceDataLoader
+     ├── UberBronze
+     ├── UberSilver
+     ├── UberGold
+     ├── DataLoader
+     └── MaintenanceJob
+```
+
+### Responsabilités
+
+`nyc_taxi_airflow.py`
+
+```text
+Orchestration Airflow
+```
+
+`run_pipeline.py`
+
+```text
+Point d'entrée du pipeline
+```
+
+`pipeline_runner_jobs_bundles.py`
+
+```text
+Moteur d'exécution
+```
+
+`maintenance_job.py`
+
+```text
+Maintenance Delta
+```
+
+Les classes Bronze/Silver/Gold réalisent les transformations métier.
+
+---
+
+# 26. Vérifier l'import du pipeline dans Docker
+
+Commande :
+
+```bash
+docker compose exec airflow-scheduler python -c "
+from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
+print('IMPORT OK')
+"
+```
+
+Puis :
+
+```bash
+docker compose exec airflow-scheduler python -c "
+from nyc_taxi.src.jobs.run_pipeline import run_nyc_taxi_pipeline
+print('run_pipeline import OK')
+"
+```
+
+---
+
+# 27. Vérifier le DAG
+
+Lister les DAG :
+
+```bash
+docker compose exec airflow-scheduler airflow dags list
+```
+
+Vérifier les erreurs d'import :
+
+```bash
+docker compose exec airflow-scheduler airflow dags list-import-errors
+```
+
+Afficher le DAG :
+
+```bash
+docker compose exec airflow-scheduler airflow dags show nyc_taxi_airflow
+```
+
+---
+
+# 28. Tester le DAG
+
+Une fois le pipeline manuel validé :
+
+```bash
+docker compose exec airflow-scheduler \
+    airflow dags test nyc_taxi_airflow 2026-09-11
+```
+
+Cette commande signifie :
+
+```text
+docker compose
+      ↓
+exécute une commande dans
+      ↓
+airflow-scheduler
+      ↓
+airflow dags test
+      ↓
+DAG = nyc_taxi_airflow
+      ↓
+date logique = 2026-09-11
+```
+
+Le test permet de vérifier toute la chaîne :
 
 ```text
 Airflow
+   ↓
+DAG
+   ↓
+run_pipeline.py
    ↓
 PipelineRunner
    ↓
 EnvironmentSetup
    ↓
-UberBronze
+Bronze
    ↓
-UberSilver
+Silver
    ↓
-UberGold
+Gold
    ↓
 DataLoader
    ↓
-MaintenanceJob
+Maintenance
    ↓
 Audit
 ```
-* il faudra que l'environnement Airflow puisse lancer ton environnement nyc_taxi_env
 
-## Lancement manuelle depuis terminal wsl
-* se placer dans : /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* python -c "from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner; print('PipelineRunner OK')"
-
-
-
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
-  --periode 202503 \
-  --taxi_type yellow \
-  --env local \
-
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
---env local \
---periode 202504 \
---taxi_type yellow
-
-
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles --periode 202502 --taxi_type yellow --env local
-
-
-* une fois le lancement reussi alors on passe au dag
-```text
-Airflow DAG
-│
-▼
-Task Python/Bash
-│
-▼
-/home/alpha/nyc_taxi_env/bin/python
-│
-▼
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles
-│
-├── EnvironmentSetup
-├── UberBronze
-├── UberSilver
-├── UberGold
-├── DataLoader
-├── MaintenanceJob
-└── Audit
-```
-
-
-
-
-### Ouvrir Power Shell
-* [ ] wsl -l -v
-* [ ] wsl
-* [ ] cd ~
-* [ ] source ~/airflow_env/bin/activate
-* [ ] python -m pip show pyspark
-* [ ] python -m pip show delta-spark
 ---
 
-* [ ] airflow dags list
-* [ ] D:\data-ai-engineer-roadmap\nyc_taxi : projet actuel
-* [ ] projet actuel est accessible depuis WSL comme : /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* [ ] which python
-* [ ] which airflow
-* [ ] python --version
-* [ ] airflow version
-* [ ] which java
-* [ ] java -version
+# 29. Résultat attendu
 
-* [ ] python -c "import pyspark; print(pyspark.__version__)"
-* [ ] python -c "import delta; print(delta.__version__)"
-* [ ] conda --version
-* [ ] conda create -n nyc_taxi_wsl python=3.11 -y
-* [ ] conda activate nyc_taxi_wsl
-* [ ] python --version
-* [ ] java -version
+Lorsque le DAG fonctionne correctement, on doit obtenir notamment :
 
-* [ ] dans (nyc_taxi_wsl) :
-* [ ] pip install pyspark==3.5.1
-* [ ] pip install delta-spark==3.2.0
-* [ ] python -c "import pyspark; print(pyspark.__version__)"
-* [ ] cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
-* [ ] nano test_spark.py
-* [ ] python test_spark.py
+```text
+PIPELINE FINALIZED - STATUS = OK
+```
 
-* [ ] nano test_spark_derby.py
-* [ ] python test_spark_derby.py
+et :
 
-* [ ] find /mnt/d/data-ai-engineer-roadmap -name "derby.log"
-* [ ] find /mnt/d/data-ai-engineer-roadmap -type d -name "spark-warehouse"
-* [ ] find /mnt/d/data-ai-engineer-roadmap -type d -name "metastore_db"
+```text
+state=success
+```
 
+Cela signifie que :
 
-* [ ] rm -rf /mnt/d/data-ai-engineer-roadmap/metastore_db
-* [ ] ls -ld /mnt/d/data-ai-engineer-roadmap/metastore_db
+```text
+Airflow
+   ↓
+DAG
+   ↓
+Pipeline
+```
 
+fonctionne correctement.
 
-* [ ] deactivate
-* [ ] rm -rf /home/alpha/nyc_taxi_env
-* [ ] ls -ld /home/alpha/nyc_taxi_env
-* [ ] which -a python3
-* [ ] ls -1 /usr/bin/python3*
-* [ ] python3 --version
+---
 
+# 30. Vérification de l'Audit
 
-### Créer un environnement
-* [ ] python3 -m venv /home/alpha/nyc_taxi_env
-* [ ] source /home/alpha/nyc_taxi_env/bin/activate
+Une fois le pipeline exécuté, il est possible de vérifier les dernières exécutions :
 
-
-### Ouvre PowerShell en administrateur et exécute : 
-* [ ] wsl --status
-* [ ] wsl -d Ubuntu
-* [ ] python3 --version
-* [ ] uname -a
-* [ ] lsb_release -a
-* [ ] sudo apt update
-* [ ] python3 -m venv --help
-* [ ] python3 -m venv ~/airflow_env
-* [ ] source ~/airflow_env/bin/activate
-* [ ] airflow version
-* [ ] pip --version
-* [ ] pip install --upgrade pip
-* [ ] pip install apache-airflow --dry-run
-* [ ] pip install apache-airflow
-* [ ] airflow version
-* [ ] mkdir ~/airflow
-* [ ] export AIRFLOW_HOME=~/airflow
-
-* [ ] echo 'export AIRFLOW_HOME=~/airflow' >> ~/.bashrc
-* [ ] source ~/.bashrc
-
-* [ ] airflow db migrate ou airflow db init
-
-
-* [ ] airflow standalone
-* [ ] airflow version
-* [ ] airflow info
-* [ ] Ctrl + C
-
-
-### Démarrage
-* [ ] Terminal 1 :
-* [ ] wsl
-* [ ] airflow scheduler
-* [ ] source ~/airflow_env/bin/activate
-* [ ] airflow dags list
-
-* [ ] (airflow_env) → ton environnement Python virtuel
-* [ ] /mnt/c/WINDOWS/system32 → ton répertoire courant
-* [ ] source ~/airflow_env/bin/activate : tu actives le virtualenv sans changer le répertoire courant.
-* [ ] cd ~
-* [ ] pwd ~
-
-
-* [ ] Terminal 2 : airflow api-server
-* [ ] Terminal 3 : airflow webserver
-* [ ] Accès navigateur Depuis Windows : http://localhost:8080
-
-* [ ] which python
-* [ ] python --version
-* [ ] which pip
-* [ ] python -m pip --version
-* [ ] python -m pip install --upgrade pip
-* [ ] python -m pip install --upgrade pip
-
-### installer PySpark et Delta
-* [ ] python -m pip install pyspark==3.5.1 delta-spark==3.2.0
-* [ ] python -m pip show pyspark
-* [ ] python -m pip show delta-spark
-
-* [ ] java -version
-* [ ] echo $JAVA_HOME
-
-nano test_spark_clean.py
-python test_spark_clean.py
-
-rm -rf /mnt/d/data-ai-engineer-roadmap/metastore_db
-sed -n '1,120p' nyc_taxi/src/utils/load_json.py
-python -m pip install PyYAML
-python -m pip show PyYAML
-find /mnt/d/data-ai-engineer-roadmap -maxdepth 3 -type d -name "metastore_db" -print
-find /mnt/d/data-ai-engineer-roadmap -maxdepth 3 -type d -name "spark-warehouse" -print
-
-
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
---env local \
---periode 202507 \
---taxi_type yellow
-
-
-source ~/spark4_env/bin/activate
+```bash
 cd /mnt/d/data-ai-engineer-roadmap
-airflow standalone
-http://localhost:8080
+```
 
-cd /mnt/d/data-ai-engineer-roadmap
-python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
---periode 202504 \
---taxi_type yellow
+Puis :
 
-python -c "
-from pathlib import Path
-print(Path('/mnt/d/data-ai-engineer-roadmap/data/bronze/raw_files').exists())
-"
-python3 -m pip index versions pyspark
+```bash
+/home/alpha/spark4_env/bin/python -c '
+from nyc_taxi.src.common.spark_manager import SparkManager
 
-### Memoire
-df -h /
-du -sh /mnt/d/data-ai-engineer-roadmap/* 2>/dev/null | sort -h
-du -sh /mnt/d/data-ai-engineer-roadmap/spark-warehouse/* 2>/dev/null | sort -h
-ls -la /mnt/d/data-ai-engineer-roadmap/spark-warehouse/audit.db/audit_load
+spark = SparkManager(
+    app_name="audit_check",
+    env="local"
+).get_spark()
 
-du -sh /home/alpha/nyc_taxi_env
-du -sh /home/alpha/.ivy2
-du -sh /home/alpha/.cache
+spark.sql("""
+SELECT
+    run_id,
+    periode,
+    table_name,
+    taxi_type,
+    status,
+    start_time,
+    end_time,
+    duration_seconds,
+    error_step,
+    message
+FROM audit.audit_load
+ORDER BY end_time DESC
+LIMIT 10
+""").show(truncate=False)
+'
+```
 
-### Nettoyer les caches sans toucher aux données
-python -m pip cache purge
+L'audit permet notamment de vérifier :
 
-### Puis le cache Ivy de Spark/Delta :
-rm -rf ~/.ivy2/cache
-rm -rf ~/.ivy2/jars
-du -sh ~/.cache
-rm -rf ~/.cache/*
+```text
+run_id
+periode
+table_name
+taxi_type
+status
+start_time
+end_time
+duration
+error_step
+message
+```
 
-python3 -m venv ~/spark4_env
-source ~/spark4_env/bin/activate
-pip install --upgrade pip
-pip install pyspark
-python -m pip install --upgrade pip
-python -c "import pyspark; import delta; print('PySpark =', pyspark.__version__); print('Delta OK')"
+---
 
-### les anciennes versions Delta
-rm -rf spark-warehouse/*/_delta_log
+# 31. Vérification Java / Spark
 
+Pour vérifier Java :
 
+```bash
+which java
+java -version
+```
+
+Vérifier les processus Java :
+
+```bash
+jps
+```
+
+Sous Windows, si nécessaire :
+
+```powershell
+tasklist | findstr java
+```
+
+---
+
+# 32. Commandes Docker de diagnostic
+
+Voir l'utilisation Docker :
+
+```bash
+docker system df
+```
+
+Voir les images :
+
+```bash
+docker images
+```
+
+Voir les conteneurs :
+
+```bash
+docker compose ps
+```
+
+Logs du Scheduler :
+
+```bash
+docker compose logs airflow-scheduler --since=5m
+```
+
+Logs de l'API Server :
+
+```bash
+docker compose logs airflow-apiserver --tail=50
+```
+
+---
+
+# 33. Attention aux commandes Docker de nettoyage
+
+Commandes possibles :
+
+```bash
+docker container prune -f
+docker image prune -a
+docker volume prune -f
+```
+
+Mais les commandes suivantes sont beaucoup plus agressives :
+
+```bash
+docker system prune -a --volumes -f
+```
+
+⚠️ Elles peuvent supprimer des images, conteneurs, réseaux et volumes Docker inutilisés.
+
+Ne pas les utiliser comme simple commande de nettoyage quotidien.
+
+---
+
+# 34. Diagnostic général de l'espace disque
+
+Commande recommandée :
+
+```bash
 echo "=== DISQUE ==="
 df -h /
 
@@ -464,262 +1263,242 @@ du -sh /mnt/d/data-ai-engineer-roadmap/spark-warehouse/* 2>/dev/null | sort -h
 
 echo "=== HOME ==="
 du -sh /home/alpha/* 2>/dev/null | sort -h
+```
 
+---
 
+# 35. Séquence de travail recommandée
 
+Pour éviter les problèmes, toujours travailler dans cet ordre.
 
-from delta.tables import DeltaTable
+## Étape 1 — Activer Spark
 
-tables = [
-"audit.audit_load",
-"audit.audit_row_count",
-"silver.silver_nyc_taxi",
-"gold.gold_dim_date",
-"gold.gold_dim_location",
-"gold.gold_fact_trips",
-"gold.gold_kpi_daily",
-"ref.gold_dim_location",
-]
+```bash
+source ~/spark4_env/bin/activate
+```
 
-for table in tables:
-print(f"VACUUM : {table}")
-DeltaTable.forName(spark, table).vacuum(168)
+## Étape 2 — Se placer à la racine
 
+```bash
+cd /mnt/d/data-ai-engineer-roadmap
+```
 
+## Étape 3 — Tester Python
 
-cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi/src/common
-python spark_manager.py
-
-
-which python
+```bash
 python --version
-which pip
-pip list | grep airflow
-python -m pip show apache-airflow
-python -m pip install apache-airflow
-airflow version
-python -m airflow version
-ls -la /home/alpha/airflow
-echo $AIRFLOW_HOME
-grep "^dags_folder" /home/alpha/airflow/airflow.cfg
-ls -la /mnt/d/data-ai-engineer-roadmap/airflow/dags/
-nano /home/alpha/airflow/airflow.cfg
-ls -la /mnt/d/data-ai-engineer-roadmap/airflow/dags/
-grep "^dags_folder" /home/alpha/airflow/airflow.cfg
-dags_folder = /mnt/d/data-ai-engineer-roadmap/airflow/dags
-python -m airflow dags list-import-errors
-python -m airflow dags list | grep nyc
-python -m airflow dags report
-cat /mnt/d/data-ai-engineer-roadmap/airflow/dags/nyc_taxi_dag.py
-python -m airflow dags report | grep nyc_taxi
-sudo lsof -i :8080
-ss -ltnp | grep :8080
-curl.exe http://localhost:8080
-hostname -I
+which python
+```
 
-source ~/spark4_env/bin/activate
-cat ~/airflow/simple_auth_manager_passwords.json.generated
-cat ~/airflow/simple_auth_manager_passwords.json.generated
-{"admin": "rbFQkhHXU2rmZUht"}
-python -m airflow dags report
+## Étape 4 — Tester le projet
 
-Le fichier DAG est trouvé
-Le DAG est correctement parsé
-Airflow CLI le voit comme actif
+```bash
+python -c "import nyc_taxi; print('NYC Taxi OK')"
+```
 
+## Étape 5 — Tester PipelineRunner
 
-✅ Pipeline local stable  
-✅ Audit fonctionnel  
-✅ get_next_period fonctionnel  
-✅ DAG Airflow avec 1 tâche  
-✅ Paramétrage Airflow (taxi_type)  
-✅ DAG découpé Bronze → Silver → Gold  
-✅ Maintenance automatisée  
-✅ Dashboard de monitoring (Airflow + tables audit)  
+```bash
+python -c "
+from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
+print('PipelineRunner OK')
+"
+```
 
-✅ Airflow est installé et fonctionne  
-✅ L'interface Web est accessible  
-✅ Le DAG est détecté et enregistré  
-✅ Le parsing du fichier nyc_taxi_dag.py est correct  
-✅ On est prêt à exécuter le pipeline depuis Airflow  
+## Étape 6 — Exécuter le pipeline manuellement
 
+```bash
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+    --env local \
+    --periode 202504 \
+    --taxi_type yellow
+```
 
-### démarrer Airflow
-cd /mnt/d/data-ai-engineer-roadmap/
-python -m airflow standalone
+## Étape 7 — Vérifier l'Audit
 
+Vérifier que l'exécution est correctement enregistrée.
+
+## Étape 8 — Démarrer Airflow Docker
+
+```bash
+cd /mnt/d/data-ai-engineer-roadmap/airflow
+docker compose up -d
+```
+
+## Étape 9 — Vérifier Airflow
+
+```bash
+docker compose ps
+```
+
+## Étape 10 — Vérifier le DAG
+
+```bash
+docker compose exec airflow-scheduler airflow dags list
+```
+
+## Étape 11 — Tester le point d'entrée
+
+```bash
+docker compose exec airflow-scheduler python -c "
+from nyc_taxi.src.jobs.run_pipeline import run_nyc_taxi_pipeline
+print('run_pipeline OK')
+"
+```
+
+## Étape 12 — Tester le DAG
+
+```bash
+docker compose exec airflow-scheduler \
+    airflow dags test nyc_taxi_airflow 2026-09-11
+```
+
+---
+
+# 36. Architecture finale à retenir
+
+```text
+                         WINDOWS
+                            │
+                            │
+                 D:\data-ai-engineer-roadmap
+                            │
+                            ▼
+                          WSL2
+                            │
+              ┌─────────────┴─────────────┐
+              │                           │
+              ▼                           ▼
+       spark4_env                    Docker
+              │                           │
+              │                     ┌─────┴─────┐
+              │                     │           │
+              │                 Airflow     PostgreSQL
+              │                     │
+              │                     ▼
+              │                    DAG
+              │                     │
+              │                     ▼
+              │             run_pipeline.py
+              │                     │
+              │                     ▼
+              └────────────► PipelineRunner
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+                 Bronze          Silver           Gold
+                                                    │
+                                                    ▼
+                                                   Audit
+                                                    │
+                                                    ▼
+                                               Maintenance
+```
+
+---
+
+# 37. Commandes essentielles à retenir
+
+### Spark local
+
+```bash
 source ~/spark4_env/bin/activate
 cd /mnt/d/data-ai-engineer-roadmap
+```
 
+### Pipeline
 
-Get-ChildItem D:\data-ai-engineer-roadmap\nyc_taxi\schema\yellow
-Test-Path "D:\data-ai-engineer-roadmap\metastore_db"
+```bash
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
+    --env local \
+    --periode 202504 \
+    --taxi_type yellow
+```
 
+### Purge Delta
 
-cd /mnt/d/data-ai-engineer-roadmap
+```bash
+python -m nyc_taxi.src.admin.run_purge_delta_storage.py
+```
 
-/home/alpha/spark4_env/bin/python -c '
-from nyc_taxi.src.common.spark_manager import SparkManager
+### Airflow Docker
 
-spark = SparkManager(
-app_name="audit_check",
-env="local"
-).get_spark()
+```bash
+cd /mnt/d/data-ai-engineer-roadmap/airflow
+docker compose up -d
+```
 
-spark.sql("""
-SELECT
-run_id,
-periode,
-table_name,
-taxi_type,
-status,
-start_time,
-end_time,
-duration_seconds,
-error_step,
-message
-FROM audit.audit_load
-ORDER BY end_time DESC
-LIMIT 10
-""").show(truncate=False)
-'
+### Vérification
 
+```bash
+docker compose ps
+```
 
+### DAG
 
-jps
-tasklist | findstr java
+```bash
+docker compose exec airflow-scheduler airflow dags list
+```
 
+### Test DAG
 
-### Docker
-* docker system df
-* docker container prune -f
-* docker image prune -a -f
-* docker volume prune -f
-* docker system prune -a --volumes -f
-* docker images
-* docker image prune -a
-Docker Desktop → Settings → Kubernetes → désactiver Kubernetes, puis Docker Desktop redémarrera
-
-### Installer Airflow avec Docker
-* Docker Desktop → Settings → Resources → WSL Integration
-* wsl --shutdown
-* cd /mnt/d/data-ai-engineer-roadmap/airflow
-* docker compose version
-* docker compose config
-* docker compose up airflow-init
-* docker compose up -d 
-* docker compose ps
-* docker compose up airflow-init
-* docker compose up -d
-* http://localhost:8080
-
-### Configurer user
-* depuis /mnt/d/data-ai-engineer-roadmap/airflow
-* docker compose exec airflow-apiserver airflow users list
-* je dois obtenir comme résultat une ligne marquée : admin
+```bash
+docker compose exec airflow-scheduler \
+    airflow dags test nyc_taxi_airflow 2026-09-11
+```
 
 ---
-* si admin n'existe pas alors faut la creer
-* docker compose exec airflow-apiserver airflow users reset-password --username admin --password admin
-* docker compose logs airflow-init --tail=100
-* docker compose logs airflow-apiserver --tail=50
-* docker compose exec airflow-apiserver airflow config get-value core auth_manager
-* docker compose exec airflow-apiserver airflow config get-value api auth_backends
 
-* docker compose config
-* docker compose down
-* docker compose down -v
-* docker compose up airflow-init
-* docker compose up -d
-* docker compose ps
-* http://localhost:8080
-* {"admin": "Mtg46dzedhTFCrUM"}
-* docker compose exec airflow-apiserver airflow config get-value core simple_auth_manager_users
-* http://localhost:8080
-* Utilisateur : admin
-* Mot de passe : Mtg46dzedhTFCrUM
-* docker compose exec airflow-apiserver airflow config get-value core simple_auth_manager_users
-* docker compose exec airflow-apiserver sh -c 'python -c "import json; d=json.load(open(\"/opt/airflow/simple_auth_manager_passwords.json.generated\")); print(list(d.keys()))"'
-* docker compose exec airflow-apiserver sh -c 'python -c "import json; d=json.load(open(\"/opt/airflow/simple_auth_manager_passwords.json.generated\")); print(len(d.get(\"admin\", \"\")))"'
-* cd /mnt/d/data-ai-engineer-roadmap
-* tree -L 2
+# 38. État actuel du projet
 
-* cd /mnt/d/data-ai-engineer-roadmap/airflow
-* docker compose down
+Les éléments suivants sont maintenant validés :
 
-* docker compose exec airflow-apiserver bash
-* ls -la /opt/airflow
-* ls -la /opt/airflow/nyc_taxi/src/jobs
+* [x] Projet NYC Taxi accessible depuis WSL
+* [x] Environnement Spark WSL fonctionnel
+* [x] PySpark installé
+* [x] Delta Lake installé
+* [x] PyYAML installé
+* [x] Pipeline local fonctionnel
+* [x] Bronze → Silver → Gold fonctionnel
+* [x] Audit fonctionnel
+* [x] Maintenance Delta
+* [x] Airflow installé
+* [x] Airflow Docker fonctionnel
+* [x] PostgreSQL utilisé pour les métadonnées Airflow
+* [x] DAG détecté
+* [x] `run_pipeline.py` placé dans `nyc_taxi/src/jobs`
+* [x] `PipelineRunner` séparé du DAG
+* [x] DAG avec une tâche d'orchestration
+* [x] Import `nyc_taxi` fonctionnel dans Docker
+* [x] Import `run_pipeline.py` fonctionnel
+* [x] DAG Airflow testé avec succès
+* [x] Pipeline exécuté depuis Airflow
+* [x] Statut final `SUCCESS / OK`
 
-dans docker
-* python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles     --env docker     --periode 202501     --taxi_type yellow
+## Architecture logicielle finale
 
+```text
+Airflow
+   │
+   ▼
+nyc_taxi_airflow.py
+   │
+   ▼
+run_pipeline.py
+   │
+   ▼
+PipelineRunner
+   │
+   ├── EnvironmentSetup
+   ├── ReferenceDataLoader
+   ├── UberBronze
+   ├── UberSilver
+   ├── UberGold
+   ├── DataLoader
+   └── MaintenanceJob
+   │
+   ▼
+Audit
+```
 
-python -c "import sys sys.path.append('/opt/airflow') import nyc_taxi print('OK')"
-
-docker compose exec airflow-apiserver airflow users create \
---username alphadiop \
---password Ibrahima@1diop \
---firstname Alpha \
---lastname Oumar \
---role Admin \
---email alphadiop@gmail.com
-
-
----
-* docker compose up airflow-init
-* cette commande va
----
-````text
-PostgreSQL
-    ↓
-création de la base airflow
-    ↓
-airflow db migrate
-    ↓
-création de l'utilisateur admin
-````
-
-
-````text
-                 Docker Desktop
-                       │
-          ┌────────────┴────────────┐
-          │                         │
-      PostgreSQL                 Airflow
-          │                         │
-  metadata DB             ┌───────┴───────┐
-  │               │
-  API Server       Scheduler
-  │               │
-  └───────┬───────┘
-  │
-  DAG
-  │
-  NYC Taxi Pipeline
-  │
-  ┌──────────┼──────────┐
-  ↓          ↓          ↓
-  Bronze     Silver      Gold
-
-````
-
-* Power Shell --> admin
-* wsl
-* cd /mnt/d/data-ai-engineer-roadmap/airflow
-* docker compose ps -> vérification des container
-* docker compose up -d -> demmarrer les container si absent
-* docker compose exec airflow-apiserver bash -> Entrer dans le conteneur Airflow
-* ls -la /opt/airflow/nyc_taxi
-* docker compose down
-* docker compose up -d
-* docker compose exec airflow-apiserver bash
-* python -c "import nyc_taxi; print('OK')"
-  python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles \
-  --env docker \
-  --periode 202501 \
-  --taxi_type yellow
-
-* grep -R "load_config(" nyc_taxi/src
-* mkdir -p /opt/airflow/nyc_taxi/logs
-* python -c "from pathlib import Path; p=Path('/opt/airflow/nyc_taxi/src/utils/config/load_config.py'); print(p.parents[4]); print(p.parents[5])"
+Cette architecture permet ensuite d'évoluer vers un véritable pipeline de production avec scheduling, retries, monitoring, paramétrage des périodes, gestion des erreurs et éventuellement plusieurs tâches Airflow.

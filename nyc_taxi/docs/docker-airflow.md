@@ -1,7 +1,17 @@
+* power Shell
+* wsl
+* cd /mnt/d/data-ai-engineer-roadmap
+* source ~/spark4_env/bin/activate
+* python test_run_pipeline.py
+
+
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles     --env docker     --periode 202501     --taxi_type yellow
+python -m nyc_taxi.src.jobs.run_pipeline {'env':'docker', "periode":202501, "taxi_type":"yellow"}
+python -m nyc_taxi.src.jobs.run_pipeline {'env':'docker', "periode":202501, "taxi_type":"yellow"}
+
 # Mise en place d'Airflow — Projet NYC Taxi
 
 ## 1. Objectif
-
 L'objectif est d'intégrer **Airflow** au projet NYC Taxi afin d'orchestrer l'exécution du pipeline de Data Engineering.
 
 Le pipeline doit pouvoir fonctionner dans plusieurs environnements :
@@ -34,9 +44,7 @@ Spark / Delta Lake
 ```
 
 ---
-
 # 2. Comprendre WSL, Docker et Airflow
-
 ## 2.1 WSL
 
 WSL signifie :
@@ -1519,3 +1527,185 @@ docker compose exec airflow-scheduler python -c "
 from nyc_taxi.src.jobs.run_pipeline import run_nyc_taxi_pipeline
 print('run_pipeline import OK')
 "
+
+
+#### Etape
+✅ DAG avec 1 tâche  
+✅ run_pipeline.py séparé  
+✅ Exécution depuis Airflow  
+✅ Logs Airflow  
+
+⬜ Paramètres Airflow (periode, taxi_type)  
+⬜ Variables Airflow  
+⬜ Connections Airflow  
+⬜ DAG Bronze/Silver/Gold séparés  
+⬜ Retries  
+⬜ Notifications  
+⬜ Monitoring  
+⬜ Déploiement Databricks  
+
+
+### Actions à faire
+* [ ] Ajouter un formulaire Airflow avec params pour saisir periode, taxi_type et env directement depuis l'interface, puis de les récupérer dans run_pipeline.py
+* [ ] C'est exactement comme cela que les équipes Data Engineering déclenchent des rechargements ciblés en production
+
+
+### Vérifier que le DAG est rechargé
+* [ ] cd /mnt/d/data-ai-engineer-roadmap/airflow
+* [ ] docker compose restart airflow-scheduler
+* [ ] docker compose exec airflow-scheduler airflow dags show nyc_taxi_airflow
+* [ ] docker compose exec airflow-scheduler airflow dags list | grep nyc_taxi
+* [ ] docker compose exec airflow-scheduler airflow dags show nyc_taxi_airflow
+* [ ] docker compose exec airflow-scheduler cat /opt/airflow/dags/nyc_taxi_airflow.py
+* [ ] docker compose exec airflow-scheduler find /opt/airflow/dags -maxdepth 2 -type f -print
+* [ ] docker compose exec airflow-scheduler grep -R "env = \"docker\"" /opt/airflow/dags
+* [ ] docker compose exec airflow-scheduler grep -R 'dag_id="nyc_taxi_airflow"' /opt/airflow/dags
+* [ ] docker compose exec airflow-scheduler grep -n "Param\|params\|periode\|taxi_type\|env" /opt/airflow/dags/nyc_taxi_airflow.py
+* [ ] docker compose restart airflow-apiserver
+* [ ] sleep 5
+
+* [ ] docker compose restart airflow-apiserver -> forcer une nouvelle session
+* [ ] docker compose down -v
+* [ ] docker compose up -d
+* [ ] docker compose exec airflow-apiserver airflow dags list | grep nyc_taxi
+* [ ] docker compose exec airflow-apiserver airflow dags details nyc_taxi_airflow
+* [ ] docker compose exec airflow-scheduler airflow config get-value database sql_alchemy_conn
+* [ ] grep -n -A15 -B5 "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN" docker-compose.yml
+* [ ] grep -n -A10 -B5 "airflow-scheduler:" docker-compose.yml
+* [ ] grep -n -A10 -B5 "airflow-apiserver:" docker-compose.yml
+* [ ] docker compose exec airflow-scheduler airflow config get-value dag_processor refresh_interval
+* [ ] docker compose exec airflow-scheduler airflow config get-value dag_processor min_file_process_interval
+* [ ] docker compose exec airflow-scheduler airflow info
+* [ ] docker compose exec airflow-scheduler airflow --help
+* [ ] docker compose exec airflow-scheduler airflow dag-processor --help
+* [ ] docker compose exec airflow-scheduler airflow dag-processor -n 1 -v
+* [ ] docker compose exec airflow-scheduler airflow dags list | grep nyc
+* [ ] docker compose exec airflow-scheduler airflow dags list | grep nyc
+* [ ] docker compose down
+* [ ] docker compose up -d
+* [ ] docker compose ps
+
+* [ ] docker compose exec airflow-scheduler airflow dags list | grep nyc
+
+enregistrer ton DAG dans la base.
+vérifier la configuration Airflow 3 du DAG processor
+chargement/parsing des DAGs du Scheduler
+fichier est parsé par le DagBag, 
+mais que nyc_taxi_airflow n'arrive pas jusqu'à la base utilisée par l'API/UI.
+quels conteneurs Airflow sont démarrés (scheduler, apiserver, éventuel dag-processor, etc.)
+
+Ton environnement Docker contient uniquement :
+airflow-apiserver
+airflow-scheduler
+postgres
+
+* Le DAG Processor est le composant chargé de parser les DAGs et de les enregistrer dans la base.
+
+* Avec Airflow 3, la configuration recommandée est généralement :
+API Server
+Scheduler
+DAG Processor
+PostgreSQL
+
+
+```text
+PostgreSQL
+     │
+     ├── airflow-apiserver
+     ├── airflow-scheduler
+     └── airflow-dag-processor
+```
+
+
+```text
+Docker Desktop
+      │
+      ▼
+ ┌─────────────┐
+ │ PostgreSQL  │
+ └──────┬──────┘
+        │
+ ┌──────┼───────────────┐
+ │      │               │
+ ▼      ▼               ▼
+API  Scheduler   DAG Processor
+Server
+ │      │               │
+ └──────┴───────┬───────┘
+                │
+                ▼
+        nyc_taxi_airflow
+                │
+                ▼
+        run_pipeline.py
+                │
+                ▼
+         PipelineRunner
+```
+
+
+✅ Le fichier existe dans /opt/airflow/dags  
+✅ DagBag manuel arrive à charger nyc_taxi_airflow  
+✅ Pas d'erreur de syntaxe  
+✅ PostgreSQL fonctionne  
+❌ airflow dags list ne voit aucun DAG  
+❌ UI ne voit aucun DAG  
+
+
+
+
+docker compose exec airflow-scheduler \
+python -c "
+from airflow.models import DagBag
+bag = DagBag(dag_folder='/opt/airflow/dags', include_examples=False)
+dag = bag.get_dag('nyc_taxi_airflow')
+print('DAG =', dag.dag_id)
+print('PARAMS =', dag.params)
+"
+
+
+docker compose exec airflow-scheduler \
+python -c "
+from airflow.models import DagBag
+bag = DagBag(dag_folder='/opt/airflow/dags', include_examples=False)
+dag = bag.get_dag('nyc_taxi_airflow')
+print('DAG =', dag.dag_id)
+print('PARAMS =', dag.params)
+"
+
+
+
+
+* [ ] Tester dans l'interface : http://localhost:8080
+* [ ] Puis : DAGs -> nyc_taxi_airflow -> Trigger DAG
+* [ ] reponse attendu : periode taxi_type env
+
+### Premier test : 
+* [ ] parametres à saisir : {"periode": 202504,"taxi_type": "yellow","env": "docker"}
+* [ ] Puis : Trigger
+
+### Vérifier la transmission
+
+
+## Déclencher le DAG depuis l'interface Airflow
+Et ton run_nyc_taxi_pipeline() sait déjà récupérer : params = context["params"]
+```text
+Airflow
+   │
+   ▼
+nyc_taxi_airflow
+   │
+   ▼
+PythonOperator
+   │
+   ▼
+run_nyc_taxi_pipeline(**context)
+   │
+   ▼
+PipelineRunner
+```
+
+
+
+
+docker stats --no-stream

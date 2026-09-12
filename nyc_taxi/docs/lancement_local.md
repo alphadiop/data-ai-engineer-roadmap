@@ -1,3 +1,13 @@
+###### Lancement dans un docker
+###### PowerShell
+###### wsl
+###### source ~/spark4_env/bin/activate
+###### cd /mnt/d/data-ai-engineer-roadmap
+###### cd airflow
+###### Entrer dans le conteneur : docker compose exec airflow-scheduler bash
+###### python3 -m nyc_taxi.src.jobs.test_airflow_pipeline.py
+
+
 cd D:\data-ai-engineer-roadmap\nyc_taxi
 tree /F src
 
@@ -23,14 +33,13 @@ run_pipeline_local.ps1 → exécution standard du pipeline
 
 
 import sys
-
 spark = (
 SparkSession.builder
-.appName("nyc_taxi")
-.config(
-"spark.pyspark.python",
-sys.executable
-)
+    .appName("nyc_taxi")
+    .config(
+    "spark.pyspark.python",
+    sys.executable
+    )
 .getOrCreate()
 )
 

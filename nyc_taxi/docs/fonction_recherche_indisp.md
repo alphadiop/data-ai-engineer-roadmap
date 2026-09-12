@@ -3,15 +3,11 @@
 * [ ] grep -Rn "load_config(" nyc_taxi/src
 * [ ] grep -Rn "SparkSession" nyc_taxi/src
 * [ ] grep -Rn "saveAsTable" nyc_taxi/src
-* [ ] python -c "
-  from nyc_taxi.src.utils.config.load_config import load_config
-  print(load_config('variable_environnement','local'))
-  "
+* [ ] python -c "from nyc_taxi.src.utils.config.load_config import load_config print(load_config('variable_environnement','local'))"
 
-python -c "
-from nyc_taxi.src.utils.config.load_config import load_config
-print(load_config('variable_environnement','docker'))
-"
+* http://localhost:8080
+
+* python -c "from nyc_taxi.src.utils.config.load_config import load_config print(load_config('variable_environnement','docker'))"
 ---
 * grep = recherche de texte dans des fichiers.
 * -R signifie Recursive
@@ -20,7 +16,7 @@ print(load_config('variable_environnement','docker'))
 * cherche le mot SparkSession dans spark_manager.py
 
 * D:\data-ai-engineer-roadmap\nyc_taxi\src
-* : grep -R "load_config(" nyc_taxi/src
+* grep -R "load_config(" nyc_taxi/src
 * wsl puis cd D:\data-ai-engineer-roadmap
 
 * Cherche le texte "load_config(" dans tous les fichiers à l'intérieur du dossier nyc_taxi/src et de ses sous-dossiers.
@@ -54,9 +50,9 @@ python -c "
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 c = CatalogManager(
-spark=None,
-logger=None,
-env='docker'
+    spark=None,
+    logger=None,
+    env='docker'
 )
 
 print('ENV       =', c.env)

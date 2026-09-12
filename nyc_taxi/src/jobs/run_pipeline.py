@@ -1,4 +1,7 @@
-def run_nyc_taxi_pipeline():
+
+
+def run_nyc_taxi_pipeline(**context):
+    print(context.keys())
     from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
     from nyc_taxi.src.common.spark_manager import SparkManager
     from nyc_taxi.src.logger.logger import PipelineLogger
@@ -14,9 +17,18 @@ def run_nyc_taxi_pipeline():
     # ============================================================
     # Paramètres du pipeline
     # ============================================================
-    env = "docker"
-    taxi_type = "yellow"
-    periode = 202501
+    params = context["params"]
+    periode = params.get("periode")
+    taxi_type = params.get("taxi_type")
+    env = params.get("env")
+
+    print(f"periode   = {periode}")
+    print(f"taxi_type = {taxi_type}")
+    print(f"env       = {env}")
+
+    # env = "docker"
+    # taxi_type = "yellow"
+    # periode = 202501
 
     # ============================================================
     # Logger
@@ -97,5 +109,22 @@ def run_nyc_taxi_pipeline():
     # ============================================================
     # Exécution
     # ============================================================
-
     runner.run()
+
+# if __name__ == "__main__":
+#     context = {
+#         "params": {
+#             "periode": 202503,
+#             "taxi_type": "yellow",
+#             "env": "docker"
+#         }
+#     }
+#     run_nyc_taxi_pipeline(
+#         context=context
+#     )
+
+    ## Power Shell
+    ## wsl
+    ## cd /mnt/d/data-ai-engineer-roadmap
+    ## source ~/spark4_env/bin/activate
+    ## python run_pipeline.py
