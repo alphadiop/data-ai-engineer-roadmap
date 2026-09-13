@@ -488,8 +488,7 @@ airflow/
 * Entrer dans le conteneur : docker compose exec airflow-scheduler bash
 * Lister les DAGs : docker compose exec airflow-scheduler airflow dags list
 * Tester le parsing : docker compose exec airflow-scheduler airflow dag-processor -n 1 -v
-* Tester un DAG : docker compose exec airflow-scheduler \
-  airflow dags test nyc_taxi_airflow 2026-09-11
+* Tester un DAG : docker compose exec airflow-scheduler airflow dags test nyc_taxi_airflow 2026-09-11
 
 
 ```text

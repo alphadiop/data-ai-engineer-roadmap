@@ -4,6 +4,8 @@
 * source ~/spark4_env/bin/activate
 * python test_run_pipeline.py
 
+* /mnt/d/data-ai-engineer-roadmap/metastore_db/dbex.lck
+* rm /mnt/d/data-ai-engineer-roadmap/metastore_db/dbex.lck
 
 python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles     --env docker     --periode 202501     --taxi_type yellow
 python -m nyc_taxi.src.jobs.run_pipeline {'env':'docker', "periode":202501, "taxi_type":"yellow"}
@@ -1709,3 +1711,8 @@ PipelineRunner
 
 
 docker stats --no-stream
+python3 -c "
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.getOrCreate()
+print('Warehouse =', spark.conf.get('spark.sql.warehouse.dir'))
+"

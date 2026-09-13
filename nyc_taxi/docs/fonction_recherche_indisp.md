@@ -4,6 +4,8 @@
 * [ ] grep -Rn "SparkSession" nyc_taxi/src
 * [ ] grep -Rn "saveAsTable" nyc_taxi/src
 * [ ] python -c "from nyc_taxi.src.utils.config.load_config import load_config print(load_config('variable_environnement','local'))"
+* grep -R -n "def repair_local_metastore" /mnt/d/data-ai-engineer-roadmap/nyc_taxi/src
+
 
 * http://localhost:8080
 
