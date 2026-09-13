@@ -1,4 +1,22 @@
 
+### Airflow peut piloter :
+* [ ] Databricks
+* [ ] Snowflake
+* [ ] SQL Server
+* [ ] AWS
+* [ ] Azure
+* [ ] APIs
+* [ ] Power BI
+* [ ] SFTP
+* [ ] etc.
+---
+
+### Un PipelineRunner actuel est déjà très proche d'un exécutable qui pourrait être lancé soit par :
+* [ ] un Databricks Workflow
+* [ ] un Airflow DAG : couche d'orchestration externe.
+* [ ] ou même un GitHub Action
+---
+
 ### Comprendre 
 * [ ] Pourquoi on utilise Airflow
 * [ ] Son architecture
@@ -13,6 +31,11 @@
 * [ ] Apache Airflow est un orchestrateur de workflows
 * [ ] Il permet d'automatiser, planifier et superviser des traitements de données
 ---
+
+
+### "Avez-vous déjà travaillé avec Airflow ?"
+* Oui. J'ai installé Airflow sous Docker/WSL, créé des DAGs et orchestré des traitements Databricks.
+
 
 #### Exemple de traitement de données
 * [ ] Télécharger fichier

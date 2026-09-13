@@ -1,3 +1,10 @@
+### Orchestration 
+* [ ] Databricks Jobs
+* [ ] Scheduling
+* [ ] Retry
+* [ ] Monitoring
+* [ ] Paramètres
+
 
 ### construire une architecture quotidienne de un tera par jour
 * Je propose une architecture Lakehouse sur Databricks organisée en trois couches : Bronze, Silver et Gold.

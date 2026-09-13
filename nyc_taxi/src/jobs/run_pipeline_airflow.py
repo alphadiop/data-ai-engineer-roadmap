@@ -127,4 +127,4 @@ def run_nyc_taxi_pipeline(**context):
     ## wsl
     ## cd /mnt/d/data-ai-engineer-roadmap
     ## source ~/spark4_env/bin/activate
-    ## python run_pipeline.py
+    ## python run_pipeline_airflow.py

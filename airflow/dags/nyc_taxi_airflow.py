@@ -2,7 +2,7 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.providers.standard.operators.python import PythonOperator
-from nyc_taxi.src.jobs.run_pipeline import run_nyc_taxi_pipeline
+from nyc_taxi.src.jobs.run_pipeline_airflow import run_nyc_taxi_pipeline
 from airflow.models.param import Param
 
 with DAG(
