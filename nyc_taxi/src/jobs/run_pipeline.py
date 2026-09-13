@@ -3,6 +3,18 @@ def run_pipeline(
         taxi_type,
         periode=None
 ):
+    """
+    avec cette fonction : on a une séparation nette entre le métier et l'orchestrateur
+    le métier dit seulement :
+    « Donne-moi un environnement, un type de taxi et éventuellement une période, et je lance le pipeline. »
+    il ne sait pas si l'appel vient de :
+        Airflow
+        Databricks
+        Terminal
+        Test Python
+        GitHub Actions
+
+    """
     from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
     from nyc_taxi.src.common.spark_manager import SparkManager
     from nyc_taxi.src.logger.logger import PipelineLogger
@@ -48,42 +60,13 @@ def run_pipeline(
     # Étapes du pipeline
     # ============================================================
     steps = [
-        EnvironmentSetup(
-            spark=spark,
-            env=env,
-            logger=logger
-        ),
-
-        ReferenceDataLoader(
-            spark=spark,
-            env=env,
-            logger=logger
-        ),
-
-        UberBronze(
-            spark=spark,
-            logger=logger
-        ),
-
-        UberSilver(
-            spark=spark,
-            logger=logger
-        ),
-
-        UberGold(
-            spark=spark,
-            logger=logger
-        ),
-
-        DataLoader(
-            spark=spark,
-            logger=logger
-        ),
-
-        MaintenanceJob(
-            spark=spark,
-            logger=logger
-        ),
+        EnvironmentSetup(spark=spark,env=env,logger=logger),
+        ReferenceDataLoader(spark=spark,env=env,logger=logger),
+        UberBronze(spark=spark,logger=logger),
+        UberSilver(spark=spark,logger=logger),
+        UberGold(spark=spark,logger=logger),
+        DataLoader(spark=spark,logger=logger),
+        MaintenanceJob(spark=spark,logger=logger),
     ]
 
     # ============================================================
@@ -101,4 +84,4 @@ def run_pipeline(
     # ============================================================
     # Exécution
     # ============================================================
-    runner.run()
+    return runner.run()

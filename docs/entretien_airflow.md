@@ -13,6 +13,7 @@
 
 ### Un PipelineRunner actuel est déjà très proche d'un exécutable qui pourrait être lancé soit par :
 * [ ] un Databricks Workflow
+* [ ] Terminal wsl ou docker
 * [ ] un Airflow DAG : couche d'orchestration externe.
 * [ ] ou même un GitHub Action
 ---
