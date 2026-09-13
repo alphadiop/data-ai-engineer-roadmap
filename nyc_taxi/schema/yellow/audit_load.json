@@ -1,0 +1,42 @@
+{
+  "run_id": {
+    "sql_type": "BIGINT",
+    "nullable": "NOT NULL"
+  },
+  "periode": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "table_name": {
+    "sql_type": "STRING",
+    "nullable": "NOT NULL"
+  },
+  "taxi_type": {
+    "sql_type": "STRING",
+    "nullable": "NOT NULL"
+  },
+  "status": {
+    "sql_type": "STRING",
+    "nullable": "NOT NULL"
+  },
+  "start_time": {
+    "sql_type": "TIMESTAMP",
+    "nullable": "NOT NULL"
+  },
+  "end_time": {
+    "sql_type": "TIMESTAMP",
+    "nullable": "NOT NULL"
+  },
+  "duration_seconds": {
+    "sql_type": "DECIMAL(18,2)",
+    "nullable": ""
+  },
+  "error_step": {
+    "sql_type": "STRING",
+    "nullable": ""
+  },
+  "message": {
+    "sql_type": "STRING",
+    "nullable": ""
+  }
+}

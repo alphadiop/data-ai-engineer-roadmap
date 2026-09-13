@@ -1,0 +1,58 @@
+{
+  "periode": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "trip_date": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "nb_trips": {
+    "sql_type": "BIGINT",
+    "nullable": "NOT NULL"
+  },
+  "revenue": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_distance": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_tip": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_revenue_per_trip": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "total_tips": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "total_distance": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "revenue_per_distance": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_passengers_per_trip": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_trip_duration": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_tip_percent": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  },
+  "avg_speed": {
+    "sql_type": "DECIMAL(19,2)",
+    "nullable": ""
+  }
+}

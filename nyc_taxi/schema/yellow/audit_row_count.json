@@ -1,0 +1,22 @@
+{
+  "run_id": {
+    "sql_type": "BIGINT",
+    "nullable": "NOT NULL"
+  },
+  "periode": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "table_name": {
+    "sql_type": "STRING",
+    "nullable": "NOT NULL"
+  },
+  "row_count": {
+    "sql_type": "BIGINT",
+    "nullable": "NOT NULL"
+  },
+  "created_at": {
+    "sql_type": "TIMESTAMP",
+    "nullable": "NOT NULL"
+  }
+}

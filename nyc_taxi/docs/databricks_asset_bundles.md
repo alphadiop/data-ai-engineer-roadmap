@@ -230,19 +230,7 @@ nyc_taxi/
 - [ ] ensuite seulement, on améliorera le déploiement avec Python Wheel / Databricks Asset Bundles.
 
 
-### sauvegarder les modifications suivies par Git
-- [ ] git stash push -m "WIP avant passage sur dev"
 
-git add \
-src/jobs/run_pipeline.py \
-src/jobs/pipeline_runner_jobs_bundles.py \
-src/jobs/databricks_launcher.py \
-databricks.yml \
-resources/nyc_pipeline.yml
-
-
-* git diff -- docs/databricks_asset_bundles.md
-* git stash push -m "notes bundle avant passage sur dev" -- docs/databricks_asset_bundles.md
 
 
 

@@ -1,0 +1,33 @@
+resources:
+  jobs:
+
+    nyc_taxi_job:
+      name: nyc_taxi_pipeline
+
+      parameters:
+        - name: periode
+          default: "202601"
+        - name: taxi_type
+          default: "yellow"
+
+      tasks:
+        - task_key: run_pipeline
+          job_cluster_key: nyc_cluster
+          python_wheel_task:
+            package_name: nyc_taxi
+            entry_point: run_pipeline
+
+            parameters:
+              - "--periode"
+              - "{{job.parameters.periode}}"
+
+              - "--taxi_type"
+              - "{{job.parameters.taxi_type}}"
+
+
+      job_clusters:
+        - job_cluster_key: nyc_cluster
+          new_cluster:
+            spark_version: "17.0.x-scala2.13"
+            node_type_id: "Standard_DS3_v2"
+            num_workers: 2
