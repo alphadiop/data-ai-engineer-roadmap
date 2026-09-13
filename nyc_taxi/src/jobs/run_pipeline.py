@@ -4,16 +4,15 @@ def run_pipeline(
         periode=None
 ):
     """
-    avec cette fonction : on a une séparation nette entre le métier et l'orchestrateur
-    le métier dit seulement :
-    « Donne-moi un environnement, un type de taxi et éventuellement une période, et je lance le pipeline. »
-    il ne sait pas si l'appel vient de :
-        Airflow
-        Databricks
-        Terminal
-        Test Python
-        GitHub Actions
+    Point d'entrée générique du pipeline NYC Taxi.
 
+    Le pipeline métier ne dépend pas de l'orchestrateur.
+    Il peut être appelé depuis :
+        - le terminal
+        - Airflow
+        - Databricks
+        - un test Python
+        - GitHub Actions
     """
     from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
     from nyc_taxi.src.common.spark_manager import SparkManager
@@ -50,7 +49,7 @@ def run_pipeline(
     # ============================================================
     spark_manager = SparkManager(
         env=env,
-        app_name="NYC_Taxi_Airflow",
+        app_name="NYC_Taxi_Pipeline",
         logger=logger,
     )
 
@@ -85,3 +84,41 @@ def run_pipeline(
     # Exécution
     # ============================================================
     return runner.run()
+
+if __name__ == "__main__":
+    # import sys
+    # sys.path.append("/mnt/d/data-ai-engineer-roadmap")
+
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--env",
+        choices=["local", "docker", "databricks"],
+        default="local"
+    )
+
+    parser.add_argument(
+        "--taxi_type",
+        default="yellow"
+    )
+
+    parser.add_argument(
+        "--periode",
+        type=int,
+        default=None
+    )
+
+    args = parser.parse_args()
+
+    run_pipeline(
+        env=args.env,
+        taxi_type=args.taxi_type,
+        periode=args.periode
+    )
+
+    # wsl
+    # cd /mnt/d/data-ai-engineer-roadmap
+    # source ~/spark4_env/bin/activate
+    # python -m nyc_taxi.src.jobs.run_pipeline --env local --taxi_type yellow --periode 202501

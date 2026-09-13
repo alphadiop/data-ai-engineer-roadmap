@@ -222,6 +222,14 @@ nyc_taxi/
 - [ ] databricks bundle run nyc_taxi_pipeline
 
 
+### Databricks Job
+- [ ] créer le point d'entrée Databricks ;
+- [ ] le tester dans Databricks ;
+- [ ] créer le Databricks Job ;
+- [ ] tester le Job ;
+- [ ] ensuite seulement, on améliorera le déploiement avec Python Wheel / Databricks Asset Bundles.
+
+
 
 
 

@@ -5,7 +5,14 @@
 ###### cd /mnt/d/data-ai-engineer-roadmap
 ###### cd airflow
 ###### Entrer dans le conteneur : docker compose exec airflow-scheduler bash
-###### python3 -m nyc_taxi.src.jobs.test_airflow_pipeline.py
+###### python3 -m nyc_taxi.src.jobs.test_airflow_pipeline
+
+* wsl
+* 
+* source ~/spark4_env/bin/activate
+* from src.jobs.run_pipeline import run_nyc_taxi_pipeline
+* run_nyc_taxi_pipeline(env="local", taxi_type="yellow",periode=202501)
+* python -m nyc_taxi.src.jobs.run_pipeline.py --env local --periode 202504 --taxi_type yellow
 
 
 cd D:\data-ai-engineer-roadmap\nyc_taxi
@@ -32,16 +39,6 @@ create_local_tables.py → création des tables Delta vides avec tes JSON schema
 run_pipeline_local.ps1 → exécution standard du pipeline
 
 
-import sys
-spark = (
-SparkSession.builder
-    .appName("nyc_taxi")
-    .config(
-    "spark.pyspark.python",
-    sys.executable
-    )
-.getOrCreate()
-)
 
 python nyc_taxi\src\jobs\pipeline_runner_jobs_bundles.py --periode 202605 --taxi_type yellow --env local
 

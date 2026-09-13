@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
 
     args = parser.parse_args()
-
+    # argparse transforme les arguments en objet : args.env ...
     env = args.env
     periode = args.periode
     taxi_type = args.taxi_type
@@ -274,36 +274,13 @@ if __name__ == "__main__":
         logger=logger,
 
         steps=[
-            EnvironmentSetup(
-                spark=spark,
-                env=env,
-                logger=logger
-            ),
-            ReferenceDataLoader(
-                spark=spark,
-                env=env,
-                logger=logger
-            ),
-            UberBronze(
-                spark=spark,
-                logger=logger,
-            ),
-            UberSilver(
-                spark=spark,
-                logger=logger
-            ),
-            UberGold(
-                spark=spark,
-                logger=logger
-            ),
-            DataLoader(
-                spark=spark,
-                logger=logger
-            ),
-            MaintenanceJob(
-                spark=spark,
-                logger=logger
-            )
+            EnvironmentSetup(spark=spark,env=env,logger=logger),
+            ReferenceDataLoader(spark=spark,env=env,logger=logger),
+            UberBronze(spark=spark,logger=logger,),
+            UberSilver(spark=spark,logger=logger),
+            UberGold(spark=spark,logger=logger),
+            DataLoader(spark=spark,logger=logger),
+            MaintenanceJob(spark=spark, logger=logger)
         ]
     )
     runner.run()
