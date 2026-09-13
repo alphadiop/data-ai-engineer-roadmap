@@ -122,3 +122,4 @@ if __name__ == "__main__":
     # cd /mnt/d/data-ai-engineer-roadmap
     # source ~/spark4_env/bin/activate
     # python -m nyc_taxi.src.jobs.run_pipeline --env local --taxi_type yellow --periode 202501
+    # Le Job est configuré comme : Python script
