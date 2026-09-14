@@ -231,6 +231,45 @@ nyc_taxi/
 
 
 
+### sauvegarde du travail local
+* git clean
+* git reset --hard
+* git add .
 
+### Merge de release vers dev
+* git merge release
+* git commit -m "merge: align dev with release"
+* La branche dev contient maintenant le projet complet.
+
+
+
+````text
+Git
+ ↓
+Bundle
+ ↓
+target dev
+ ↓
+Job Serverless
+ ↓
+run_pipeline.py
+ ↓
+Bronze → Silver → Gold → Audit
+````
+
+* databricks bundle deploy -t dev
+* cd /mnt/d/data-ai-engineer-roadmap && python -c "from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner; print('IMPORT OK')"
+
+````text
+````
+
+
+````text
+````
+
+
+````text
+````
+#### Le merge a été envoyé sur GitHub
 
 

@@ -270,7 +270,7 @@ class AuditManager:
                 self.logger.info(
                     "Aucune période SUCCESS trouvée -> 202401"
                 )
-                return 202401
+                return 202501
 
             year = max_period // 100
             month = max_period % 100
@@ -292,7 +292,7 @@ class AuditManager:
                 f"Impossible de lire {audit_table}: {e}"
             )
 
-            return 202401
+            return 202501
 
 
 if __name__ == "__main__":

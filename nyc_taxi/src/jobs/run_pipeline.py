@@ -85,10 +85,8 @@ def run_pipeline(
     # ============================================================
     return runner.run()
 
-if __name__ == "__main__":
-    # import sys
-    # sys.path.append("/mnt/d/data-ai-engineer-roadmap")
 
+def main():
     import argparse
 
     parser = argparse.ArgumentParser()
@@ -112,11 +110,16 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    run_pipeline(
+    return run_pipeline(
         env=args.env,
         taxi_type=args.taxi_type,
         periode=args.periode
     )
+
+
+if __name__ == "__main__":
+    main()
+
 
     # wsl
     # cd /mnt/d/data-ai-engineer-roadmap

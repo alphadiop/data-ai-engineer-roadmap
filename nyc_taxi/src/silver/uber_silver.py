@@ -189,9 +189,15 @@ class UberSilver(PipelineStep):
             table_name="silver_nyc_taxi"
         )
         schema_json = load_json(schema_file)
+        
+        self.logger.info(f"DEBUG df_silver columns BEFORE schema = {df_silver.columns}")
         df_silver = SchemaManager.apply_schema(
                 df = df_silver,
                 schema_json = schema_json
+        )
+
+        self.logger.info(
+            f"DEBUG df_silver columns = {df_silver.columns}"
         )
 
         context.df_silver = df_silver

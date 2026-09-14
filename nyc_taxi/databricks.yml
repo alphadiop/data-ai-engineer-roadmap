@@ -4,6 +4,12 @@ bundle:
 include:
   - resources/*.yml
 
+artifacts:
+  default:
+    type: whl
+    build: python -m build --wheel
+    path: .
+
 workspace:
   host: https://dbc-8c847397-3c66.cloud.databricks.com
 
@@ -11,23 +17,5 @@ targets:
   dev:
     default: true
 
-    variables:
-      catalog: nyc_taxi
-
     workspace:
       host: https://dbc-8c847397-3c66.cloud.databricks.com
-resources:
-  jobs:
-    nyc_taxi_job:
-      name: nyc_taxi_job
-      tasks:
-        - task_key: pipeline
-          spark_python_task:
-            python_file: src/jobs/pipeline_runner_jobs_bundles.py
-            parameters:
-              - "--periode"
-              - "202605"
-              - "--taxi_type"
-              - "yellow"
-              - "--env"
-              - "databricks"
