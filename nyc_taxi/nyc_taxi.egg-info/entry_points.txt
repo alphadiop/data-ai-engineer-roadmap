@@ -1,0 +1,2 @@
+[console_scripts]
+nyc-taxi-pipeline = nyc_taxi.src.jobs.run_pipeline:main
