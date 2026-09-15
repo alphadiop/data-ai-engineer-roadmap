@@ -1,1 +1,35 @@
+# IDE
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build / distribution
+build/
+dist/
+
+# Environnements virtuels
+.venv/
+venv/
+
+# Databricks local state
+.databricks/
+
+# Données locales
+nyc_taxi/data/*
+!nyc_taxi/data/*/
+!nyc_taxi/data/*/.gitkeep
+
+# Spark / Hive local
+*.db
+metastore_db/
+spark-warehouse/
+
+
+# Logs
+*.log
+
+# Fichier volontairement exclu
 nyc_taxi/docs/regle.md

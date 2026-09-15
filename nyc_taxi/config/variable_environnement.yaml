@@ -5,13 +5,13 @@ local:
   path_sql_schema: "D:/data-ai-engineer-roadmap/nyc_taxi/schema"
   path_data: "D:/data-ai-engineer-roadmap/nyc_taxi/data"
   path_logs: "D:/data-ai-engineer-roadmap/nyc_taxi/logs"
-  bronze_path: "D:/data-ai-engineer-roadmap/data/bronze/raw_files"
+  bronze_path: "D:/data-ai-engineer-roadmap/nyc_taxi/data/bronze/raw_files"
   dataset_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"
-  ref_path : "D:/data-ai-engineer-roadmap/data/ref/taxi_zone_lookup.csv"
-  warehouse_dir: "D:/data-ai-engineer-roadmap/spark-warehouse"
-  metastore_dir: "D:/data-ai-engineer-roadmap/metastore_db"
-  log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/"
-  path_logs2: "/opt/airflow/nyc_taxi/logs"
+  ref_path : "D:/data-ai-engineer-roadmap/nyc_taxi/data/ref/taxi_zone_lookup.csv"
+  warehouse_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/spark-warehouse"
+  metastore_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/metastore_db"
+  log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/logs"
+
 
 docker:
   env: docker
