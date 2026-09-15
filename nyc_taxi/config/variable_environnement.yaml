@@ -7,22 +7,21 @@ local:
   path_logs: "D:/data-ai-engineer-roadmap/nyc_taxi/logs"
   bronze_path: "D:/data-ai-engineer-roadmap/nyc_taxi/data/bronze/raw_files"
   dataset_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"
-  ref_path : "D:/data-ai-engineer-roadmap/nyc_taxi/data/ref/taxi_zone_lookup.csv"
+  ref_path : "D:/data-ai-engineer-roadmap/nyc_taxi/data/reference/taxi_zone_lookup.csv"
   warehouse_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/spark-warehouse"
   metastore_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/metastore_db"
   log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/logs"
-
 
 docker:
   env: docker
   catalog_name: "nyc_taxi"
   project_root: "/opt"
   path_sql_schema: "/opt/airflow/nyc_taxi/schema"
-  path_data: "/opt/data"
+  path_data: "/opt/airflow/nyc_taxi/data"
   path_logs: "/opt/airflow/nyc_taxi/logs"
-  bronze_path: "/opt/data/bronze/raw_files"
+  bronze_path: "/opt/airflow/nyc_taxi/data/bronze/raw_files"
   dataset_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"
-  ref_path: "/opt/data/ref/taxi_zone_lookup.csv"
+  ref_path: "/opt/data/reference/taxi_zone_lookup.csv"
   warehouse_dir: "/opt/airflow/spark-warehouse"
   metastore_dir: "/opt/airflow/metastore_db"
   log_dir: "/opt/airflow/nyc_taxi/"

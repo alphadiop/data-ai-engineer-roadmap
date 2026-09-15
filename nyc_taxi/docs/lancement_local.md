@@ -8,7 +8,7 @@
 ###### python3 -m nyc_taxi.src.jobs.test_airflow_pipeline
 
 * wsl
-* 
+* cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
 * source ~/spark4_env/bin/activate
 * from src.jobs.run_pipeline import run_nyc_taxi_pipeline
 * run_nyc_taxi_pipeline(env="local", taxi_type="yellow",periode=202501)

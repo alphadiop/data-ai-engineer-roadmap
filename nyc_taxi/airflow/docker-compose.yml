@@ -30,7 +30,7 @@ x-airflow-common:
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ../config:/opt/airflow/config
-    - ../nyc_taxi:/opt/airflow/nyc_taxi
+    - ..:/opt/airflow/nyc_taxi
     - ../data:/opt/data
 
   depends_on:
@@ -42,6 +42,8 @@ services:
 
   postgres:
     image: postgres:16
+
+    restart: unless-stopped
 
     environment:
       POSTGRES_USER: airflow
