@@ -81,3 +81,24 @@ jobs:
       - name: Test Airflow initialization
         run: |
           docker compose run --rm airflow-init
+
+
+  databricks-bundle-checks:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: nyc_taxi
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate Databricks bundle
+        run: |
+          databricks bundle validate
