@@ -1,2 +1,0 @@
-class PeriodAlreadyLoadedException(Exception):
-    pass

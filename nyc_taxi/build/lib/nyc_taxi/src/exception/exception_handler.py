@@ -1,2 +1,0 @@
-class DataNotAvailableError(Exception):
-    pass
