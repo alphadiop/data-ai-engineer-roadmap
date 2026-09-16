@@ -41,6 +41,10 @@ jobs:
         run: |
           pip install ./nyc_taxi
 
+      - name: Run unit tests
+        run: |
+          python -m pytest -q nyc_taxi/tests
+
       - name: Compile Python files
         run: |
           python -m compileall -q nyc_taxi/src
