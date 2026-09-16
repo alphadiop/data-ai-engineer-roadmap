@@ -28,7 +28,7 @@ def run_nyc_taxi_pipeline(**context):
     print(f"taxi_type = {taxi_type}")
     print(f"env       = {env}")
 
-    return run_pipeline(
+    run_pipeline(
         env=env,
         taxi_type=taxi_type,
         periode=periode,
