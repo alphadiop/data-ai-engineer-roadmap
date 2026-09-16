@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: nyc_taxi/requirements.txt
 
       - name: Upgrade pip
         run: |
@@ -32,10 +34,8 @@ jobs:
 
       - name: Install project dependencies
         run: |
-          pip install \
-            pyspark==3.5.1 \
-            delta-spark==3.2.0 \
-            PyYAML
+          pip install -r nyc_taxi/requirements.txt
+
 
       - name: Install NYC Taxi package
         run: |
