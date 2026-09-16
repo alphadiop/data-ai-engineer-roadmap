@@ -56,3 +56,28 @@ jobs:
           python -c "import nyc_taxi.src.common.spark_manager; print('SparkManager import OK')"
           python -c "import nyc_taxi.src.jobs.run_pipeline; print('Pipeline import OK')"
           python -c "import nyc_taxi.src.jobs.run_pipeline_airflow; print('Airflow runner import OK')"
+
+  airflow-docker-checks:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: nyc_taxi/airflow
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate docker compose file
+        run: |
+          docker compose config
+
+      - name: Build Airflow image
+        run: |
+          docker compose build
+
+      - name: Test Airflow initialization
+        run: |
+          docker compose run --rm airflow-init
