@@ -104,6 +104,10 @@ jobs:
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
+      - name: Install Python build
+        run: |
+          python -m pip install build
+
       - name: Validate Databricks bundle
         run: |
           databricks bundle validate
