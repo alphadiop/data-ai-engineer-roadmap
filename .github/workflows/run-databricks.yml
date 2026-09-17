@@ -27,21 +27,24 @@ jobs:
       DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
 
-    defaults:
-      run:
-        working-directory: nyc_taxi
-
     steps:
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check repository structure
+        run: |
+          pwd
+          echo "=== Racine du dépôt ==="
+          ls -la
+          echo "=== Contenu de nyc_taxi ==="
+          ls -la nyc_taxi
+
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
       - name: Run Databricks job
+        working-directory: nyc_taxi
         run: |
           databricks bundle run nyc_taxi_job \
             --params taxi_type=${{ inputs.taxi_type }},periode=${{ inputs.periode }}
-
-
