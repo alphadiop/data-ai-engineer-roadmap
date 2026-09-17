@@ -1,0 +1,18 @@
+{
+  "location_id": {
+    "sql_type": "INT",
+    "nullable": "NOT NULL"
+  },
+  "Borough": {
+    "sql_type": "STRING",
+    "nullable": ""
+  },
+  "Zone": {
+    "sql_type": "STRING",
+    "nullable": ""
+  },
+  "service_zone": {
+    "sql_type": "STRING",
+    "nullable": ""
+  }
+}

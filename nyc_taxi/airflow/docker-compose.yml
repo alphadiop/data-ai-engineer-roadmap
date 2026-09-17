@@ -1,0 +1,95 @@
+x-airflow-common:
+  &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+  environment:
+    &airflow-common-env
+
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+
+    AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: "6af251abcc71b82f93a9205cd41b3b3ef797bf810d89815134998c1d4454e56e"
+    AIRFLOW__API_AUTH__JWT_SECRET: "6af251abcc71b82f93a9205cd41b3b3ef797bf810d89815134998c1d4454e56e"
+
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+
+
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+
+    # Airflow 3 - SimpleAuthManager
+    # Mode développement : tous les utilisateurs sont administrateurs
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+    PYTHONPATH: /opt/airflow
+
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ../config:/opt/airflow/config
+    - ..:/opt/airflow/nyc_taxi
+    - ../data:/opt/data
+
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+
+services:
+
+  postgres:
+    image: postgres:16
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+
+    restart: "no"
+
+
+  airflow-apiserver:
+    <<: *airflow-common
+
+    command: api-server --port 8080
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: unless-stopped
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    restart: unless-stopped
+
+
+volumes:
+  postgres_data:

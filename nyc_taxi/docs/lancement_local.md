@@ -1,0 +1,61 @@
+###### Lancement dans un docker
+###### PowerShell
+###### wsl
+###### source ~/spark4_env/bin/activate
+###### cd /mnt/d/data-ai-engineer-roadmap
+###### cd airflow
+###### Entrer dans le conteneur : docker compose exec airflow-scheduler bash
+###### python3 -m nyc_taxi.src.jobs.test_airflow_pipeline
+
+* wsl
+* cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
+* source ~/spark4_env/bin/activate
+* from src.jobs.run_pipeline import run_nyc_taxi_pipeline
+* run_nyc_taxi_pipeline(env="local", taxi_type="yellow",periode=202501)
+* python -m nyc_taxi.src.jobs.run_pipeline.py --env local --periode 202504 --taxi_type yellow
+
+
+cd D:\data-ai-engineer-roadmap\nyc_taxi
+tree /F src
+
+set PYTHONPATH=D:\data-ai-engineer-roadmap
+echo %PYTHONPATH%
+
+python -c "import nyc_taxi.src.jobs.pipeline_runner_jobs_bundles; print('OK')"
+
+python nyc_taxi\src\jobs\pipeline_runner_jobs_bundles.py --periode 202605 --taxi_type yellow
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles --periode 202605 --taxi_type yellow --env local
+
+conda deactivate
+conda env config vars set PYTHONPATH=D:\data-ai-engineer-roadmap
+conda deactivate
+conda activate spark_local
+
+set PYSPARK_PYTHON=python
+
+Amélioration future pour ton projet
+reset_local_environment.py → nettoyage complet
+create_local_tables.py → création des tables Delta vides avec tes JSON schemas
+run_pipeline_local.ps1 → exécution standard du pipeline
+
+
+
+python nyc_taxi\src\jobs\pipeline_runner_jobs_bundles.py --periode 202605 --taxi_type yellow --env local
+
+
+catalog_manager.show_catalogs().show()
+catalog_manager.show_schemas("nyc_taxi").show()
+catalog_manager.show_tables("nyc_taxi", "bronze").show()
+catalog_manager.show_tables("nyc_taxi", "silver").show()
+catalog_manager.show_tables("nyc_taxi", "gold").show()
+catalog_manager.show_tables("nyc_taxi", "ref").show()
+catalog_manager.show_tables("nyc_taxi", "audit").show()
+
+
+
+print("=== DATAFRAME ===")
+df_audit.printSchema()
+
+print("=== TABLE ===")
+self.spark.table(audit_table).printSchema()
+

@@ -1,0 +1,21 @@
+bundle:
+  name: nyc_taxi_pipeline
+
+include:
+  - resources/*.yml
+
+artifacts:
+  default:
+    type: whl
+    build: python -m build --wheel
+    path: .
+
+workspace:
+  host: https://dbc-8c847397-3c66.cloud.databricks.com
+
+targets:
+  dev:
+    default: true
+
+    workspace:
+      host: https://dbc-8c847397-3c66.cloud.databricks.com

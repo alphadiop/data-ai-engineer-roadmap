@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    nyc_taxi_job:
+      name: nyc_taxi_pipeline
+
+      parameters:
+        - name: taxi_type
+          default: "yellow"
+
+        - name: periode
+          default: "202504"
+
+      tasks:
+        - task_key: run_pipeline
+
+          python_wheel_task:
+            package_name: nyc_taxi
+            entry_point: nyc-taxi-pipeline
+
+            named_parameters:
+              env: databricks
+              taxi_type: "{{job.parameters.taxi_type}}"
+              periode: "{{job.parameters.periode}}"
+
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"
+            dependencies:
+              - ../dist/nyc_taxi-1.0.0-py3-none-any.whl
