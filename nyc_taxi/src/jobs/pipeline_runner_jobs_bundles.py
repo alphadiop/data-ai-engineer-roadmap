@@ -100,7 +100,11 @@ class PipelineRunner:
         except DataNotAvailableError as e:
 
             context.status = "NO_DATA"
-            context.error_step = context.current_step
+            context.error_step = getattr(
+                context,
+                "current_step",
+                "PipelineRunner"
+            )
             context.message = str(e)
 
             pipeline_error = e
@@ -112,7 +116,11 @@ class PipelineRunner:
         except Exception as e:
 
             context.status = "ERROR"
-            context.error_step = context.current_step
+            context.error_step = getattr(
+                context,
+                "current_step",
+                "PipelineRunner"
+            )
             context.message = str(e)
 
             # je stocke erreur
@@ -139,16 +147,16 @@ class PipelineRunner:
 
             except Exception as audit_error:
 
+                self.logger.exception(
+                    f"AuditManager failure: {audit_error}"
+                )
+
                 if context.status == "SUCCESS":
                     context.status = "ERROR"
 
-                    context.error_step = (
-                        "AuditManager"
-                    )
+                    context.error_step = "AuditManager"
 
-                    context.message = (
-                        str(audit_error)
-                    )
+                    context.message = str(audit_error)
 
                 if pipeline_error is None:
                     pipeline_error = audit_error
