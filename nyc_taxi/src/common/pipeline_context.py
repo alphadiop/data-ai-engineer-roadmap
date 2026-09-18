@@ -1,6 +1,7 @@
 class PipelineContext:
 
     def __init__(self,env:str = "local",taxi_type:str=None):
+        self.error_step = None
         self.env = env
         self.taxi_type = taxi_type
 

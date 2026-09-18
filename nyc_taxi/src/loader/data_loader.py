@@ -3,7 +3,7 @@ from nyc_taxi.src.common.schema_manager import SchemaManager
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.utils.load_json import load_json
-import logging
+
 from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.decorators import log_execution
 from pathlib import Path
@@ -158,87 +158,6 @@ class DataLoader(PipelineStep):
             self.logger.info(
                 f"END WRITE {table_name}"
             )
-
-
-    # @log_execution
-    # def run(self, context):
-    #
-    #     catalog_manager = CatalogManager(
-    #         spark=self.spark,
-    #         env=context.env,
-    #         logger=self.logger
-    #     )
-    #
-    #     delta_manager = DeltaManager(
-    #         spark=self.spark,
-    #         catalog_manager=catalog_manager,
-    #         logger=self.logger
-    #     )
-    #
-    #     tables = [
-    #         ("silver", "silver_nyc_taxi", context.df_silver),
-    #         ("gold", "gold_fact_trips", context.df_fact_trips),
-    #         ("ref", "dim_date", context.df_dim_date),
-    #         ("gold", "gold_kpi_daily", context.df_kpi_daily)
-    #     ]
-    #
-    #     partitioned_tables = {
-    #         "silver_nyc_taxi",
-    #         "gold_fact_trips",
-    #         "gold_kpi_daily"
-    #     }
-    #
-    #     for schema_name, table_name, df in tables:
-    #         self.logger.info( f"START VALIDATION {table_name}")
-    #
-    #         # récupérer le DataFrame éventuellement casté
-    #         df = self.validate_schema(
-    #             context=context,
-    #             table_name=table_name,
-    #             df=df
-    #         )
-    #
-    #         # ==========================================================
-    #         # PERIODE
-    #         # ==========================================================
-    #         if table_name in partitioned_tables:
-    #             if "periode" not in df.columns:
-    #                 self.logger.info(
-    #                     f"Ajout colonne periode={context.periode} "
-    #                     f"dans {table_name}"
-    #                 )
-    #                 df = df.withColumn(
-    #                     "periode",
-    #                     lit(context.periode).cast("int")
-    #                 )
-    #             else:
-    #                 self.logger.info(
-    #                     f"Colonne periode déjà présente "
-    #                     f"dans {table_name}"
-    #                 )
-    #         # ==========================================================
-    #         # ROW COUNT
-    #         # ==========================================================
-    #         row_count = df.count()
-    #         context.row_count[table_name] = row_count
-    #         self.logger.info( f"{table_name} rows = {row_count}" )
-    #
-    #         # ==========================================================
-    #         # WRITE
-    #         # ==========================================================
-    #         self.logger.info( f"START WRITE {table_name}")
-    #
-    #         delta_manager.sauvegarde_tables_delta(
-    #             df=df,
-    #             schema_name=schema_name,
-    #             table_name=table_name,
-    #             periode=context.periode,
-    #             replace=True
-    #         )
-    #         self.logger.info( f"END WRITE {table_name}" )
-
-
-
 
     def validate_schema(
             self,
