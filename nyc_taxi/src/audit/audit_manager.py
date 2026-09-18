@@ -81,7 +81,7 @@ class AuditManager:
         end_time = context.end_time
 
         duration_seconds = (
-            Decimal(str(context.duration_seconds))
+            Decimal(str(round(float(context.duration_seconds),2)))
             if context.duration_seconds is not None
             else None
         )
