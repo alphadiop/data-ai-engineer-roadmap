@@ -166,13 +166,27 @@ nyc_taxi/
 ## Running Locally
 
 ```bash
+wsl
+cd /mnt/d/data-ai-engineer-roadmap/nyc_taxi
+source ~/spark4_env/bin/activate
+python -m nyc_taxi.src.jobs.pipeline_runner_jobs_bundles --env local --periode 202504 --taxi_type yellow
+python -m nyc_taxi.src.jobs.run_pipeline --env local --taxi_type yellow --periode 202505
 python -m nyc_taxi.src.jobs.run_pipeline \
   --env local \
   --taxi_type yellow \
   --periode 202505
+  
 ```
 
 ---
+
+```PowerShell
+powershell
+conda activate spark_local
+cd D:\data-ai-engineer-roadmap
+python -m nyc_taxi.src.jobs.run_pipeline --env local --taxi_type yellow --periode 202505
+```
+
 
 ## Running with Airflow
 

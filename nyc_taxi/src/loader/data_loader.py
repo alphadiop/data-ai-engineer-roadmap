@@ -1,3 +1,5 @@
+
+
 from nyc_taxi.src.common.path_manager import PathManager
 from nyc_taxi.src.common.schema_manager import SchemaManager
 from nyc_taxi.src.common.catalog_manager import CatalogManager
@@ -9,6 +11,7 @@ from nyc_taxi.src.common.decorators import log_execution
 from pathlib import Path
 from pyspark.sql.functions import lit
 
+
 class DataLoader(PipelineStep):
     """
     Valide les schémas,
@@ -16,13 +19,12 @@ class DataLoader(PipelineStep):
     charge les données dans Delta.
     """
 
-    def __init__(self,spark,logger=None):
+    def __init__(self, spark, logger=None):
 
-        super().__init__(spark,self.__class__.__name__)
+        super().__init__(spark, self.__class__.__name__)
 
         self.spark = spark
         self.logger = logger
-
 
     @log_execution
     def run(self, context):
@@ -86,8 +88,20 @@ class DataLoader(PipelineStep):
 
         for schema_name, table_name, df in tables:
 
-            self.logger.info(
-                f"START {table_name}"
+            row_count = df.count()
+
+            self.logger.separator(
+                f"LOAD : {schema_name}.{table_name}"
+            )
+
+            self.logger.metric(
+                "Rows before load",
+                f"{row_count:,}".replace(",", " ")
+            )
+
+            self.logger.metric(
+                "Period",
+                context.periode
             )
 
             # ======================================================
@@ -99,32 +113,37 @@ class DataLoader(PipelineStep):
                 if "periode" not in df.columns:
 
                     self.logger.info(
-                        f"Ajout colonne periode={context.periode} "
-                        f"dans {table_name}"
+                        f"Adding period column : "
+                        f"periode={context.periode}"
                     )
 
                     df = df.withColumn(
                         "periode",
                         lit(context.periode).cast("int")
                     )
+
                 else:
+
                     self.logger.info(
-                        f"Colonne periode déjà présente "
-                        f"dans {table_name}"
+                        "Period column already present"
                     )
 
             # ======================================================
             # VALIDATION SCHEMA
             # ======================================================
 
-            self.logger.info(
-                f"START VALIDATION {table_name}"
+            self.logger.subsection(
+                f"SCHEMA VALIDATION : {table_name}"
             )
 
             df = self.validate_schema(
                 context=context,
                 table_name=table_name,
                 df=df
+            )
+
+            self.logger.success(
+                f"Schema validated : {table_name}"
             )
 
             # ======================================================
@@ -135,18 +154,41 @@ class DataLoader(PipelineStep):
 
             context.row_count[table_name] = row_count
 
-            self.logger.info(
-                f"{table_name} rows = {row_count}"
+            self.logger.metric(
+                "Rows to write",
+                f"{row_count:,}".replace(",", " ")
             )
 
             # ======================================================
             # WRITE DELTA
             # ======================================================
 
-            self.logger.info(
-                f"START WRITE {table_name}"
+            self.logger.subsection(
+                f"DELTA WRITE : {schema_name}.{table_name}"
             )
 
+            if table_name in partitioned_tables:
+
+                self.logger.metric(
+                    "Write mode",
+                    "Overwrite partition"
+                )
+
+                self.logger.metric(
+                    "Partition",
+                    f"periode={context.periode}"
+                )
+
+            else:
+
+                self.logger.metric(
+                    "Write mode",
+                    "Standard"
+                )
+
+            self.logger.info(
+                f"Writing Delta table : {table_name}"
+            )
             delta_manager.sauvegarde_tables_delta(
                 df=df,
                 schema_name=schema_name,
@@ -155,8 +197,12 @@ class DataLoader(PipelineStep):
                 replace=True
             )
 
-            self.logger.info(
-                f"END WRITE {table_name}"
+            self.logger.success(
+                f"Delta write completed : "
+                f"{schema_name}.{table_name}"
+            )
+            self.logger.success(
+                f"{table_name} loaded"
             )
 
     def validate_schema(
@@ -165,28 +211,10 @@ class DataLoader(PipelineStep):
             table_name,
             df
     ):
-        log_path = Path(context.config["path_logs"])
 
-        self.logger.info(f"=============validate_schema=================")
-        self.logger.info(f"path_logs = {log_path}")
-        self.logger.info(f"exists = {log_path.exists()}")
-        self.logger.info(f"is_dir = {log_path.is_dir()}")
-
-        log_path = Path(context.config["path_logs"])
-
-        test_file = log_path / "test.log"
-
-        test_file.touch(exist_ok=True)
-
-        self.logger.info(
-            f"TEST FILE = {test_file}"
-        )
-
-        self.logger.info(
-            f"TEST FILE EXISTS = {test_file.exists()}"
-        )
-
-        self.logger.info(f"=============validate_schema=================")
+        # ==========================================================
+        # SCHEMA
+        # ==========================================================
 
         schema_manager = SchemaManager(
             spark=self.spark,
@@ -195,7 +223,6 @@ class DataLoader(PipelineStep):
 
         path_manager = PathManager(
             context=context
-
         )
 
         schema_file = path_manager.schema_path(
@@ -204,26 +231,36 @@ class DataLoader(PipelineStep):
         )
 
         self.logger.info(
-            f"Validation schema : {schema_file}"
+            f"Schema file : {schema_file}"
         )
 
         schema_json = load_json(schema_file)
 
-        # récupérer le DataFrame retourné par SchemaManager
+        # ==========================================================
+        # APPLICATION DU SCHEMA
+        # ==========================================================
+
         df = schema_manager.apply_schema(
             df=df,
             schema_json=schema_json
         )
 
+        # ==========================================================
+        # VALIDATION DES COLONNES
+        # ==========================================================
+        self.logger.info(
+            f"Schema validation started : {table_name}"
+        )
         schema_manager.validate_columns(
             df=df,
             schema_json=schema_json
         )
 
+        self.logger.success(
+            f"Schema valid : {table_name}"
+        )
         self.logger.info(
-            f"Schema valide pour {table_name}"
+            f"Nombre de partition: {df.rdd.getNumPartitions()}"
         )
 
         return df
-
-

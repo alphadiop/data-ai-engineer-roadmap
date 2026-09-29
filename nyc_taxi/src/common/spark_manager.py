@@ -72,8 +72,17 @@ class SparkManager:
             )
 
             # ------------------------------------------------------
-            # Hive Metastore Derby
+            # Hive Metastore Derby  self.config[self.env]["spark_local_dir"] self.config[self.env]["spark_ivy_dir"]
             # ------------------------------------------------------
+            # .config(
+            #     "spark.hadoop.javax.jdo.option.ConnectionURL",
+            #     f"jdbc:derby:{self.config[self.env]['metastore_dir']};create=true"
+            # )
+            # .config(
+            #     "spark.driver.extraJavaOptions",
+            #     f"-Dderby.system.home={self.config[self.env]['project_root']}"
+            # )
+
             .config(
                 "javax.jdo.option.ConnectionURL",
                 f"jdbc:derby:{self.config[self.env]['metastore_dir']};create=true"
@@ -92,7 +101,7 @@ class SparkManager:
             )
 
             # ------------------------------------------------------
-            # Ressources
+            # Ressources : RAM
             # ------------------------------------------------------
             .config(
                 "spark.driver.memory",
@@ -107,8 +116,11 @@ class SparkManager:
         spark = (
             configure_spark_with_delta_pip(builder)
             .enableHiveSupport()
+            .config("spark.jars.ivy", self.config[self.env]["spark_ivy_dir"])
+            .config("spark.local.dir",  self.config[self.env]["spark_local_dir"])
             .getOrCreate()
         )
+
         self.logger.info(
             f"warehouse = {spark.conf.get('spark.sql.warehouse.dir')}"
         )
@@ -121,6 +133,10 @@ class SparkManager:
 
         self.logger.info(
             f"metastore_yaml = {self.config[self.env]['metastore_dir']}"
+        )
+
+        self.logger.info(
+            f"Spark local dir = {spark.sparkContext.getConf().get('spark.local.dir')}"
         )
 
 

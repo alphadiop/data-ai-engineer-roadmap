@@ -1,11 +1,11 @@
 
 from pathlib import Path
 
-from pyspark.sql import DataFrame
+
 
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.pipeline_step import PipelineStep
-
+from nyc_taxi.src.common.pipeline_context import PipelineContext
 
 class ReferenceDataLoader(PipelineStep):
 
@@ -30,7 +30,7 @@ class ReferenceDataLoader(PipelineStep):
             logger=logger
         )
 
-    def run(self, context):
+    def run(self, context:PipelineContext):
 
         schema_name = "ref"
         table_name = "dim_location"

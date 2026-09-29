@@ -9,11 +9,11 @@ class PipelineLogger:
 
     def __init__(
             self,
-            name,
-            env="local",
+            name:str,
+            env:str="local",
             periode=None,
             taxi_type=None,
-            level=logging.INFO
+            level:int=logging.INFO
     ):
         self.name = name
         self.env = env
@@ -106,7 +106,7 @@ class PipelineLogger:
         # ----------------------------------------------------------
         # Informations de démarrage
         # ----------------------------------------------------------
-        self.info("=" * 120)
+        self.separator("Informations de démarrage")
         self.info("PIPELINE LOGGER")
         self.info("=" * 120)
         self.info(f"environment      = {env}")
@@ -115,7 +115,29 @@ class PipelineLogger:
         self.info(f"path_logs        = {root_log_dir}")
         self.info(f"log_file         = {self.path_log}")
         self.info(f"logging_mode     = console + file")
-        self.info("=" * 120)
+
+        self.separator("Fin Informations de démarrage")
+
+
+    def separator(self, title: str):
+        self.info("=" * 100)
+        self.info(title)
+        self.info("=" * 100)
+
+    def subsection(self, title: str):
+        self.info("-" * 100)
+        self.info(title)
+        self.info("-" * 100)
+
+    def success(self, message: str):
+        self.info(f"✓ {message}")
+
+    def warning(self, message: str):
+        self.info(f"⚠ {message}")
+
+    def metric(self, label: str, value):
+        self.info(f"{label:<30} : {value}")
+
 
     # ==================================================================
     # PATH

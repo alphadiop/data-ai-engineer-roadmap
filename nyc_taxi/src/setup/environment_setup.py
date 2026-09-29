@@ -22,6 +22,9 @@ class EnvironmentSetup(PipelineStep):
     - création des schémas
     - création des tables Delta
     - réparation du metastore local
+
+    attention faut initialiser l'environnement avant de chercher à acceder aux tables
+
     """
 
     def __init__(
@@ -51,25 +54,27 @@ class EnvironmentSetup(PipelineStep):
     @log_execution
     def run(self,context):
 
-        self.logger.info("=" * 80)
-        self.logger.info("EnvironmentSetup")
-        self.logger.info("=" * 80)
+        self.logger.separator(
+            "ENVIRONMENT SETUP"
+        )
 
         context.path_sql_schema = Path(
             context.config["path_sql_schema"]
         )
 
         if self.environment_exists():
-            self.logger.info(
-                "Environnement déjà initialisé"
+
+            self.logger.success(
+                "Environment already initialized"
             )
+
             if self.env == "local":
                 self.repair_metastore()
             return
 
-        self.logger.info("=" * 80)
-        self.logger.info("Initialisation environnement")
-        self.logger.info("=" * 80)
+        self.logger.separator(
+            "ENVIRONMENT INITIALIZATION"
+        )
 
         self.create_catalog(
             context.config
@@ -87,10 +92,9 @@ class EnvironmentSetup(PipelineStep):
         if self.env in ("local", "docker"):
             self.repair_metastore()
 
-        if self.logger:
-            self.logger.info("=" * 80)
-            self.logger.info("Initialisation terminée")
-            self.logger.info("=" * 80)
+        self.logger.success(
+            "Environment initialization completed"
+        )
 
 
     def environment_exists(self):
@@ -110,13 +114,19 @@ class EnvironmentSetup(PipelineStep):
                     table_name=table_name
                 )
             )
-            self.logger.info(
-                "full_table_name : {}".format(full_table_name)
+
+            self.logger.metric(
+                "Check table",
+                full_table_name
             )
+
 
             if not self.spark.catalog.tableExists(
                     full_table_name
             ):
+                self.logger.warning(
+                    f"Missing table : {full_table_name}"
+                )
                 return False
         return True
 
@@ -181,10 +191,10 @@ class EnvironmentSetup(PipelineStep):
             table_name=table_name
         )
 
-        if self.logger:
-            self.logger.info(
-                f"Création table : {schema_name}.{table_name}"
-            )
+        self.logger.metric(
+            "Create table",
+            f"{schema_name}.{table_name}"
+        )
 
         self.delta_manager.create_table(
             schema_name=schema_name,
@@ -207,10 +217,11 @@ class EnvironmentSetup(PipelineStep):
                 / f"{table_name}.json"
         )
 
-        if self.logger:
-            self.logger.info(
-                f"Schema : {schema_file}"
-            )
+
+        self.logger.metric(
+            "Schema file",
+            schema_file
+        )
 
         schema_json = load_json(
             schema_file
@@ -221,11 +232,9 @@ class EnvironmentSetup(PipelineStep):
         )
 
     def repair_metastore(self):
-
-        if self.logger:
-            self.logger.info(
-                "Réparation metastore local"
-            )
+        self.logger.separator(
+            "METASTORE REPAIR"
+        )
         self.catalog_manager.repair_local_metastore()
 
 

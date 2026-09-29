@@ -11,6 +11,8 @@ local:
   warehouse_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/spark-warehouse"
   metastore_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/metastore_db"
   log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/logs"
+  spark_local_dir: "D:/spark_tmp"
+  spark_ivy_dir: "D:/spark_ivy"
 
 docker:
   env: docker
@@ -22,13 +24,17 @@ docker:
   bronze_path: "/opt/airflow/nyc_taxi/data/bronze/raw_files"
   dataset_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"
   ref_path: "/opt/data/reference/taxi_zone_lookup.csv"
-  warehouse_dir: "/opt/airflow/spark-warehouse"
-  metastore_dir: "/opt/airflow/metastore_db"
+  warehouse_dir: "/opt/airflow/docker-spark-warehouse"
+  metastore_dir: "/opt/airflow/docker-metastore_db"
   log_dir: "/opt/airflow/nyc_taxi/"
+  spark_local_dir: "/opt/airflow/spark_tmp"
+  spark_ivy_dir: "/opt/airflow/spark_ivy"
+  
 
 databricks:
   env: databricks
   catalog_name: "nyc_taxi"
+  project_root: "/Volumes/nyc_taxi"
   bronze_path: "/Volumes/nyc_taxi/bronze/raw_files"
   path_sql_schema: "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/schema"
   dataset_url: "https://d37ci6vzurychx.cloudfront.net/trip-data"

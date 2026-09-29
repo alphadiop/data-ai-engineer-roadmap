@@ -69,31 +69,69 @@ class PipelineRunner:
             env=self.env
         )
 
+        self.environment_setup = EnvironmentSetup(
+            spark=self.spark,
+            env=self.env,
+            logger=self.logger
+        )
+
     def run(self):
+
+        pipeline_error = None
+
+        # ==========================================================
+        # INITIALISATION / VERIFICATION ENVIRONNEMENT
+        # ==========================================================
+
+        self.logger.separator(
+            "PIPELINE INITIALIZATION"
+        )
+
+        context = self._build_context()
+
+        self.environment_setup.run(context)
+
+        self.logger.success(
+            "Environment ready"
+        )
+
+        self.logger.separator(
+            "ENVIRONMENT CHECK"
+        )
+
+        self.logger.metric(
+            "audit.audit_load",
+            self.spark.catalog.tableExists("audit.audit_load")
+        )
+
+        self.logger.metric(
+            "audit.audit_row_count",
+            self.spark.catalog.tableExists("audit.audit_row_count")
+        )
+
         # ==========================================================
         # DÉTERMINATION DE LA PÉRIODE
         # ==========================================================
 
-        pipeline_error = None
-
         self._determine_period()
-
-        # ==========================================================
-        # CONTEXTE
-        # ==========================================================
-
-        context = self._build_context()
 
         # ==========================================================
         # CONTRÔLE : PÉRIODE DÉJÀ CHARGÉE
         # ==========================================================
 
-        if self._check_already_loaded(context):
-            return context
+        self.logger.subsection(
+            "LOAD CONTROL"
+        )
+
+        self._check_already_loaded(context)
 
         # ==========================================================
         # EXÉCUTION DU PIPELINE
         # ==========================================================
+
+        self.logger.separator(
+            "PIPELINE EXECUTION"
+        )
 
         try:
 
@@ -120,6 +158,12 @@ class PipelineRunner:
 
             pipeline_error = e
 
+            self.logger.warning(
+                f"No data available | "
+                f"step={context.error_step} | "
+                f"message={context.message}"
+            )
+
         # ==========================================================
         # ERREUR PIPELINE
         # ==========================================================
@@ -136,11 +180,18 @@ class PipelineRunner:
 
             pipeline_error = e
 
+            self.logger.error(
+                f"Pipeline error | "
+                f"step={context.error_step} | "
+                f"message={context.message}"
+            )
+
         # ==========================================================
         # FINALISATION
         # ==========================================================
 
         finally:
+
             context.end_time = datetime.now()
 
             context.duration_seconds = (
@@ -148,10 +199,15 @@ class PipelineRunner:
             ).total_seconds()
 
             # ------------------------------------------------------
-            # AUDIT LOAD
+            # AUDIT
             # ------------------------------------------------------
 
+            self.logger.subsection(
+                "AUDIT"
+            )
+
             try:
+
                 audit_table = self.catalog_manager.audit_load()
 
                 self.audit_manager.delete_period(
@@ -161,9 +217,6 @@ class PipelineRunner:
 
                 self.audit_manager.insert_audit(context)
 
-                # --------------------------------------------------
-                # AUDIT ROW COUNT
-                # --------------------------------------------------
                 row_count_table = (
                     self.catalog_manager.audit_row_count()
                 )
@@ -174,6 +227,10 @@ class PipelineRunner:
                 )
 
                 self.audit_manager.insert_row_counts(context)
+
+                self.logger.success(
+                    "Audit completed"
+                )
 
             except Exception as audit_error:
 
@@ -190,11 +247,71 @@ class PipelineRunner:
                     pipeline_error = audit_error
 
             # ------------------------------------------------------
-            # FINALISATION DU LOG
+            # PIPELINE SUMMARY
             # ------------------------------------------------------
 
+            self.logger.separator(
+                "PIPELINE START"
+            )
+            self.logger.metric(
+                "Run ID",
+                context.run_id
+            )
+
+            self.logger.metric(
+                "Environment",
+                context.env
+            )
+
+            self.logger.metric(
+                "Taxi Type",
+                context.taxi_type
+            )
+
+            self.logger.metric(
+                "Period",
+                context.periode
+            )
+
+            self.logger.metric(
+                "Status",
+                context.status
+            )
+
+            self.logger.metric(
+                "Duration",
+                f"{context.duration_seconds:.2f}s"
+            )
+
+            if context.row_count:
+
+                self.logger.subsection(
+                    "ROW COUNTS"
+                )
+
+                for table_name, count in context.row_count.items():
+
+                    self.logger.metric(
+                        table_name,
+                        f"{count:,}".replace(",", " ")
+                    )
+
+            self.logger.separator(
+                f"PIPELINE FINALIZED - STATUS = {context.status}"
+            )
+
+            # ------------------------------------------------------
+            # FINALISATION DU LOG
+            # ------------------------------------------------------
             self.logger.finalize(
                 success=context.status == "SUCCESS"
+            )
+            self.logger.separator(
+                "PIPELINE SUMMARY"
+            )
+            self.logger.metric(
+                "Run ID",
+                context.run_id
             )
 
         if pipeline_error is not None:
@@ -213,14 +330,14 @@ class PipelineRunner:
             )
 
             self.logger.info(
-                f"Période déterminée automatiquement : "
+                f"Period automatically determined : "
                 f"{self.periode}"
             )
 
         else:
 
             self.logger.info(
-                f"Période fournie explicitement : "
+                f"Period explicitly provided : "
                 f"{self.periode}"
             )
 
@@ -244,47 +361,40 @@ class PipelineRunner:
         context.start_time = datetime.now()
         context.table_name = "silver_nyc_taxi"
 
-        self.logger.info(
-            f"Période sélectionnée : {context.periode}"
+        self.logger.subsection(
+            "PIPELINE CONTEXT"
         )
 
-        self.logger.info(
-            f"path_sql_schema : "
-            f"{context.config['path_sql_schema']}"
+        self.logger.metric(
+            "Environment",
+            context.env
         )
 
-        self.logger.info(
-            f"Environnement = {context.env}"
+        self.logger.metric(
+            "Taxi Type",
+            context.taxi_type
         )
 
-        self.logger.info(
-            f"catalog_name : "
-            f"{context.config['catalog_name']}"
+        self.logger.metric(
+            "Period",
+            context.periode
         )
 
-        self.logger.info(f"\n{'=' * 120}")
-
-        self.logger.info(
-            f"context.row_count = {context.row_count}"
+        self.logger.metric(
+            "Catalog",
+            context.config["catalog_name"]
         )
 
-        self.logger.info(f"\n{'=' * 120}")
-
-        self.logger.info(
-            f"{'*' * 25} periode : {context.periode}"
+        self.logger.metric(
+            "Table",
+            context.table_name
         )
 
-        self.logger.info(
-            f"{'*' * 20} taxi_type : "
-            f"{context.taxi_type} {'*' * 20}"
-        )
 
-        self.logger.info(
-            f"{'*' * 20} table_name : "
-            f"{context.table_name} {'*' * 20}"
+        self.logger.metric(
+            "SQL Schema Path",
+            context.config["path_sql_schema"]
         )
-
-        self.logger.info(f"{'=' * 120}")
 
         return context
 
@@ -299,9 +409,15 @@ class PipelineRunner:
                 f"Period {context.periode} already loaded"
             )
 
-            self.logger.info(context.message)
+            self.logger.info(
+                f"Period {context.periode} already loaded"
+            )
 
             return True
+
+        self.logger.success(
+            f"Period {context.periode} is not loaded"
+        )
 
         return False
 
@@ -314,20 +430,30 @@ class PipelineRunner:
                 "PipelineRunner: aucune étape configurée."
             )
 
-        for step in self.steps:
+        total_steps = len(self.steps)
+
+        for index, step in enumerate(self.steps, start=1):
 
             context.current_step = (
                 step.__class__.__name__
             )
 
-            self.logger.info(
-                f"Starting {context.current_step}"
+            start = datetime.now()
+
+            self.logger.separator(
+                f"STEP {index}/{total_steps} : "
+                f"{context.current_step}"
             )
 
             step.run(context)
 
-            self.logger.info(
-                f"Finished {context.current_step}"
+            duration = (
+                    datetime.now() - start
+            ).total_seconds()
+
+            self.logger.success(
+                f"{context.current_step} completed "
+                f"in {duration:.2f}s"
             )
 
 
@@ -401,15 +527,29 @@ def main():
     # LOGS DE LANCEMENT
     # ==========================================================
 
-    logger.info(
-        "=============== PIPELINE ============="
+    logger.separator(
+        "NYC TAXI PIPELINE"
     )
 
-    logger.info(f"sys.argv  : {sys.argv}")
-    logger.info(f"env       : {env}")
-    logger.info(f"args      : {args}")
-    logger.info(f"periode   : {periode}")
-    logger.info(f"taxi_type : {taxi_type}")
+    logger.metric(
+        "Environment",
+        env
+    )
+
+    logger.metric(
+        "Taxi Type",
+        taxi_type
+    )
+
+    logger.metric(
+        "Period",
+        periode if periode is not None else "AUTO"
+    )
+
+    logger.metric(
+        "Command",
+        " ".join(sys.argv)
+    )
 
     # ==========================================================
     # PIPELINE
@@ -422,11 +562,6 @@ def main():
         periode=periode,
         logger=logger,
         steps=[
-            EnvironmentSetup(
-                spark=spark,
-                env=env,
-                logger=logger
-            ),
             ReferenceDataLoader(
                 spark=spark,
                 env=env,
@@ -473,7 +608,7 @@ def main():
 
         return 1
 
-    logger.info(
+    logger.success(
         f"PIPELINE COMPLETED | "
         f"status={context.status} | "
         f"periode={context.periode}"

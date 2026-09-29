@@ -1,4 +1,5 @@
-from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.logger.logger import PipelineLogger
+
 from nyc_taxi.src.common.spark_manager import SparkManager
 from nyc_taxi.src.admin.metastore_repair import MetastoreRepair
 
@@ -6,8 +7,10 @@ from nyc_taxi.src.admin.metastore_repair import MetastoreRepair
 if __name__ == "__main__":
 
     logger = PipelineLogger(
-        "MetastoreRepair",
-        env="local"
+        name="pipeline_runner",
+        env="local",
+        periode=202505,
+        taxi_type='yellow'
     )
 
     spark = SparkManager(
