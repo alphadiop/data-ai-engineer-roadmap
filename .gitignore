@@ -47,6 +47,7 @@ spark-warehouse/
 # Logs
 # ============================================================
 *.log
+notebooks/
 nyc_taxi/logs/
 nyc_taxi/airflow/logs/
 
