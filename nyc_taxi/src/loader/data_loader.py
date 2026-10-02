@@ -10,7 +10,7 @@ from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.decorators import log_execution
 from pathlib import Path
 from pyspark.sql.functions import lit
-
+from pyspark.sql.functions import spark_partition_id
 
 class DataLoader(PipelineStep):
     """
@@ -259,8 +259,15 @@ class DataLoader(PipelineStep):
         self.logger.success(
             f"Schema valid : {table_name}"
         )
-        self.logger.info(
-            f"Nombre de partition: {df.rdd.getNumPartitions()}"
+
+
+        num_partitions = (
+            df.select(spark_partition_id())
+            .distinct()
+            .count()
         )
 
+        self.logger.info(
+            f"Nombre de partitions : {num_partitions}"
+        )
         return df
