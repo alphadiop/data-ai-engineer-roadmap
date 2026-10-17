@@ -1,5 +1,5 @@
 from nyc_taxi.src.logger.logger import PipelineLogger
-from nyc_taxi.src.common.spark_manager import SparkManager
+from nyc_taxi.src.spark.spark_manager import SparkManager
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.admin.metadata_explore import MetadataExplorer
 

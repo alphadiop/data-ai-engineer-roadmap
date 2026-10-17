@@ -264,7 +264,7 @@ class UberBronze(PipelineStep):
 
 
 if __name__ == "__main__":
-    from nyc_taxi.src.common.spark_manager import SparkManager
+    from nyc_taxi.src.spark.spark_manager import SparkManager
     from nyc_taxi.src.utils.config import load_config
 
     taxi_type = "yellow"

@@ -53,7 +53,7 @@ jobs:
       - name: Test imports
         run: |
           python -c "import nyc_taxi; print('nyc_taxi import OK')"
-          python -c "import nyc_taxi.src.common.spark_manager; print('SparkManager import OK')"
+          python -c "import nyc_taxi.src.spark.spark_manager; print('SparkManager import OK')"
           python -c "import nyc_taxi.src.jobs.run_pipeline; print('Pipeline import OK')"
           python -c "import nyc_taxi.src.jobs.run_pipeline_airflow; print('Airflow runner import OK')"
 

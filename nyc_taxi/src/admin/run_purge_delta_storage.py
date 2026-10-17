@@ -1,7 +1,7 @@
 from nyc_taxi.src.admin.purge_delta_storage import PurgeDeltaStorage
 
 if __name__ == "__main__":
-    from nyc_taxi.src.common.spark_manager import SparkManager
+    from nyc_taxi.src.spark.spark_manager import SparkManager
     from nyc_taxi.src.common.logger import PipelineLogger
 
     logger = PipelineLogger("PURGE",env="local")
