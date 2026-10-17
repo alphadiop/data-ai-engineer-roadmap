@@ -141,8 +141,7 @@ class ReferenceDataLoader(PipelineStep):
             f"{row_count} lignes."
         )
 
-        self.logger.info("=" * 80)
-        self.logger.info(
+        self.logger.separator(
             "REFERENCE DATA LOADER terminé"
         )
-        self.logger.info("=" * 80)
+

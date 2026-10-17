@@ -11,7 +11,7 @@ from nyc_taxi.src.gold.uber_gold import UberGold
 from nyc_taxi.src.loader.data_loader import DataLoader
 
 from nyc_taxi.src.common.pipeline_context import PipelineContext
-from nyc_taxi.src.common.spark_manager import SparkManager
+from nyc_taxi.src.spark.spark_manager import SparkManager
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 
 from nyc_taxi.src.admin.metastore_repair import MetastoreRepair
@@ -491,7 +491,6 @@ def main():
     # ==========================================================
     # LOGGER
     # ==========================================================
-
     logger = PipelineLogger(
         name="pipeline_runner",
         env=env,

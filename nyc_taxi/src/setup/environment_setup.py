@@ -3,7 +3,7 @@ from pathlib import Path
 from nyc_taxi.src.common.catalog_manager import CatalogManager
 from nyc_taxi.src.common.delta_manager import DeltaManager
 from nyc_taxi.src.common.logger import PipelineLogger
-from nyc_taxi.src.common.spark_manager import SparkManager
+from nyc_taxi.src.spark.spark_manager import SparkManager
 
 
 from nyc_taxi.src.utils.load_json import load_json

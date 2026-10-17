@@ -62,3 +62,4 @@ nyc_taxi/airflow/logs/
 # Fichiers volontairement exclus
 # ============================================================
 nyc_taxi/docs/regle.md
+nyc_taxi/verification_wheel/

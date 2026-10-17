@@ -15,7 +15,7 @@ def run_pipeline(
         - GitHub Actions
     """
     from nyc_taxi.src.jobs.pipeline_runner_jobs_bundles import PipelineRunner
-    from nyc_taxi.src.common.spark_manager import SparkManager
+    from nyc_taxi.src.spark.spark_manager import SparkManager
     from nyc_taxi.src.logger.logger import PipelineLogger
 
     from nyc_taxi.src.setup.environment_setup import EnvironmentSetup

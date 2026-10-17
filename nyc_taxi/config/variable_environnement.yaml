@@ -13,6 +13,21 @@ local:
   log_dir: "D:/data-ai-engineer-roadmap/nyc_taxi/logs"
   spark_local_dir: "D:/spark_tmp"
   spark_ivy_dir: "D:/spark_ivy"
+  spark_jars_dir : "D:/spark_jars/sqljdbc_13.6/fra/jars"
+
+  sql_server:
+    profiles:
+      dw_prod:
+        enabled: true
+        odbc_driver: "ODBC Driver 17 for SQL Server"
+        host: "localhost"
+        port: 1433
+        database: "AdventureWorks2022"
+        username: "alphadiop"
+        password: "Ibrahima1"
+        encrypt: "yes"
+        trust_server_certificate: "yes"
+
 
 docker:
   env: docker
@@ -29,6 +44,8 @@ docker:
   log_dir: "/opt/airflow/nyc_taxi/"
   spark_local_dir: "/opt/airflow/spark_tmp"
   spark_ivy_dir: "/opt/airflow/spark_ivy"
+  spark_jars_dir : "/opt/airflow/spark_jars/sqljdbc_13.6/fra/jars"
+
   
 
 databricks:

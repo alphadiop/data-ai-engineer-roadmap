@@ -1,40 +1,43 @@
-import os
-import sys
+# -*- coding: utf-8 -*-
+"""
+ Fonction load_json
+"""
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from nyc_taxi.src.common.logger import PipelineLogger
+    from nyc_taxi.src.logger.logger import PipelineLogger
 
-def load_json(path: Union[str, Path], logger: Optional["PipelineLogger"] = None) -> dict:
+
+def load_json(path: str | Path, logger: 'PipelineLogger' = None) -> dict:
+    """Chargement d'un fichier JSON
+
+    :param path: chemin d'un fichier JSON
+    :param logger: gestion des logs
+    :return: dictionnaire du contenu du fichier JSON chargée
+    """
     path = Path(path)
+
+    if not path.exists():
+        return {}
+
+    if path.stat().st_size == 0:
+        return {}
 
     try:
         if not path.exists():
-            if logger:
-                logger.error(f"File not found: {path}")
-            raise FileNotFoundError(f"File not found: {path}")
+            raise FileNotFoundError(path)
+
+        if path.is_dir():
+            raise IsADirectoryError(
+                f"{path} est un répertoire et non un fichier JSON"
+        )
 
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
-        
     except Exception as e:
         if logger:
-            logger.error(f"Error loading file: {path}")
-        raise e
-
-
-if __name__ == "__main__":
-
-    from sql_schema.build_schema import build_schema
-    from sql_schema.get_columns_from_schema import get_columns_from_schema
-
-    logger = PipelineLogger("build_schema")
-    path = "/Workspace/Users/alphadiop@gmail.com/Learning workspace/nyc_taxi/src/schema/yellow/audit_load.json"
-    load_json = load_json(path)
-    schema = build_schema(load_json)
-    print(schema)
-    colums = get_columns_from_schema(schema)
-    print(colums)
+            logger.exception(e)
+        raise

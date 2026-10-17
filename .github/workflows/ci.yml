@@ -1,4 +1,4 @@
-name: CI - NYC Taxi
+name: CI-CD NYC Taxi
 
 on:
   push:
@@ -112,6 +112,4 @@ jobs:
         run: |
           databricks bundle validate
 
-      - name: Deploy Databricks bundle
-        run: |
-          databricks bundle deploy
+

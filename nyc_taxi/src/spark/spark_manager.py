@@ -39,6 +39,14 @@ class SparkManager:
         if self.env == "databricks":
             return SparkSession.getActiveSession()
 
+        # sqlserver_jdbc_jar = (
+        #         "file:///"
+        #         + self.config[self.env]["spark_jars_dir"].replace(":", "")
+        #         + "/mssql-jdbc-13.6.0.jre11.jar"
+        # )
+        #
+        # print("SQL Server JDBC JAR =", sqlserver_jdbc_jar)
+
         # ==========================================================
         # LOCAL
         # ==========================================================
@@ -54,39 +62,19 @@ class SparkManager:
             # ------------------------------------------------------
             # Delta Lake
             # ------------------------------------------------------
-            .config(
-                "spark.sql.extensions",
-                "io.delta.sql.DeltaSparkSessionExtension"
-            )
-            .config(
-                "spark.sql.catalog.spark_catalog",
-                "org.apache.spark.sql.delta.catalog.DeltaCatalog"
-            )
+            .config("spark.sql.extensions","io.delta.sql.DeltaSparkSessionExtension")
+            .config("spark.sql.catalog.spark_catalog","org.apache.spark.sql.delta.catalog.DeltaCatalog")
+
 
             # ------------------------------------------------------
             # Warehouse
             # ------------------------------------------------------
-            .config(
-                "spark.sql.warehouse.dir",
-                self.config[self.env]["warehouse_dir"]
-            )
+            .config("spark.sql.warehouse.dir",self.config[self.env]["warehouse_dir"])
 
             # ------------------------------------------------------
-            # Hive Metastore Derby  self.config[self.env]["spark_local_dir"] self.config[self.env]["spark_ivy_dir"]
+            # Hive Metastore Derby
             # ------------------------------------------------------
-            # .config(
-            #     "spark.hadoop.javax.jdo.option.ConnectionURL",
-            #     f"jdbc:derby:{self.config[self.env]['metastore_dir']};create=true"
-            # )
-            # .config(
-            #     "spark.driver.extraJavaOptions",
-            #     f"-Dderby.system.home={self.config[self.env]['project_root']}"
-            # )
-
-            .config(
-                "javax.jdo.option.ConnectionURL",
-                f"jdbc:derby:{self.config[self.env]['metastore_dir']};create=true"
-            )
+            .config("javax.jdo.option.ConnectionURL",f"jdbc:derby:{self.config[self.env]['metastore_dir']};create=true")
 
             # ------------------------------------------------------
             # Python utilisé par Spark
@@ -111,7 +99,19 @@ class SparkManager:
                 "spark.executor.memory",
                 "8g"
             )
+
+            # ------------------------------------------------------
+            # SQL Server JDBC
+            # ------------------------------------------------------
+            # .config("spark.jars", sqlserver_jdbc_jar)
+            #
+            # .config(
+            #     "spark.driver.extraClassPath",
+            #     "D:/spark_jars/sqljdbc_13.6/fra/jars/mssql-jdbc-13.6.0.jre11.jar"
+            # )
+
         )
+
 
         spark = (
             configure_spark_with_delta_pip(builder)

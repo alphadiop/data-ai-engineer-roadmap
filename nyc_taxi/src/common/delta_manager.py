@@ -6,7 +6,7 @@ from nyc_taxi.src.common.logger import PipelineLogger
 from pyspark.sql import DataFrame
 import logging
 
-from nyc_taxi.src.common.spark_manager import SparkManager
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -767,6 +767,7 @@ if __name__ == "__main__":
     import os
 
     from nyc_taxi.src.common.catalog_manager import CatalogManager
+    from nyc_taxi.src.spark.spark_manager import SparkManager
     logger=PipelineLogger('DeltaManager')
 
     spark_manager = SparkManager(
