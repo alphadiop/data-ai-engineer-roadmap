@@ -63,3 +63,5 @@ nyc_taxi/airflow/logs/
 # ============================================================
 nyc_taxi/docs/regle.md
 nyc_taxi/verification_wheel/
+
+note.md
