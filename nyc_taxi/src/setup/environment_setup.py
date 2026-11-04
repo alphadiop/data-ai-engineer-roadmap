@@ -13,18 +13,23 @@ from nyc_taxi.src.common.pipeline_step import PipelineStep
 from nyc_taxi.src.common.decorators import log_execution
 from nyc_taxi.src.common.pipeline_context import PipelineContext
 
+
 class EnvironmentSetup(PipelineStep):
     """
-    Initialise complètement l'environnement.
-    c'est une opération d'initialisation.
+    Initialise complètement l'environnement du pipeline.
 
-    - création du catalogue
-    - création des schémas
-    - création des tables Delta
-    - réparation du metastore local
+    Responsabilités :
+    - création du catalogue ;
+    - création des schémas ;
+    - création des tables Delta ;
+    - réparation du metastore local.
 
-    attention faut initialiser l'environnement avant de chercher à acceder aux tables
+    Le contexte fournit les informations nécessaires :
+    - context.config : chemins et configuration ;
+    - context.taxi_type : sélection des schémas et des tables ;
+    - context.path_sql_schema : localisation des fichiers de schéma SQL.
 
+    L'environnement doit être initialisé avant toute consultation des tables.
     """
 
     def __init__(

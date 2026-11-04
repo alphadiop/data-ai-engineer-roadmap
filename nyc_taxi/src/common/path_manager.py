@@ -1,13 +1,13 @@
 
 from nyc_taxi.src.utils.load_json import load_json
-
+from nyc_taxi.src.common.pipeline_context import PipelineContext
 import os
 from pathlib import Path
 
 
 class PathManager:
 
-    def __init__(self, context):
+    def __init__(self, context:PipelineContext):
 
         self.context = context
 
@@ -15,7 +15,7 @@ class PathManager:
         self.taxi_type = context.taxi_type
 
         self.logger = context.logger
-        self.config = context.config
+        self.config = context.config or {}
 
         self.project_root = self._get_project_root()
         self.schema_root = self._get_schema_root()
@@ -51,7 +51,6 @@ class PathManager:
             )
 
     def _get_project_root(self):
-
         if self.env == "databricks":
             return Path(
                 "/Workspace/Users/alphadiop@gmail.com/"
@@ -62,8 +61,8 @@ class PathManager:
             return self._resolve_path(
                 self.config["project_root"]
             )
-
         return Path.cwd()
+
 
     def _get_schema_root(self):
         return self.project_root / "schema"
@@ -83,7 +82,6 @@ class PathManager:
         # ------------------------------------------------------------
         # WSL
         # ------------------------------------------------------------
-
         if self._is_wsl():
             return Path(
                 self._windows_to_wsl(path)
@@ -97,7 +95,6 @@ class PathManager:
 
     @staticmethod
     def _is_wsl():
-
         return (
                 os.name == "posix"
                 and "microsoft" in Path(

@@ -516,13 +516,10 @@ class DeltaManager:
                 )
 
                 (
-                    df.write
+                df.write
                     .format("delta")
                     .mode("overwrite")
-                    .option(
-                        "replaceWhere",
-                        f"periode = {periode}"
-                    )
+                    .option(key="replaceWhere",value=f"periode = {periode}")
                     .saveAsTable(full_table_name)
                 )
 

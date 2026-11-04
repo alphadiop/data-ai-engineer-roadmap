@@ -69,17 +69,17 @@ class SparkEnvironmentLogger:
 
         self.logger.info(
             f"warehouse_yaml       = "
-            f"{self.config['local']['warehouse_dir']}"
+            f"{self.config[self.env]['warehouse_dir']}"
         )
 
         self.logger.info(
             f"metastore_dir        = "
-            f"{self.config['local']['metastore_dir']}"
+            f"{self.config[self.env]['metastore_dir']}"
         )
 
         self.logger.info(
             f"bronze_path          = "
-            f"{self.config['local']['bronze_path']}"
+            f"{self.config[self.env]['bronze_path']}"
         )
 
         self.logger.info("-" * 120)

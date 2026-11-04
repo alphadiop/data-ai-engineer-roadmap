@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from pathlib import Path
-
+import sqlparse
 from nyc_taxi.src.utils.config.load_config import load_config
 
 
@@ -21,6 +21,7 @@ class PipelineLogger:
         self.taxi_type = taxi_type
         self.level = level
         self.path_log = None
+        self.path_sql = None
 
         # ----------------------------------------------------------
         # Logger Python
@@ -57,11 +58,15 @@ class PipelineLogger:
 
         root_log_dir = config[self.env]["path_logs"]
 
-        self.path_log = self.get_path_logs(
+        path_log = self.get_path_logs(
             root_log_dir=root_log_dir,
             periode=periode,
             taxi_type=taxi_type
         )
+
+        self.path_log = path_log.get('log')
+
+        self.path_sql = path_log.get('sql')
 
         # ----------------------------------------------------------
         # Suppression des anciens handlers
@@ -88,10 +93,8 @@ class PipelineLogger:
         self.handlers = [
             console_handler
         ]
-
-
         file_handler = logging.FileHandler(
-            self.path_log,
+            str(self.path_log),
             mode="a",
             encoding="utf-8"
         )
@@ -108,21 +111,24 @@ class PipelineLogger:
         # ----------------------------------------------------------
         self.separator("Informations de démarrage")
         self.info("PIPELINE LOGGER")
-        self.info("=" * 120)
         self.info(f"environment      = {env}")
         self.info(f"periode          = {periode}")
         self.info(f"taxi_type        = {taxi_type}")
         self.info(f"path_logs        = {root_log_dir}")
         self.info(f"log_file         = {self.path_log}")
+        self.info(f"log_sql_file     = {self.path_sql}")
         self.info(f"logging_mode     = console + file")
 
         self.separator("Fin Informations de démarrage")
+
+        self.sql_logger = self.get_file_handler()
 
 
     def separator(self, title: str):
         self.info("=" * 100)
         self.info(title)
         self.info("=" * 100)
+
 
     def subsection(self, title: str):
         self.info("-" * 100)
@@ -139,8 +145,9 @@ class PipelineLogger:
         self.info(f"{label:<30} : {value}")
 
 
+
     # ==================================================================
-    # PATH
+    # PATH LOG
     # ==================================================================
 
     @staticmethod
@@ -161,20 +168,20 @@ class PipelineLogger:
         """
 
         if periode is None:
-
             path_log = Path(root_log_dir) / "pipeline.log"
-
+            path_sql = Path(root_log_dir) / "pipeline.sql"
             path_log.parent.mkdir(
                 parents=True,
                 exist_ok=True
             )
-
-            return str(path_log)
+            return {
+                "log": str(path_log),
+                "sql": str(path_sql)
+            }
 
         # ----------------------------------------------------------
-        # Validation
+        # -----Validation-------------------------------------------
         # ----------------------------------------------------------
-
         periode = str(periode)
 
         if len(periode) != 6 or not periode.isdigit():
@@ -189,42 +196,32 @@ class PipelineLogger:
             )
 
         # ----------------------------------------------------------
-        # Année
+        # ----Année------------------------------------------------
         # ----------------------------------------------------------
-
         annee = periode[:4]
 
         # ----------------------------------------------------------
         # Répertoire
         # ----------------------------------------------------------
 
-        path_log = (
-                Path(root_log_dir)
-                / taxi_type
-                / annee
-        )
-
-        path_log.mkdir(
-            parents=True,
-            exist_ok=True
-        )
+        path_log = (Path(root_log_dir) / taxi_type / annee)
+        path_log.mkdir(parents=True,exist_ok=True)
 
         # ----------------------------------------------------------
         # Timestamp lancement
         # ----------------------------------------------------------
-
-        timestamp = datetime.now().strftime(
-            "%Y%m%d_%H%M%S"
-        )
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         # ----------------------------------------------------------
         # Fichier
         # ----------------------------------------------------------
+        return {"log": str(path_log / f"{periode}_{timestamp}.log"),
+               "sql":str(path_log / f"{periode}_{timestamp}.sql")
+               }
 
-        return str(
-            path_log
-            / f"{periode}_{timestamp}.log"
-        )
+
+
+
 
     # ==================================================================
     # HANDLERS
@@ -232,11 +229,9 @@ class PipelineLogger:
 
     def remove_handlers(self):
         """
-        Supprime proprement tous les handlers existants.
+            Supprime proprement tous les handlers existants.
         """
-
         for handler in self.logger.handlers[:]:
-
             try:
                 handler.flush()
             except Exception:
@@ -249,9 +244,11 @@ class PipelineLogger:
 
             self.logger.removeHandler(handler)
 
+
+
     def flush(self):
         """
-        Force l'écriture des logs en attente.
+            Force l'écriture des logs en attente.
         """
 
         for handler in self.logger.handlers:
@@ -312,15 +309,11 @@ class PipelineLogger:
         # Databricks
         # ----------------------------------------------------------
         status = "OK" if success else "NOOK"
-
-        self.info("=" * 120)
-        self.info(f"PIPELINE FINALIZED - STATUS = {status}")
-        self.info("=" * 120)
+        self.separator(f"PIPELINE FINALIZED - STATUS = {status}")
 
         self.flush()
         extension = ".ok" if success else ".nook"
-
-        current_path = Path(self.path_log)
+        current_path = Path(str(self.path_log))
 
         final_path = current_path.with_suffix(extension)
 
@@ -357,3 +350,15 @@ class PipelineLogger:
         else:
             self.logger.warning(f"Log file not found: {current_path}")
 
+
+
+    def write_sql_query(self, query: str, reindent:bool=True):
+        if self.sql_logger is not None:
+            self.sql_logger.write(
+                f"\n\n{sqlparse.format(query,reindent=reindent,keyword_case='upper',strip_comments=True)}"
+            )
+
+
+
+    def get_file_handler(self):
+        return open(str(self.path_sql), "w")
