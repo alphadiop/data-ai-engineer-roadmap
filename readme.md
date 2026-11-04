@@ -140,7 +140,6 @@ nyc_taxi/
 * Incremental processing by period
 
 ### Silver Layer
-
 * Data quality checks
 * Data type standardization
 * Derived business columns
@@ -149,13 +148,11 @@ nyc_taxi/
 * Tip percentage calculation
 
 ### Gold Layer
-
 * Fact table generation
 * Daily KPI generation
 * Date dimension generation
 
 ### Audit Layer
-
 * Pipeline execution tracking
 * Success and failure monitoring
 * Row count monitoring

@@ -332,16 +332,37 @@ Les écarts correspondent aux contrôles qualité appliqués dans la couche Silv
 
 Le modèle permet notamment :
 
+
 ### Analyse du chiffre d'affaires
+
+Le chiffre d'affaires correspond à la somme de la colonne `total_amount`
+des courses de taxi présentes dans les données analysées.
 
 ```sql
 SUM(total_amount)
 ```
 
+Dans la table `gold.gold_fact_trips`, cette colonne représente le montant total
+associé à une course. Le résultat dépend des filtres appliqués, notamment
+de la période sélectionnée.
+
+Pour calculer le chiffre d'affaires d'une période donnée, il faut donc
+additionner les montants des courses correspondant à cette période.
+
+---
+
 ---
 
 ### Nombre de trajets
 
+Cette formule SQL permet de compter le nombre total de lignes
+d'une table. Pour compter les courses de `gold_fact_trips`,
+utiliser `COUNT(*)` dans une requête SQL.
+
+Questions associées :
+- Comment compter les lignes d'une table SQL ?
+- Combien de courses contient gold_fact_trips ?
+- Comment obtenir le nombre total de trajets en SQL ?
 ```sql
 COUNT(*)
 ```

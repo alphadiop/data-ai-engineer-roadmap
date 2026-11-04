@@ -5,18 +5,19 @@
 
 from typing import TYPE_CHECKING
 
+import pandas as pd
 from nyc_taxi.src.sql_operations.sql_operations import SQLOperations
 from nyc_taxi.src.logger.logger import PipelineLogger
 
-
+from nyc_taxi.src.utils.tabulate_dataframe import tabulate_dataframe
 
 
 
 def get_sql_operations(
     env: str,
     server_name: str = "dw_prod",
-    odbc_driver: str = None,
-    connect_args: dict = None,
+    odbc_driver: str | None = None,
+    connect_args: dict | None = None,
     options: dict = None,
     logger: 'PipelineLogger' = None
 ) -> 'SQLOperations':
@@ -27,13 +28,14 @@ def get_sql_operations(
     return SQLOperations(
         env=env,
         server_name=server_name,
-        odbc_driver=odbc_driver,
+        odbc_driver=str(odbc_driver),
         connect_args=connect_args,
         options=options,
         logger=logger
     )
 
 if __name__ == '__main__':
+
     odbc_driver = "ODBC Driver 17 for SQL Server"
     env = "local"
     periode = 202411
@@ -51,6 +53,8 @@ if __name__ == '__main__':
         odbc_driver=odbc_driver,
         logger=logger,
     )
-    rows = sql_ops.fetch_all("SELECT TOP 10 * FROM Sales.SalesOrderHeader")
-    logger.info(rows)
+    rows = sql_ops.fetch_all("SELECT TOP 5 * FROM Sales.SalesOrderHeader")
+    df1 = pd.DataFrame(rows)
+    df = tabulate_dataframe(df1)
+    logger.info(df)
 

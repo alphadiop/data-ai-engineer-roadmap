@@ -10,7 +10,11 @@ from nyc_taxi.src.utils.config.load_config import load_config
 
 
 class SQLManager:
-    """Gère les connexions SQL Server avec SQLAlchemy et pyodbc."""
+    """Gère les connexions SQL Server avec SQLAlchemy et pyodbc
+       SQLAlchemy est la couche de gestion des connexions et d'exécution SQL ;
+       pyodbc est le connecteur ;
+       SQL Server est le système qui stocke et interroge les données
+    """
 
     def __init__(
         self,
@@ -32,7 +36,6 @@ class SQLManager:
             logger=self.logger,
         )
 
-        print(self.config)
         # server_name correspond au nom du profil dans le YAML.
         self.db_config = (
             self.config
@@ -79,17 +82,20 @@ class SQLManager:
         return False
 
     def _read_secret(self, name: str) -> str:
-        """ Lit un secret dont le nom de variable est indiqué dans le YAML."""
+        """ Lit un secret dont le nom de variable est indiqué dans le YAML.
+            Le YAML indique où trouver les identifiants.
+            _read_secret() récupère leur valeur dans les variables d'environnement.
+            _build_engine() construit ensuite la chaîne de connexion.
+            Les identifiants ne sont plus écrits directement dans le code ou le YAML.
+        """
         env_name = self.db_config.get(f"{name}")
         if not env_name:
             raise ValueError(
-                f"Le profil '{self.server_name}' doit définir "
-                f"'{name}'."
+                f"Le profil '{self.server_name}' doit définir '{name}'."
             )
 
         value = os.getenv(env_name)
 
-        print(f"value : {value}")
         if not value:
             raise RuntimeError(
                 f"La variable d'environnement '{env_name}' n'est pas définie."
@@ -123,8 +129,8 @@ class SQLManager:
         if self.db_config.get("trusted_connection", False):
             connection_string += "Trusted_Connection=yes;"
         else:
-            username = self.db_config['username']
-            password = self.db_config['password']
+            username = self._read_secret('username')
+            password = self._read_secret('password')
             connection_string += (
                 f"UID={username};"
                 f"PWD={password};"
@@ -187,6 +193,7 @@ class SQLManager:
                 text(query), params or {}
             ).fetchall()
 
+
     def fetch_one(self, query: str, params=None):
         with self.engine.connect() as conn:
             return conn.execute(
@@ -199,12 +206,17 @@ class SQLManager:
                 text(query), params or {}
             ).scalar()
 
+
     def close(self):
-        if self.connexion is not None and not self.connexion.closed:
-            self.connexion.close()
+        if self.connexion is not None:
+            if not self.connexion.closed:
+                self.connexion.close()
+
+            self.connexion = None
 
         if self.engine is not None:
             self.engine.dispose()
+            self.engine = None
 
 
 if __name__ == "__main__":
@@ -234,6 +246,7 @@ if __name__ == "__main__":
                 FROM Sales.SalesOrderHeader
                 """
             )
+
             logger.info(rows)
 
 
