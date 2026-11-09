@@ -1,0 +1,6 @@
+
+IF EXISTS (SELECT * FROM sys.sysfiles WHERE name = N'{File}')
+BEGIN
+   DBCC SHRINKFILE({File}, EMPTYFILE) ;
+   ALTER DATABASE {BaseName} REMOVE FILE {File} ;
+END

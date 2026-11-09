@@ -35,8 +35,9 @@ class DeltaManager:
             table_name=table_name
         )
 
-        exists = self.spark.catalog.tableExists(
-            full_table_name
+        exists = self.table_exists(
+            schema_name=schema_name,
+            table_name=table_name
         )
 
         self.logger.info(
@@ -123,8 +124,9 @@ class DeltaManager:
             else ""
         )
 
-        exists = self.spark.catalog.tableExists(
-            full_table_name
+        exists = self.table_exists(
+            schema_name=schema_name,
+            table_name=table_name
         )
         self.logger.info(
             f"Table exists {full_table_name} = {exists}"
@@ -217,19 +219,18 @@ class DeltaManager:
             """
         )
 
+
+
     def table_exists(
             self,
             schema_name: str,
             table_name: str
     ) -> bool:
 
-        full_table_name = self.catalog_manager.get_table_name(
+        return self.catalog_manager.table_exists(
+            catalog_name="nyc_taxi",
             schema_name=schema_name,
             table_name=table_name
-        )
-
-        return self.spark.catalog.tableExists(
-            full_table_name
         )
 
 
@@ -516,13 +517,10 @@ class DeltaManager:
                 )
 
                 (
-                    df.write
+                df.write
                     .format("delta")
                     .mode("overwrite")
-                    .option(
-                        "replaceWhere",
-                        f"periode = {periode}"
-                    )
+                    .option(key="replaceWhere",value=f"periode = {periode}")
                     .saveAsTable(full_table_name)
                 )
 

@@ -11,6 +11,8 @@ from nyc_taxi.src.common.decorators import log_execution
 from pathlib import Path
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import spark_partition_id
+from nyc_taxi.src.common.pipeline_context import PipelineContext
+
 
 class DataLoader(PipelineStep):
     """
@@ -26,8 +28,9 @@ class DataLoader(PipelineStep):
         self.spark = spark
         self.logger = logger
 
+
     @log_execution
-    def run(self, context):
+    def run(self, context:PipelineContext):
 
         # ==========================================================
         # DELTA MANAGER
@@ -49,38 +52,18 @@ class DataLoader(PipelineStep):
         # TABLES
         # ==========================================================
 
-        tables = [
-            (
-                "silver",
-                "silver_nyc_taxi",
-                context.df_silver
-            ),
-            (
-                "gold",
-                "gold_fact_trips",
-                context.df_fact_trips
-            ),
-            (
-                "ref",
-                "dim_date",
-                context.df_dim_date
-            ),
-            (
-                "gold",
-                "gold_kpi_daily",
-                context.df_kpi_daily
-            )
+        tables = [("silver","silver_nyc_taxi",context.df_silver),
+                  ("audit","silver_rejected_rows",context.df_rejete),
+                  ("gold","gold_fact_trips",context.df_fact_trips),
+                  ("ref","dim_date",context.df_dim_date),
+                  ("gold","gold_kpi_daily",context.df_kpi_daily)
         ]
 
         # ==========================================================
         # TABLES PARTITIONNÉES PAR PERIODE
         # ==========================================================
 
-        partitioned_tables = {
-            "silver_nyc_taxi",
-            "gold_fact_trips",
-            "gold_kpi_daily"
-        }
+        partitioned_tables = {"silver_nyc_taxi","gold_fact_trips","gold_kpi_daily", "silver_rejected_rows"}
 
         # ==========================================================
         # TRAITEMENT
@@ -93,16 +76,14 @@ class DataLoader(PipelineStep):
             self.logger.separator(
                 f"LOAD : {schema_name}.{table_name}"
             )
+            self.logger.info(f"Columns for {schema_name}.{table_name} : {df.columns}")
 
             self.logger.metric(
                 "Rows before load",
                 f"{row_count:,}".replace(",", " ")
             )
 
-            self.logger.metric(
-                "Period",
-                context.periode
-            )
+            self.logger.metric("Period",context.periode)
 
             # ======================================================
             # PERIODE
@@ -123,7 +104,6 @@ class DataLoader(PipelineStep):
                     )
 
                 else:
-
                     self.logger.info(
                         "Period column already present"
                     )
@@ -193,7 +173,7 @@ class DataLoader(PipelineStep):
                 df=df,
                 schema_name=schema_name,
                 table_name=table_name,
-                periode=context.periode,
+                periode=int(context.periode),
                 replace=True
             )
 
@@ -237,29 +217,20 @@ class DataLoader(PipelineStep):
         schema_json = load_json(schema_file)
 
         # ==========================================================
-        # APPLICATION DU SCHEMA
+        # APPLICATION ET VALIDATION DU SCHEMA
         # ==========================================================
+
+        self.logger.info(
+            f"Schema validation started : {table_name}"
+        )
 
         df = schema_manager.apply_schema(
             df=df,
             schema_json=schema_json
         )
-
-        # ==========================================================
-        # VALIDATION DES COLONNES
-        # ==========================================================
-        self.logger.info(
-            f"Schema validation started : {table_name}"
-        )
-        schema_manager.validate_columns(
-            df=df,
-            schema_json=schema_json
-        )
-
         self.logger.success(
-            f"Schema valid : {table_name}"
+            f"Schema validation completed : {table_name}"
         )
-
 
         num_partitions = (
             df.select(spark_partition_id())

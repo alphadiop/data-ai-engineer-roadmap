@@ -1,0 +1,3 @@
+
+IF OBJECT_ID('{View}') IS NOT NULL
+    DROP VIEW {View};

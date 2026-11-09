@@ -23,8 +23,8 @@ local:
         host: "localhost"
         port: 1433
         database: "AdventureWorks2022"
-        username: "alphadiop"
-        password: "Ibrahima1"
+        username: "SQL_SERVER_USERNAME"
+        password: "SQL_SERVER_PASSWORD"
         encrypt: "yes"
         trust_server_certificate: "yes"
 

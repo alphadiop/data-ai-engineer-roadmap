@@ -1,0 +1,5 @@
+
+DELETE
+FROM
+    {SrcTable}
+    {Where};

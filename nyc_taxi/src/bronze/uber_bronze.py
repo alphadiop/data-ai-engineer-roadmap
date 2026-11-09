@@ -14,10 +14,10 @@ from pyspark.sql.functions import (
 from urllib.error import HTTPError, URLError
 
 from nyc_taxi.src.common.pipeline_step import PipelineStep
-from nyc_taxi.src.common.logger import PipelineLogger
+from nyc_taxi.src.logger.logger import PipelineLogger
 from nyc_taxi.src.common.decorators import log_execution 
 from nyc_taxi.src.exception.exception_handler import DataNotAvailableError
-
+from nyc_taxi.src.common.pipeline_context import PipelineContext
 
 class UberBronze(PipelineStep):
 
@@ -28,12 +28,10 @@ class UberBronze(PipelineStep):
      Sinon, nous allons le télécharger à partir du répertoire Bronze.
     """
 
-
     def __init__(self, spark,logger:PipelineLogger | None = None):
         super().__init__(spark,self.__class__.__name__)
         self.spark = spark
         self.logger = logger or logging.getLogger(__name__)
-
 
 
 
@@ -45,13 +43,13 @@ class UberBronze(PipelineStep):
             )
 
 
-
     @log_execution
     def get_file_name(self, taxi_type:str, year:int, month:int) -> str:
         file = f"{taxi_type}_tripdata_{year}-{month:02}.parquet"
         if self.logger:
             self.logger.info(f"File name: {file}")
         return file
+
 
 
     @log_execution
@@ -63,8 +61,9 @@ class UberBronze(PipelineStep):
             / self.get_file_name(taxi_type, year, month)
         )
 
+
     @log_execution
-    def run(self, context) -> DataFrame:
+    def run(self, context:PipelineContext) -> DataFrame:
         """
             Extract the data from the file and return a Spark DataFrame
             we supposed that path_volume exists otherwise we create it in SQL
@@ -82,28 +81,14 @@ class UberBronze(PipelineStep):
         context.year = int(context.periode) // 100
         context.month = int(context.periode) % 100
 
-        self.logger.metric(
-            "Taxi type",
-            context.taxi_type
-        )
+        self.logger.metric("Taxi type",context.taxi_type)
+        self.logger.metric("Period", context.periode)
+        self.logger.metric("Year",context.year)
 
-        self.logger.metric(
-            "Period",
-            context.periode
-        )
-
-        self.logger.metric(
-            "Year",
-            context.year
-        )
-
-        self.logger.metric(
-            "Month",
-            context.month
-        )
+        self.logger.metric("Month", context.month)
 
         file_name = self.get_file_name(
-            taxi_type = context.taxi_type,
+            taxi_type = str(context.taxi_type),
             year=context.year,
             month = context.month
         )
@@ -116,52 +101,20 @@ class UberBronze(PipelineStep):
 
         path_file.parent.mkdir(parents=True, exist_ok=True)
 
-        self.logger.separator(
-            "BRONZE EXTRACTION"
-        )
+        self.logger.separator("BRONZE EXTRACTION")
+        self.logger.info(f"Downloading dataset : {file_name}")
+        self.logger.metric("Period",context.periode)
+        self.logger.metric("Dataset URL",dataset_url)
+        self.logger.metric("Bronze path",path_volume)
+        self.logger.metric("Source file",file_name)
+        self.logger.metric("Source File",path_file)
 
-        self.logger.info(
-            f"Downloading dataset : {file_name}"
-        )
-
-        self.logger.metric(
-            "Period",
-            context.periode
-        )
-
-        self.logger.metric(
-            "Dataset URL",
-            dataset_url
-        )
-
-        self.logger.metric(
-            "Bronze path",
-            path_volume
-        )
-        self.logger.metric(
-            "Source file",
-            file_name
-        )
-
-        self.logger.metric(
-            "Source File",
-            path_file
-        )
         if path_file.exists():
-
-            self.logger.success(
-                f"File already available : {path_file.name}"
-            )
+            self.logger.success(f"File already available : {path_file.name}")
 
         else:
-
-            url = (
-                f"{dataset_url}/{file_name}"
-            )
-
-            self.logger.info(
-                f"Downloading : {file_name}"
-            )
+            url = (f"{dataset_url}/{file_name}")
+            self.logger.info(f"Downloading : {file_name}")
 
             try:
                 urlretrieve(url, str(path_file))
@@ -175,82 +128,20 @@ class UberBronze(PipelineStep):
                         )
                 raise
 
-        # if not path_file.exists():
-        #     url = (
-        #         f"{dataset_url}/{file_name}"
-        #     )
-        #
-        #     self.logger.metric(
-        #         "Downloading",
-        #         file_name
-        #     )
-        #
-        #     try:
-        #         urlretrieve(url, str(path_file))
-        #
-        #     except HTTPError as e:
-        #
-        #         if e.code in (403, 404):
-        #             raise DataNotAvailableError(
-        #                     f"Dataset indisponible pour "
-        #                     f"{context.taxi_type} {context.periode}"
-        #                 )
-        #         raise
-        #
-        #     except URLError as e:
-        #         self.logger.error(
-        #             f"Error downloading {file_name} : {e}"
-        #         )
-        #         raise
-
-        #archived = self.path_volume / self.taxi_type / str(self.year) / file_name
-
-        # archived = path_file
-        #
-        # if not archived.exists():
-        #     path_file.replace(archived)
-        #     path_file = archived
-
-
-        df = self.spark.read.parquet(
-            str(path_file)
-        )
-
-
-        df_bronze = df.withColumn(
-            "periode",
-            lit(context.periode)
-        )
+        df = self.spark.read.parquet(str(path_file))
+        df_bronze = df.withColumn("periode", lit(context.periode))
         row_count = df_bronze.count()
 
         context.df_bronze = df_bronze
         context.row_count["bronze"] = row_count
-
         context.table_name = "silver_nyc_taxi"
+        self.logger.separator("BRONZE SUMMARY")
 
-        self.logger.separator(
-            "BRONZE SUMMARY"
-        )
+        self.logger.metric("Bronze Rows loaded",f"{row_count:,}".replace(",", " "))
 
-        self.logger.metric(
-            "Bronze Rows loaded",
-            f"{row_count:,}".replace(",", " ")
-        )
-
-        self.logger.metric(
-            "Period",
-            context.periode
-        )
-
-        self.logger.metric(
-            "Taxi type",
-            context.taxi_type
-        )
-
-        self.logger.metric(
-            "File",
-            file_name
-        )
+        self.logger.metric("Period",context.periode)
+        self.logger.metric("Taxi type",context.taxi_type)
+        self.logger.metric("File",file_name)
 
         return df_bronze
             

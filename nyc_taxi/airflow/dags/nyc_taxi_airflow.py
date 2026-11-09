@@ -26,6 +26,3 @@ with DAG(
         task_id="run_nyc_taxi_pipeline",
         python_callable=run_nyc_taxi_pipeline,
     )
-
-
-

@@ -1,0 +1,2 @@
+
+ALTER PARTITION FUNCTION {FunctionName}() SPLIT RANGE ({Range}) ;

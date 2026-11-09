@@ -365,22 +365,26 @@ class CatalogManager:
             """
         )
 
-
     def table_exists(
-        self,
-        catalog_name: str,
-        schema_name: str,
-        table_name: str
+            self,
+            catalog_name: str,
+            schema_name: str,
+            table_name: str
     ) -> bool:
-        full_name = self.get_table_name(
+
+        schema_full_name = self.get_schema_name(
             schema_name=schema_name,
-            table_name=table_name,
             catalog_name=catalog_name
         )
-        return self.spark.catalog.tableExists(
-            full_name
-        )
 
+        tables = self.spark.sql(
+            f"SHOW TABLES IN {schema_full_name}"
+        ).collect()
+
+        return any(
+            row.tableName == table_name
+            for row in tables
+        )
 
     def rename_table(
         self,
@@ -527,8 +531,10 @@ class CatalogManager:
                 )
 
                 # 2. Vérifier si la table est déjà enregistrée
-                exists = self.spark.catalog.tableExists(
-                    f"{schema_name}.{table_name}"
+                exists = self.table_exists(
+                    catalog_name="nyc_taxi",
+                    schema_name=schema_name,
+                    table_name=table_name
                 )
 
                 if exists:

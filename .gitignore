@@ -64,4 +64,17 @@ nyc_taxi/airflow/logs/
 nyc_taxi/docs/regle.md
 nyc_taxi/verification_wheel/
 
-ote.md
+note.md
+
+# ============================================================
+# Checkpoints Jupyter
+# ============================================================
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# ============================================================
+# Log temporaire
+# ============================================================
+erreur_pipeline.txt
+/docs/
+/powershell/

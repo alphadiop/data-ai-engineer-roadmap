@@ -10,8 +10,7 @@ from nyc_taxi.src.common.spark_environment_logger import (
 
 class SparkManager:
     """
-    Gestionnaire de SparkSession pour l'environnement local
-    et Databricks.
+    Gestionnaire de SparkSession pour l'environnement local et Databricks.
     """
 
     def __init__(
@@ -47,7 +46,7 @@ class SparkManager:
         #
         # print("SQL Server JDBC JAR =", sqlserver_jdbc_jar)
 
-        # ==========================================================
+        # ======================================================================
         # LOCAL
         # ==========================================================
         builder = (

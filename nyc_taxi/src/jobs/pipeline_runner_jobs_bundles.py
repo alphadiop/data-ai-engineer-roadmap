@@ -42,7 +42,7 @@ class PipelineRunner:
             env,
             taxi_type="yellow",
             periode=None,
-            logger=None,
+            logger: PipelineLogger | None = None,
             steps=None
     ):
         self.spark = spark
@@ -87,54 +87,60 @@ class PipelineRunner:
             "PIPELINE INITIALIZATION"
         )
 
+        # Construire le contexte
         context = self._build_context()
 
+        # Initialiser l'environnement avant d'accéder aux tables
         self.environment_setup.run(context)
-
-        self.logger.success(
-            "Environment ready"
-        )
-
-        self.logger.separator(
-            "ENVIRONMENT CHECK"
-        )
-
-        self.logger.metric(
-            "audit.audit_load",
-            self.spark.catalog.tableExists("audit.audit_load")
-        )
-
-        self.logger.metric(
-            "audit.audit_row_count",
-            self.spark.catalog.tableExists("audit.audit_row_count")
-        )
+        self.logger.success("Environment ready")
 
         # ==========================================================
         # DÉTERMINATION DE LA PÉRIODE
         # ==========================================================
-
         self._determine_period()
+
+        # Mettre à jour la période dans le contexte
+        context.periode = int(self.periode)
+
+        # ==========================================================
+        # VERIFICATION DES TABLES D'AUDIT
+        # ==========================================================
+
+        self.logger.separator("ENVIRONMENT CHECK")
+
+        audit_load_table = self.catalog_manager.audit_load()
+        audit_row_count_table = self.catalog_manager.audit_row_count()
+
+        self.logger.metric(
+            "audit.audit_load",
+            self.catalog_manager.table_exists(
+                catalog_name="nyc_taxi",
+                schema_name="audit",
+                table_name="audit_load"
+            )
+        )
+
+        self.logger.metric(
+            "audit.audit_row_count",
+            self.catalog_manager.table_exists(
+                catalog_name="nyc_taxi",
+                schema_name="audit",
+                table_name="audit_row_count"
+            )
+        )
 
         # ==========================================================
         # CONTRÔLE : PÉRIODE DÉJÀ CHARGÉE
         # ==========================================================
-
-        self.logger.subsection(
-            "LOAD CONTROL"
-        )
-
+        self.logger.subsection("LOAD CONTROL")
         self._check_already_loaded(context)
 
         # ==========================================================
         # EXÉCUTION DU PIPELINE
         # ==========================================================
-
-        self.logger.separator(
-            "PIPELINE EXECUTION"
-        )
+        self.logger.separator("PIPELINE EXECUTION")
 
         try:
-
             self._execute_steps(context)
 
             # Toutes les étapes ont réussi
@@ -326,7 +332,8 @@ class PipelineRunner:
 
             self.periode = self.audit_manager.get_next_period(
                 table_name="silver_nyc_taxi",
-                taxi_type=self.taxi_type
+                taxi_type=self.taxi_type,
+                env=self.env
             )
 
             self.logger.info(
@@ -355,7 +362,9 @@ class PipelineRunner:
 
         context.env = self.env
         context.taxi_type = self.taxi_type
-        context.periode = int(self.periode)
+
+        if self.periode is not None:
+            context.periode = int(self.periode)
 
         context.run_id = int(datetime.now().timestamp())
         context.start_time = datetime.now()

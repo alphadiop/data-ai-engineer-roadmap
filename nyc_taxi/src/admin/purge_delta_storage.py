@@ -27,6 +27,7 @@ class PurgeDeltaStorage:
     TABLES = [
         "audit.audit_load",
         "audit.audit_row_count",
+        "audit.silver_rejected_rows"
         "silver.silver_nyc_taxi",
         "gold.gold_fact_trips",
         "ref.dim_date",
