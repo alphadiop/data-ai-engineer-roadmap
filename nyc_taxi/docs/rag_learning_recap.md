@@ -131,7 +131,7 @@ Cette modification évite un chargement inutile sans changer le principe de la r
 
 ## 8. Test de recherche
 
-Le script `nyc_taxi/test_rag_search.py` teste la question suivante :
+Le script `../../scripts` teste la question suivante :
 
 « Quelle formule SQL permet de calculer les revenus des courses ? »
 
@@ -380,7 +380,7 @@ Le fichier de roadmap a été exclu.
 
 ### Test 2 — Vérification des chunks
 
-Un script `nyc_taxi/check_rag_chunks.py` permet d'examiner les documents et les chunks produits.
+Un script `../../scripts` permet d'examiner les documents et les chunks produits.
 
 Il a notamment permis de vérifier que le passage métier consacré au chiffre d'affaires est bien présent dans `data_model.md`.
 
@@ -388,7 +388,7 @@ Le découpeur conserve désormais les paragraphes entiers, ce qui améliore la c
 
 ### Test 3 — Recherche du chiffre d'affaires
 
-Script de test : `nyc_taxi/test_rag_search.py`
+Script de test : `../../scripts`
 
 Question initiale :
 

@@ -1,0 +1,2 @@
+
+ALTER TABLE {Table} DROP COLUMN {Column};

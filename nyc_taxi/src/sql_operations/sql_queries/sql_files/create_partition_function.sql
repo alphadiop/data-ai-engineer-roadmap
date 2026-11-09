@@ -1,0 +1,2 @@
+
+CREATE PARTITION FUNCTION [{NameFunction}](int) AS RANGE LEFT FOR VALUES ({Values}) ;

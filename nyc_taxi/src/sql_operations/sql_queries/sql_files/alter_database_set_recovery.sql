@@ -1,0 +1,2 @@
+
+ALTER DATABASE {Base} SET RECOVERY {Option};

@@ -80,8 +80,8 @@ Si les documents ne suffisent pas, la réponse attendue doit indiquer clairement
 ## 7. Scripts de test
 
 Les scripts de test connus comprennent :
-- `test_rag_search.py` : teste la recherche de passages et affiche les sources et scores ;
-- `test_rag_answer.py` : enchaîne la recherche et la génération par Ollama.
+- `run_rag_search.py` : teste la recherche de passages et affiche les sources et scores ;
+- `run_rag_answer.py` : enchaîne la recherche et la génération par Ollama.
 
 Les questions de test couvrent notamment :
 - la formule SQL utilisant `COUNT(*)` ;

@@ -14,7 +14,7 @@ Le système doit :
 
 - **Projet :** `D:\data-ai-engineer-roadmap`
 - **Environnement Python :** `D:\conda_envs\spark_local`
-- **Script testé :** `nyc_taxi/test_rag_answer.py`
+- **Script testé :** `../../scripts`
 - **Modèle d'embeddings :** Sentence Transformers
 - **Index vectoriel :** FAISS
 - **LLM :** Qwen 2.5 3B via Ollama

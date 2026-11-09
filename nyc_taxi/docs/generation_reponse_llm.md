@@ -25,13 +25,13 @@ Les composants développés comprennent :
 - `text_splitter.py` : découpage des documents en passages.
 - `embedding_model.py` : création des embeddings.
 - `embedding_index.py` : recherche des passages pertinents avec FAISS.
-- `test_rag_search.py` : test de la recherche documentaire.
+- `run_rag_search.py` : test de la recherche documentaire.
 
 Les documents retrouvés comprennent notamment `data_model.md`, `architecture.md`, `powerbi_dashboard.md`, `powerbi_dashboard_rag_ameliore.md` et des fichiers de récapitulation.
 
 ## 4. Intégration du LLM
 
-Le fichier `nyc_taxi/test_rag_answer.py` combine désormais la recherche FAISS et la génération de réponses par Qwen.
+Le fichier `../../scripts` combine désormais la recherche FAISS et la génération de réponses par Qwen.
 
 Le traitement est le suivant :
 1. Recevoir une question.
@@ -78,7 +78,7 @@ Le système doit :
 
 - **Projet :** `D:\data-ai-engineer-roadmap`
 - **Environnement Python :** `D:\conda_envs\spark_local`
-- **Script testé :** `nyc_taxi/test_rag_answer.py`
+- **Script testé :** `../../scripts`
 - **Modèle d'embeddings :** Sentence Transformers
 - **Index vectoriel :** FAISS
 - **LLM :** Qwen 2.5 3B via Ollama
