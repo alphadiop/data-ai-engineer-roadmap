@@ -113,12 +113,20 @@ class PipelineRunner:
 
         self.logger.metric(
             "audit.audit_load",
-            self.spark.catalog.tableExists(audit_load_table)
+            self.catalog_manager.table_exists(
+                catalog_name="nyc_taxi",
+                schema_name="audit",
+                table_name="audit_load"
+            )
         )
 
         self.logger.metric(
             "audit.audit_row_count",
-            self.spark.catalog.tableExists(audit_row_count_table)
+            self.catalog_manager.table_exists(
+                catalog_name="nyc_taxi",
+                schema_name="audit",
+                table_name="audit_row_count"
+            )
         )
 
         # ==========================================================

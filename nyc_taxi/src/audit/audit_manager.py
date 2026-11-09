@@ -31,7 +31,11 @@ class AuditManager:
         self.logger.metric("Table", context.table_name)
         self.logger.metric("Taxi type", context.taxi_type)
 
-        if not self.spark.catalog.tableExists(audit_table):
+        if not catalog_manager.table_exists(
+                catalog_name="nyc_taxi",
+                schema_name="audit",
+                table_name="audit_load"
+        ):
             self.logger.info(
                 f"Audit table inexistante : {audit_table}"
             )

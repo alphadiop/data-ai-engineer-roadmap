@@ -57,7 +57,7 @@ class EnvironmentSetup(PipelineStep):
         )
 
     @log_execution
-    def run(self,context):
+    def run(self, context):
 
         self.logger.separator(
             "ENVIRONMENT SETUP"
@@ -67,39 +67,53 @@ class EnvironmentSetup(PipelineStep):
             context.config["path_sql_schema"]
         )
 
+        # ======================================================
+        # 1. CREATION DU CATALOGUE ET DES SCHEMAS
+        # ======================================================
+
+        self.create_catalog(
+            context.config
+        )
+
+        self.create_schemas()
+
+        # ======================================================
+        # 2. VERIFICATION DES TABLES
+        # ======================================================
+
         if self.environment_exists():
 
             self.logger.success(
                 "Environment already initialized"
             )
 
-            if self.env == "local":
-                self.repair_metastore()
-            return
+        else:
 
-        self.logger.separator(
-            "ENVIRONMENT INITIALIZATION"
-        )
+            self.logger.separator(
+                "ENVIRONMENT INITIALIZATION"
+            )
 
-        self.create_catalog(
-            context.config
-        )
-        self.create_schemas()
+            self.create_tables(
+                config=context.config,
+                taxi_type=context.taxi_type
+            )
 
-        self.create_tables(
-            config=context.config,
-            taxi_type=context.taxi_type
-        )
+            self.logger.success(
+                "Missing tables initialized"
+            )
 
-        # ----------------------------------------------------------
-        # Metastore
-        # ----------------------------------------------------------
+        # ======================================================
+        # 3. REPARATION DU METASTORE LOCAL / DOCKER
+        # ======================================================
+
         if self.env in ("local", "docker"):
             self.repair_metastore()
 
         self.logger.success(
-            "Environment initialization completed"
+            "Environment setup completed"
         )
+
+
 
 
     def environment_exists(self):
@@ -113,6 +127,7 @@ class EnvironmentSetup(PipelineStep):
         ]
 
         for schema_name, table_name in required_tables:
+
             full_table_name = (
                 self.catalog_manager.get_table_name(
                     schema_name=schema_name,
@@ -125,15 +140,17 @@ class EnvironmentSetup(PipelineStep):
                 full_table_name
             )
 
-
-            if not self.spark.catalog.tableExists(
-                    full_table_name
+            if not self.catalog_manager.table_exists(
+                    catalog_name="nyc_taxi",
+                    schema_name=schema_name,
+                    table_name=table_name
             ):
                 self.logger.warning(
                     f"Missing table : {full_table_name}"
                 )
                 return False
         return True
+
 
 
     def create_catalog(self, config):
@@ -167,8 +184,7 @@ class EnvironmentSetup(PipelineStep):
             ("gold", "gold_fact_trips", "periode"),
             ("gold", "gold_kpi_daily", "periode"),
 
-            ("ref", "dim_date", None),
-            ("ref", "ref_dim_location", None)
+            ("ref", "dim_date", None)
         ]
 
         for schema_name, table_name, partition_by in tables:

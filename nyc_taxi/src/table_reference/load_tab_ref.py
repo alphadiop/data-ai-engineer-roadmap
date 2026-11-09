@@ -54,7 +54,11 @@ class ReferenceDataLoader(PipelineStep):
         # VERIFICATION : TABLE DEJA EXISTANTE
         # ======================================================
 
-        if self.spark.catalog.tableExists(full_table_name):
+        if self.catalog_manager.table_exists(
+                catalog_name="nyc_taxi",
+                schema_name=schema_name,
+                table_name=table_name
+        ):
 
             self.logger.info(
                 f"Table {full_table_name} existe déjà."
