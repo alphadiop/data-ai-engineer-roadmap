@@ -25,31 +25,22 @@ for package in src_packages:
     ] = f"src/{package.replace('.', '/')}"
 
 # Dépendances obligatoires du pipeline
+
 install_requires = [
     "PyYAML>=6.0",
-    "pyspark==3.5.1",
-    "delta-spark==3.2.0",
     "sqlparse>=0.5.5",
 ]
 
-# Dépendances des fonctionnalités complémentaires
 extras_require = {
-    "sql": [
-        "pandas",
-        "dask[dataframe]",
-        "polars",
-        "SQLAlchemy",
-        "tabulate",
+    "local": [
+        "pyspark==3.5.1",
+        "delta-spark==3.2.0",
     ],
-    "rag": [
-        "numpy",
-        "faiss-cpu",
-        "sentence-transformers",
-    ],
-    "dev": [
-        "pytest",
-    ],
+    "sql": ["pandas", "dask[dataframe]", "polars", "SQLAlchemy", "tabulate"],
+    "rag": ["numpy", "faiss-cpu", "sentence-transformers"],
+    "dev": ["pytest"],
 }
+
 
 setup(
     name="nyc_taxi",
@@ -57,9 +48,7 @@ setup(
     packages=mapped_packages,
     package_dir=package_dir,
     package_data={
-        "nyc_taxi.config": [
-            "*.yaml",
-        ],
+        "nyc_taxi.config": ["*.yaml",],
         "nyc_taxi.src.sql_operations": [
             "sql_queries/*.json",
             "sql_queries/sql_files/*.sql",
