@@ -98,28 +98,63 @@ class CatalogManager:
         return f"{catalog_name}.{schema_name}"
 
 
+
     def create_catalog(self, catalog_name: str):
-        self.logger.info(f"ENV = {self.env}")
+        self.logger.info(
+            f"[DEBUG 1] Début create_catalog | ENV={self.env}"
+        )
 
         if self.env in ("local", "docker"):
-
             self.logger.info(
-                f"Mode local : catalog {catalog_name} ignoré"
+                f"[DEBUG 2] Mode local : catalogue {catalog_name} ignoré"
             )
             return
 
-        self.spark.sql(
-            f"CREATE CATALOG IF NOT EXISTS {catalog_name}"
+        self.logger.info(
+            "[DEBUG 3] Exécution de SHOW CATALOGS"
         )
 
+        exists = self.catalog_exists(catalog_name)
 
+        self.logger.info(
+            f"[DEBUG 4] Catalogue demandé : {catalog_name} | Existe : {exists}"
+        )
+
+        self.logger.info(
+            f"[DEBUG 5] Exécution de CREATE CATALOG IF NOT EXISTS {catalog_name}"
+        )
+
+        try:
+            self.spark.sql(
+                f"CREATE CATALOG IF NOT EXISTS {catalog_name}"
+            )
+
+            self.logger.info(
+                "[DEBUG 6] Requête CREATE CATALOG exécutée"
+            )
+
+        except Exception as exc:
+            self.logger.error(
+                f"[DEBUG ERREUR] Échec création catalogue {catalog_name} : {exc}"
+            )
+            raise
 
     def catalog_exists(self, catalog_name: str) -> bool:
         catalogs = [
             row.catalog
             for row in self.spark.sql("SHOW CATALOGS").collect()
         ]
-        return catalog_name in catalogs
+
+        exists = catalog_name in catalogs
+
+        self.logger.info(
+            f"Vérification du catalogue : {catalog_name} | Existe : {exists}"
+        )
+
+        return exists
+
+
+
 
 
     def rename_catalog(self, old_catalog: str, new_catalog: str):
