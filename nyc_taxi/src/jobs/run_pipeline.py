@@ -18,7 +18,6 @@ def run_pipeline(
     from nyc_taxi.src.spark.spark_manager import SparkManager
     from nyc_taxi.src.logger.logger import PipelineLogger
 
-    from nyc_taxi.src.setup.environment_setup import EnvironmentSetup
     from nyc_taxi.src.table_reference.load_tab_ref import ReferenceDataLoader
     from nyc_taxi.src.bronze.uber_bronze import UberBronze
     from nyc_taxi.src.silver.uber_silver import UberSilver
@@ -59,7 +58,6 @@ def run_pipeline(
     # Étapes du pipeline
     # ============================================================
     steps = [
-        EnvironmentSetup(spark=spark,env=env,logger=logger),
         ReferenceDataLoader(spark=spark,env=env,logger=logger),
         UberBronze(spark=spark,logger=logger),
         UberSilver(spark=spark,logger=logger),
@@ -90,7 +88,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser()
-
+    
     parser.add_argument(
         "--env",
         choices=["local", "docker", "databricks"],
