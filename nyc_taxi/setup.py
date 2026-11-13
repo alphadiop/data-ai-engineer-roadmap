@@ -27,11 +27,8 @@ for package in src_packages:
 # Dépendances obligatoires du pipeline
 install_requires = [
     "PyYAML>=6.0",
-    "pyspark==3.5.1",
-    "delta-spark==3.2.0",
     "sqlparse>=0.5.5",
 ]
-
 # Dépendances des fonctionnalités complémentaires
 extras_require = {
     "sql": [
