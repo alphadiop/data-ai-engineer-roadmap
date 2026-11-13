@@ -36,7 +36,33 @@ class SparkManager:
         # DATBRICKS
         # ==========================================================
         if self.env == "databricks":
-            return SparkSession.getActiveSession()
+
+            self.logger.info(
+                "Diagnostic Spark : récupération de la session active"
+            )
+
+            spark = SparkSession.getActiveSession()
+
+            self.logger.info(
+                f"Diagnostic Spark : session = {spark}"
+            )
+
+            self.logger.info(
+                f"Diagnostic Spark : type = {type(spark)}"
+            )
+
+            if spark is not None:
+                try:
+                    self.logger.info(
+                        f"Diagnostic Spark : version = {spark.version}"
+                    )
+                except Exception as exc:
+                    self.logger.error(
+                        f"Diagnostic Spark : accès version impossible : {exc}"
+                    )
+                    raise
+
+            return spark
 
         # sqlserver_jdbc_jar = (
         #         "file:///"
@@ -45,7 +71,6 @@ class SparkManager:
         # )
         #
         # print("SQL Server JDBC JAR =", sqlserver_jdbc_jar)
-
         # ======================================================================
         # LOCAL
         # ==========================================================
