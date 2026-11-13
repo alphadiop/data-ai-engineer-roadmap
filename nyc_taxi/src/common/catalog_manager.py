@@ -97,20 +97,44 @@ class CatalogManager:
             return schema_name
         return f"{catalog_name}.{schema_name}"
 
-
     def create_catalog(self, catalog_name: str):
-        self.logger.info(f"ENV = {self.env}")
+
+        self.logger.info(
+            f"Début create_catalog | ENV={self.env}"
+        )
 
         if self.env in ("local", "docker"):
-
             self.logger.info(
-                f"Mode local : catalog {catalog_name} ignoré"
+                f"Mode local : catalogue {catalog_name} ignoré"
             )
             return
 
-        self.spark.sql(
-            f"CREATE CATALOG IF NOT EXISTS {catalog_name}"
+        exists = self.catalog_exists(catalog_name)
+
+        if exists:
+            self.logger.info(
+                f"Catalogue {catalog_name} déjà existant : création ignorée"
+            )
+            return
+
+        self.logger.info(
+            f"Création du catalogue {catalog_name}"
         )
+
+        try:
+            self.spark.sql(
+                f"CREATE CATALOG {catalog_name}"
+            )
+
+            self.logger.success(
+                f"Catalogue {catalog_name} créé"
+            )
+
+        except Exception as exc:
+            self.logger.error(
+                f"Échec création catalogue {catalog_name} : {exc}"
+            )
+            raise
 
 
 
@@ -119,7 +143,17 @@ class CatalogManager:
             row.catalog
             for row in self.spark.sql("SHOW CATALOGS").collect()
         ]
-        return catalog_name in catalogs
+
+        exists = catalog_name in catalogs
+
+        self.logger.info(
+            f"Vérification du catalogue : {catalog_name} | Existe : {exists}"
+        )
+
+        return exists
+
+
+
 
 
     def rename_catalog(self, old_catalog: str, new_catalog: str):
