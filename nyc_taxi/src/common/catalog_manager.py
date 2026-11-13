@@ -136,23 +136,19 @@ class CatalogManager:
             )
             raise
 
-
-
     def catalog_exists(self, catalog_name: str) -> bool:
-        catalogs = [
-            row.catalog
-            for row in self.spark.sql("SHOW CATALOGS").collect()
-        ]
+        catalogs = self.spark.catalog.listCatalogs()
 
-        exists = catalog_name in catalogs
+        exists = any(
+            catalog.name == catalog_name
+            for catalog in catalogs
+        )
 
         self.logger.info(
             f"Vérification du catalogue : {catalog_name} | Existe : {exists}"
         )
 
         return exists
-
-
 
 
 
